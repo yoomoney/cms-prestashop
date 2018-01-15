@@ -24,7 +24,6 @@ class WalletModel extends AbstractPaymentModel
         $this->applicationId = Configuration::get('YA_WALLET_APPLICATION_ID');
         $this->password = Configuration::get('YA_WALLET_PASSWORD');
         $this->minAmount = Configuration::get('YA_WALLET_MIN_AMOUNT');
-
         $this->paymentActionController = 'redirectwallet';
     }
 
@@ -80,6 +79,7 @@ class WalletModel extends AbstractPaymentModel
             $this->password = trim(Tools::getValue('YA_WALLET_PASSWORD'));
             Configuration::UpdateValue('YA_WALLET_PASSWORD', $this->password);
         }
+        Configuration::UpdateValue('YA_WALLET_LOGGING_ON', Tools::getValue('YA_WALLET_LOGGING_ON'));
 
         $this->minAmount = (float)Tools::getValue('YA_WALLET_MIN_AMOUNT');
         Configuration::UpdateValue('YA_KASSA_SEND_RECEIPT', $this->minAmount);

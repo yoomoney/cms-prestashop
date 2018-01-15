@@ -12,8 +12,12 @@ use Tools;
 
 class MetricsModel extends AbstractModel
 {
+    private $valid;
+
     public function validateOptions()
     {
+        $this->valid = false;
+
         $errors = '';
         Configuration::UpdateValue('YA_METRICS_SET_WEBVIZOR', Tools::getValue('YA_METRICS_SET_WEBVIZOR'));
         Configuration::UpdateValue('YA_METRICS_SET_CLICKMAP', Tools::getValue('YA_METRICS_SET_CLICKMAP'));
@@ -50,8 +54,14 @@ class MetricsModel extends AbstractModel
 
         if ($errors == '') {
             $errors = $this->module->displayConfirmation($this->module->l('Settings saved successfully!'));
+            $this->valid = true;
         }
         return $errors;
+    }
+
+    public function isValid()
+    {
+        return $this->valid;
     }
 
     public function initConfiguration()
@@ -62,6 +72,7 @@ class MetricsModel extends AbstractModel
     {
         $m = new \YandexMoneyModule\Metrics();
         $response = $m->run();
+
         $data = array(
             'YA_METRICS_CART' =>  array(
                 'name' => 'YA_METRICS_CART',
@@ -118,7 +129,7 @@ class MetricsModel extends AbstractModel
                 $otvet = $m->editCounter();
                 if ($otvet->counter->id != Configuration::get('YA_METRICS_NUMBER')) {
                     $error .= $this->displayError(
-                        $this->l(
+                        $this->module->l(
                             'Saving the settings the meter is not the meter number is incorrect.'
                         )
                     );
@@ -146,7 +157,7 @@ class MetricsModel extends AbstractModel
             }
         } else {
             $error .= $this->module->displayError(
-                $this->l(
+                $this->module->l(
                     'The token for authorization is missing! Get the token and repeat!'
                 )
             );
@@ -154,7 +165,7 @@ class MetricsModel extends AbstractModel
 
         if ($error == '') {
             return $this->module->displayConfirmation(
-                $this->l(
+                $this->module->l(
                     'Data was successfully sent and saved! Code metrici updated pages automatically.'
                 )
             );

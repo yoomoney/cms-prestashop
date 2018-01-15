@@ -305,13 +305,19 @@ class KassaModel extends AbstractPaymentModel
             if ($isShopIdValid) {
                 if (!$this->testConnection()) {
                     $errors .= $this->module->displayError(
-                        'Проверьте shopId и Секретное слово — где-то есть ошибка. А лучше скопируйте их прямо из '
+                        'Проверьте shopId и Секретный ключ — где-то есть ошибка. А лучше скопируйте их прямо из '
                         . '<a href="https://kassa.yandex.ru/my" target="_blank">личного кабинета Яндекс.Кассы</a>'
                     );
                     if ($this->enabled) {
                         $this->enabled = false;
                         Configuration::UpdateValue('YA_KASSA_ACTIVE', 0);
                     }
+                } elseif (strncmp('test_', Tools::getValue('YA_KASSA_PASSWORD'), 5) === 0) {
+                    $errors .= $this->module->displayWarning(
+                        'Вы включили тестовый режим приема платежей. Проверьте, как проходит оплата, и напишите '
+                        . 'менеджеру Кассы. Он выдаст рабочие shopId и Секретный ключ. '
+                        . '<a href="https://yandex.ru/support/checkout/payments/api.html#api__04" target="_blank">Инструкция</a>'
+                    );
                 }
             }
         }

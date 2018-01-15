@@ -128,7 +128,7 @@ class YandexModule extends PaymentModule
 
         $this->name = 'yandexmodule';
         $this->tab = 'payments_gateways';
-        $this->version = '1.0.1';
+        $this->version = '1.0.2';
         $this->author = 'Яндекс.Деньги';
         $this->need_instance = 1;
         $this->bootstrap = 1;
@@ -624,6 +624,7 @@ class YandexModule extends PaymentModule
 
         if (Tools::isSubmit('submitmetrikaModule')) {
             $this->metrics_status = $this->getMetricsModel()->validateOptions();
+            $this->metrika_valid = $this->getMetricsModel()->isValid();
             if ($this->metrika_valid && Configuration::get('YA_METRICS_ACTIVE')) {
                 $this->getMetricsModel()->sendData();
             } elseif ($this->metrika_valid && !Configuration::get('YA_METRICS_ACTIVE')) {
@@ -739,7 +740,7 @@ class YandexModule extends PaymentModule
             'YA_METRICS_NUMBER',
             'YA_METRICS_CELI_CART',
             'YA_METRICS_CELI_ORDER',
-            'YA_METRICS_CELI_WISHLIST'
+            'YA_METRICS_CELI_WISHLIST',
         ));
         $vars_billing = array(
             'billing' => $this->getBillingModel(),
@@ -797,9 +798,10 @@ class YandexModule extends PaymentModule
             " в <a href='https://money.yandex.ru/joinups' target='_blank'>личном кабинете</a>".
             " после подключения Яндекс.Кассы.";
         $vars_p2p['YA_WALLET_TEXT_INSIDE'] = "ID и секретное слово вы получите после".
-            " <a href='https://sp-money.yandex.ru/myservices/new.xml'".
-            " target='_blank'>регистрации приложения</a>".
+            " <a href=\"https://sp-money.yandex.ru/myservices/new.xml\"".
+            " target=\"_blank\">регистрации приложения</a>".
             " на сайте Яндекс.Денег";
+        $vars_p2p['YA_WALLET_LOGGING_ON'] = Configuration::get('YA_WALLET_LOGGING_ON');
         $this->context->smarty->assign(array(
             'ya_version' => $this->version,
             'orders_link' => $this->context->link->getAdminLink('AdminOrders', false)
@@ -1367,7 +1369,7 @@ class YandexModule extends PaymentModule
         $httpsBasePath = str_replace('http://', 'https://', _PS_BASE_URL_.__PS_BASE_URI__);
         $api_market_orders = $httpsBasePath . 'yandexmodule/marketorders';
         $redir = $httpsBasePath . 'modules/yandexmodule/callback.php';
-        $market_list = $this->context->link->getModuleLink($this->name, 'generate');
+        $market_list = str_replace('http://', 'https://', $this->context->link->getModuleLink($this->name, 'generate'));
         $helper->fields_value['YA_MARKET_YML'] = $market_list;
         $helper->fields_value['YA_WALLET_REDIRECT'] = $p2p_redirect;
         $helper->fields_value['YA_MARKET_ORDERS_APISHOP'] = $api_market_orders;
