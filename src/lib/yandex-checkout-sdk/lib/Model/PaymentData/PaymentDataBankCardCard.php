@@ -1,19 +1,45 @@
 <?php
 
-namespace YaMoney\Model\PaymentData;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Common\AbstractObject;
-use YaMoney\Common\Exceptions\EmptyPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueTypeException;
-use YaMoney\Helpers\TypeCast;
+namespace YandexCheckout\Model\PaymentData;
+
+use YandexCheckout\Common\AbstractObject;
+use YandexCheckout\Common\Exceptions\EmptyPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueTypeException;
+use YandexCheckout\Helpers\TypeCast;
 
 /**
  * Данные банковской карты
  * Необходим при оплате PCI-DSS данными.
  * @property string $number Номер банковской карты
  * @property string $expiryYear Срок действия, год, YY
+ * @property string $expiry_year Срок действия, год, YY
  * @property string $expiryMonth Срок действия, месяц, MM
+ * @property string $expiry_month Срок действия, месяц, MM
  * @property string $csc CVV2/CVC2 код
  * @property string $cardholder Имя держателя карты
  */

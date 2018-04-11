@@ -1,36 +1,66 @@
 <?php
 
-namespace YaMoney\Model;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Common\AbstractObject;
-use YaMoney\Common\Exceptions\EmptyPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueTypeException;
-use YaMoney\Helpers\TypeCast;
-use YaMoney\Model\PaymentMethod\AbstractPaymentMethod;
+namespace YandexCheckout\Model;
+
+use YandexCheckout\Common\AbstractObject;
+use YandexCheckout\Common\Exceptions\EmptyPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueTypeException;
+use YandexCheckout\Helpers\TypeCast;
+use YandexCheckout\Model\PaymentMethod\AbstractPaymentMethod;
 
 /**
  * Payment - Данные о платеже
  *
  * @property string $id Идентификатор платежа
  * @property string $status Текущее состояние платежа
- * @property PaymentErrorInterface $error Описание ошибки, возникшей при проведении платежа
  * @property RecipientInterface $recipient  Получатель платежа
  * @property AmountInterface $amount Сумма заказа
+ * @property string $description Описание транзакци
  * @property AbstractPaymentMethod $paymentMethod Способ проведения платежа
- * @property string $referenceId Идентификатор заказа
+ * @property AbstractPaymentMethod $payment_method Способ проведения платежа
  * @property \DateTime $createdAt Время создания заказа
+ * @property \DateTime $created_at Время создания заказа
  * @property \DateTime $capturedAt Время подтверждения платежа магазином
+ * @property \DateTime $captured_at Время подтверждения платежа магазином
+ * @property \DateTime $expiresAt Время, до которого можно бесплатно отменить или подтвердить платеж
+ * @property \DateTime $expires_at Время, до которого можно бесплатно отменить или подтвердить платеж
  * @property Confirmation\AbstractConfirmation $confirmation Способ подтверждения платежа
- * @property AmountInterface $charge Сумма к оплате покупателем
- * @property AmountInterface $income Сумма к получению магазином
  * @property AmountInterface $refundedAmount Сумма возвращенных средств платежа
+ * @property AmountInterface $refunded_amount Сумма возвращенных средств платежа
  * @property bool $paid Признак оплаты заказа
  * @property string $receiptRegistration Состояние регистрации фискального чека
+ * @property string $receipt_registration Состояние регистрации фискального чека
  * @property Metadata $metadata Метаданные платежа указанные мерчантом
  */
 class Payment extends AbstractObject implements PaymentInterface
 {
+    const MAX_LENGTH_DESCRIPTION = 128;
+
     /**
      * @var string Идентификатор платежа
      */
@@ -42,11 +72,6 @@ class Payment extends AbstractObject implements PaymentInterface
     private $_status;
 
     /**
-     * @var PaymentErrorInterface|null Описание ошибки, возникшей при проведении платежа
-     */
-    private $_error;
-
-    /**
      * @var RecipientInterface|null Получатель платежа
      */
     private $_recipient;
@@ -55,6 +80,11 @@ class Payment extends AbstractObject implements PaymentInterface
      * @var AmountInterface
      */
     private $_amount;
+
+    /**
+     * @var string
+     */
+    private $_description;
 
     /**
      * @var AbstractPaymentMethod Способ проведения платежа
@@ -95,6 +125,15 @@ class Payment extends AbstractObject implements PaymentInterface
      * @var Metadata Метаданные платежа указанные мерчантом
      */
     private $_metadata;
+
+    /**
+     * Время, до которого можно бесплатно отменить или подтвердить платеж. В указанное время платеж в статусе
+     * `waiting_for_capture` будет автоматически отменен.
+     *
+     * @var \DateTime Время, до которого можно бесплатно отменить или подтвердить платеж
+     * @since 1.0.2
+     */
+    private $_expiresAt;
 
     /**
      * Возвращает идентификатор платежа
@@ -156,24 +195,6 @@ class Payment extends AbstractObject implements PaymentInterface
     }
 
     /**
-     * Возвращает описание ошибки, возникшей при проведении платежа
-     * @return PaymentErrorInterface|null Описание ошибки или null если ошибка не задана
-     */
-    public function getError()
-    {
-        return $this->_error;
-    }
-
-    /**
-     * Устанавливает описание ошибки
-     * @param PaymentErrorInterface $value Инстанс объекта с описанием ошибки
-     */
-    public function setError(PaymentErrorInterface $value)
-    {
-        $this->_error = $value;
-    }
-
-    /**
      * Возвращает получателя платежа
      * @return RecipientInterface|null Получатель платежа или null если получатель не задан
      */
@@ -207,6 +228,41 @@ class Payment extends AbstractObject implements PaymentInterface
     public function setAmount(AmountInterface $value)
     {
         $this->_amount = $value;
+    }
+
+    /**
+     * Возвращает описание транзакции
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->_description;
+    }
+
+    /**
+     * Устанавливает описание транзакции
+     * @param string $value
+     *
+     * @throws InvalidPropertyValueException Выбрасывается если переданное значение превышает допустимую длину
+     * @throws InvalidPropertyValueTypeException Выбрасывается если переданное значение не является строкой
+     */
+    public function setDescription($value)
+    {
+        if ($value === null || $value === '') {
+            $this->_description = null;
+        } elseif (TypeCast::canCastToString($value)) {
+            $length = mb_strlen((string)$value, 'utf-8');
+            if ($length > self::MAX_LENGTH_DESCRIPTION) {
+                throw new InvalidPropertyValueException(
+                    'Invalid description value', 0, 'CreatePaymentRequest.description', $value
+                );
+            }
+            $this->_description = (string)$value;
+        } else {
+            throw new InvalidPropertyValueTypeException(
+                'Invalid description value type', 0, 'CreatePaymentRequest.description', $value
+            );
+        }
     }
 
     /**
@@ -407,5 +463,41 @@ class Payment extends AbstractObject implements PaymentInterface
     public function setMetadata(Metadata $value)
     {
         $this->_metadata = $value;
+    }
+
+    /**
+     * Возвращает время до которого можно бесплатно отменить или подтвердить платеж или null если оно не задано
+     * @return \DateTime|null Время, до которого можно бесплатно отменить или подтвердить платеж
+     *
+     * @since 1.0.2
+     */
+    public function getExpiresAt()
+    {
+        return $this->_expiresAt;
+    }
+
+    /**
+     * Устанавливает время до которого можно бесплатно отменить или подтвердить платеж
+     * @param \DateTime|string|int|null $value Время, до которого можно бесплатно отменить или подтвердить платеж
+     *
+     * @throws InvalidPropertyValueException Выбрасывается если передали строку, которую не удалось привести к дате
+     * @throws InvalidPropertyValueTypeException Выбрасывается если был передан аргумент, который невозможно
+     * интерпретировать как дату или время
+     *
+     * @since 1.0.2
+     */
+    public function setExpiresAt($value)
+    {
+        if ($value === null || $value === '') {
+            $this->_expiresAt = null;
+        } elseif (TypeCast::canCastToDateTime($value)) {
+            $dateTime = TypeCast::castToDateTime($value);
+            if ($dateTime === null) {
+                throw new InvalidPropertyValueException('Invalid expires_at value', 0, 'payment.expires_at', $value);
+            }
+            $this->_expiresAt = $dateTime;
+        } else {
+            throw new InvalidPropertyValueTypeException('Invalid expires_at value', 0, 'payment.expires_at', $value);
+        }
     }
 }

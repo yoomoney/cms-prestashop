@@ -1,40 +1,74 @@
 <?php
 
-namespace YaMoney\Request\Payments;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Common\AbstractRequest;
-use YaMoney\Common\Exceptions\InvalidPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueTypeException;
-use YaMoney\Helpers\TypeCast;
-use YaMoney\Model\AmountInterface;
-use YaMoney\Model\PaymentData\AbstractPaymentData;
-use YaMoney\Model\ConfirmationAttributes\AbstractConfirmationAttributes;
-use YaMoney\Model\Metadata;
-use YaMoney\Model\Receipt;
-use YaMoney\Model\ReceiptInterface;
-use YaMoney\Model\RecipientInterface;
+namespace YandexCheckout\Request\Payments;
+
+use YandexCheckout\Common\AbstractRequest;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueTypeException;
+use YandexCheckout\Helpers\TypeCast;
+use YandexCheckout\Model\AirlineInterface;
+use YandexCheckout\Model\AmountInterface;
+use YandexCheckout\Model\Payment;
+use YandexCheckout\Model\PaymentData\AbstractPaymentData;
+use YandexCheckout\Model\ConfirmationAttributes\AbstractConfirmationAttributes;
+use YandexCheckout\Model\Metadata;
+use YandexCheckout\Model\Receipt;
+use YandexCheckout\Model\ReceiptInterface;
+use YandexCheckout\Model\RecipientInterface;
 
 /**
  * Класс объекта запроса к API на проведение нового платежа
  *
- * @package YaMoney\Request\Payments
+ * @package YandexCheckout\Request\Payments
  *
  * @property RecipientInterface $recipient Получатель платежа, если задан
  * @property AmountInterface $amount Сумма создаваемого платежа
+ * @property string $description Описание транзакции
  * @property ReceiptInterface $receipt Данные фискального чека 54-ФЗ
- * @property string $referenceId Айди заказа на стороне мерчанта
  * @property string $paymentToken Одноразовый токен для проведения оплаты, сформированный Yandex.Checkout JS widget
+ * @property string $payment_token Одноразовый токен для проведения оплаты, сформированный Yandex.Checkout JS widget
  * @property string $paymentMethodId Идентификатор записи о сохраненных платежных данных покупателя
+ * @property string $payment_method_id Идентификатор записи о сохраненных платежных данных покупателя
  * @property AbstractPaymentData $paymentMethodData Данные используемые для создания метода оплаты
+ * @property AbstractPaymentData $payment_method_data Данные используемые для создания метода оплаты
  * @property AbstractConfirmationAttributes $confirmation Способ подтверждения платежа
  * @property bool $savePaymentMethod Сохранить платежные данные для последующего использования. Значение true
  * инициирует создание многоразового payment_method.
+ * @property bool $save_payment_method Сохранить платежные данные для последующего использования. Значение true
+ * инициирует создание многоразового payment_method.
  * @property bool $capture Автоматически принять поступившую оплату
  * @property string $clientIp IPv4 или IPv6-адрес покупателя. Если не указан, используется IP-адрес TCP-подключения.
+ * @property string $client_ip IPv4 или IPv6-адрес покупателя. Если не указан, используется IP-адрес TCP-подключения.
  * @property Metadata $metadata Метаданные привязанные к платежу
  */
 class CreatePaymentRequest extends AbstractRequest implements CreatePaymentRequestInterface
 {
+    const MAX_LENGTH_PAYMENT_TOKEN = 10240;
+
     /**
      * @var RecipientInterface Получатель платежа
      */
@@ -44,6 +78,11 @@ class CreatePaymentRequest extends AbstractRequest implements CreatePaymentReque
      * @var AmountInterface Сумма платежа
      */
     private $_amount;
+
+    /**
+     * @var string Описание транзакции
+     */
+    private $_description;
 
     /**
      * @var Receipt Данные фискального чека 54-ФЗ
@@ -85,6 +124,8 @@ class CreatePaymentRequest extends AbstractRequest implements CreatePaymentReque
      */
     private $_clientIp;
 
+    private $_airline;
+
     /**
      * @var Metadata Метаданные привязанные к платежу
      */
@@ -124,6 +165,50 @@ class CreatePaymentRequest extends AbstractRequest implements CreatePaymentReque
     public function setAmount(AmountInterface $value)
     {
         $this->_amount = $value;
+    }
+
+    /**
+     * Возвращает описание транзакции
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->_description;
+    }
+
+    /**
+     * Устанавливает описание транзакции
+     * @param string $value
+     *
+     * @throws InvalidPropertyValueException Выбрасывается если переданное значение превышает допустимую длину
+     * @throws InvalidPropertyValueTypeException Выбрасывается если переданное значение не является строкой
+     */
+    public function setDescription($value)
+    {
+        if ($value === null || $value === '') {
+            $this->_description = null;
+        } elseif (TypeCast::canCastToString($value)) {
+            $length = mb_strlen((string)$value, 'utf-8');
+            if ($length > Payment::MAX_LENGTH_DESCRIPTION) {
+                throw new InvalidPropertyValueException(
+                    'Invalid description value', 0, 'CreatePaymentRequest.description', $value
+                );
+            }
+            $this->_description = (string)$value;
+        } else {
+            throw new InvalidPropertyValueTypeException(
+                'Invalid description value type', 0, 'CreatePaymentRequest.description', $value
+            );
+        }
+    }
+
+    /**
+     * Проверяет наличие описания транзакции в создаваемом платеже
+     * @return bool True если описание транзакции есть, false если нет
+     */
+    public function hasDescription()
+    {
+        return $this->_description !== null;
     }
 
     /**
@@ -198,7 +283,7 @@ class CreatePaymentRequest extends AbstractRequest implements CreatePaymentReque
      * Устанавливает одноразовый токен для проведения оплаты, сформированный Yandex.Checkout JS widget
      * @param string $value Одноразовый токен для проведения оплаты
      *
-     * @throws InvalidPropertyValueException Выбрасывается если переданное значение длинее 200 символов
+     * @throws InvalidPropertyValueException Выбрасывается если переданное значение превышает допустимую длину
      * @throws InvalidPropertyValueTypeException Выбрасывается если переданное значение не является строкой
      */
     public function setPaymentToken($value)
@@ -207,7 +292,7 @@ class CreatePaymentRequest extends AbstractRequest implements CreatePaymentReque
             $this->_paymentToken = null;
         } elseif (TypeCast::canCastToString($value)) {
             $length = mb_strlen((string)$value, 'utf-8');
-            if ($length > 200) {
+            if ($length > self::MAX_LENGTH_PAYMENT_TOKEN) {
                 throw new InvalidPropertyValueException(
                     'Invalid paymentToken value', 0, 'CreatePaymentRequest.paymentToken', $value
                 );
@@ -456,6 +541,32 @@ class CreatePaymentRequest extends AbstractRequest implements CreatePaymentReque
     }
 
     /**
+     * @return AirlineInterface
+     */
+    public function getAirline()
+    {
+        return $this->_airline;
+    }
+
+
+    /**
+     * @param AirlineInterface $value
+     */
+    public function setAirline(AirlineInterface $value)
+    {
+        $this->_airline = $value;
+    }
+
+    /**
+     * Проверяет были ли установлены данные длинной записи
+     * @return bool
+     */
+    function hasAirline()
+    {
+        return $this->_airline !== null;
+    }
+
+    /**
      * Возвращает данные оплаты установленные мерчантом
      * @return Metadata Метаданные, привязанные к платежу
      */
@@ -475,7 +586,7 @@ class CreatePaymentRequest extends AbstractRequest implements CreatePaymentReque
 
     /**
      * Устанавливает метаданные, привязанные к платежу
-     * @param Metadata|null $value Метаданные платежа, устанавливаемые мерчантом
+     * @param Metadata|array|null $value Метаданные платежа, устанавливаемые мерчантом
      *
      * @throws InvalidPropertyValueTypeException Выбрасывается если переданные данные не удалось интерпретировать как
      * метаданные платежа
@@ -543,10 +654,7 @@ class CreatePaymentRequest extends AbstractRequest implements CreatePaymentReque
                 $this->setValidationError('Both paymentMethodID and paymentData values are specified');
                 return false;
             }
-        } /* elseif (!$this->hasPaymentMethodData()) {
-            $this->setValidationError('Payment method not specified, set paymentToken, paymentMethodID or paymentData');
-            return false;
-        }*/
+        }
         return true;
     }
 

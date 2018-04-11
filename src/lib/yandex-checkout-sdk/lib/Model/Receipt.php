@@ -1,16 +1,43 @@
 <?php
 
-namespace YaMoney\Model;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Common\AbstractObject;
-use YaMoney\Common\Exceptions\EmptyPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueTypeException;
-use YaMoney\Helpers\TypeCast;
+namespace YandexCheckout\Model;
+
+use YandexCheckout\Common\AbstractObject;
+use YandexCheckout\Common\Exceptions\EmptyPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueTypeException;
+use YandexCheckout\Helpers\TypeCast;
 
 /**
+ * Класс данных для формирования чека в онлайн-кассе (для соблюдения 54-ФЗ)
+ *
  * @property ReceiptItemInterface[] $items Список товаров в заказе
  * @property int $taxSystemCode Код системы налогообложения. Число 1-6.
+ * @property int $tax_system_code Код системы налогообложения. Число 1-6.
  * @property string $phone Номер телефона плательщика в формате ITU-T E.164 на который будет выслан чек.
  * @property string $email E-mail адрес плательщика на который будет выслан чек.
  */
@@ -42,6 +69,8 @@ class Receipt extends AbstractObject implements ReceiptInterface
     private $_email;
 
     /**
+     * Возврвщает список позиций в текущем чеке
+     *
      * @return ReceiptItemInterface[] Список товаров в заказе
      */
     public function getItems()
@@ -50,7 +79,17 @@ class Receipt extends AbstractObject implements ReceiptInterface
     }
 
     /**
-     * @param array $value Список товаров в заказе
+     * Устанавливает список позиций в чеке
+     *
+     * Если до этого в чеке уже были установлены значения, они удаляются и полностью заменяются переданным списком
+     * позиций. Все передаваемые значения в массиве позиций должны быть объектами класса, реализующего интерфейс
+     * ReceiptItemInterface, в противном случае будет выброшено исключение InvalidPropertyValueTypeException.
+     *
+     * @param ReceiptItemInterface[] $value Список товаров в заказе
+     *
+     * @throws EmptyPropertyValueException Выбрасывается если передали пустой массив значений
+     * @throws InvalidPropertyValueTypeException Выбрасывается если в качестве значения был передан не массив и не
+     * итератор, лабо если одно из переданных значений не реализует интерфейс ReceiptItemInterface
      */
     public function setItems($value)
     {
@@ -65,13 +104,21 @@ class Receipt extends AbstractObject implements ReceiptInterface
         $this->_items = array();
         $this->_shippingItems = array();
         foreach ($value as $key => $val) {
-            $this->_items[$key] = $val;
-            if ($val->isShipping()) {
-                $this->_shippingItems[] = $val;
+            if (is_object($val) && $val instanceof ReceiptItemInterface) {
+                $this->addItem($val);
+            } else {
+                throw new InvalidPropertyValueTypeException(
+                    'Invalid item value type in receipt', 0, 'receipt.items[' . $key . ']', $val
+                );
             }
         }
     }
 
+    /**
+     * Добавляет товар в чек
+     *
+     * @param ReceiptItemInterface $value Объект добавляемой в чек позиции
+     */
     public function addItem(ReceiptItemInterface $value)
     {
         $this->_items[] = $value;
@@ -81,6 +128,8 @@ class Receipt extends AbstractObject implements ReceiptInterface
     }
 
     /**
+     * Возвращает код системы налогообложения
+     *
      * @return int Код системы налогообложения. Число 1-6.
      */
     public function getTaxSystemCode()
@@ -90,6 +139,7 @@ class Receipt extends AbstractObject implements ReceiptInterface
 
     /**
      * Устанавливает код системы налогообложения
+     *
      * @param int $value Код системы налогообложения. Число 1-6
      *
      * @throws InvalidPropertyValueTypeException Выбрасывается если переданный аргумент - не число
@@ -115,7 +165,9 @@ class Receipt extends AbstractObject implements ReceiptInterface
     }
 
     /**
-     * @return string Номер телефона плательщика в формате ITU-T E.164 на который будет выслан чек.
+     * Возвращает номер телефона плательщика в формате ITU-T E.164 на который будет выслан чек
+     *
+     * @return string Номер телефона плательщика
      */
     public function getPhone()
     {
@@ -123,7 +175,12 @@ class Receipt extends AbstractObject implements ReceiptInterface
     }
 
     /**
-     * @param string $value Номер телефона плательщика в формате ITU-T E.164 на который будет выслан чек.
+     * Устанавливливает номер телефона плательщика в формате ITU-T E.164 на который будет выслан чек
+     *
+     * @param string $value Номер телефона плательщика в формате ITU-T E.164
+     *
+     * @throws InvalidPropertyValueTypeException Выбрасывается если в качестве значения была передана не строка
+     * @throws InvalidPropertyValueException Выбрасывается если телефон не соответствует формату ITU-T E.164
      */
     public function setPhone($value)
     {
@@ -139,7 +196,9 @@ class Receipt extends AbstractObject implements ReceiptInterface
     }
 
     /**
-     * @return string E-mail адрес плательщика на который будет выслан чек.
+     * Возвращает адрес электронной почты на который будет выслан чек
+     *
+     * @return string E-mail адрес плательщика
      */
     public function getEmail()
     {
@@ -147,7 +206,11 @@ class Receipt extends AbstractObject implements ReceiptInterface
     }
 
     /**
-     * @param string $value E-mail адрес плательщика на который будет выслан чек.
+     * Устанавливает адрес электронной почты на который будет выслан чек
+     *
+     * @param string $value E-mail адрес плательщика
+     *
+     * @throws InvalidPropertyValueTypeException Выбрасывается если в качестве значения была передана не строка
      */
     public function setEmail($value)
     {
@@ -161,7 +224,9 @@ class Receipt extends AbstractObject implements ReceiptInterface
     }
 
     /**
-     * @return bool
+     * Проверяет есть ли в чеке хотя бы одна позиция
+     *
+     * @return bool True если чек не пуст, false если в чеке нет ни одной позиции
      */
     public function notEmpty()
     {
@@ -209,15 +274,46 @@ class Receipt extends AbstractObject implements ReceiptInterface
         $amount = $orderAmount->getIntegerValue();
         if (!$withShipping) {
             if ($this->_shippingItems !== null) {
-                $amount -= $this->getShippingAmountValue();
+                if ($amount > $this->getShippingAmountValue()) {
+                    $amount -= $this->getShippingAmountValue();
+                } else {
+                    $withShipping = true;
+                }
             }
         }
         $realAmount = $this->getAmountValue($withShipping);
         if ($realAmount !== $amount) {
             $coefficient = (float)$amount / (float)$realAmount;
+            $items = array();
+            $realAmount = 0;
+            foreach ($this->_items as $item) {
+                if ($withShipping || !$item->isShipping()) {
+                    $price = round($coefficient * $item->getPrice()->getIntegerValue());
+                    if ($price < 1.0) {
+                        if ($item->getPrice()->getIntegerValue() > 1) {
+                            $item->getPrice()->setValue(0.01);
+                        }
+                        $amount -= $item->getAmount();
+                    } else {
+                        $items[] = $item;
+                        $realAmount += $item->getAmount();
+                    }
+                }
+            }
+            uasort($items, function (ReceiptItemInterface $a, ReceiptItemInterface $b) {
+                if ($a->getPrice()->getIntegerValue() > $b->getPrice()->getIntegerValue()) {
+                    return -1;
+                }
+                if ($a->getPrice()->getIntegerValue() < $b->getPrice()->getIntegerValue()) {
+                    return 1;
+                }
+                return 0;
+            });
+
+            $coefficient = (float)$amount / (float)$realAmount;
             $realAmount = 0;
             $aloneId = null;
-            foreach ($this->_items as $index => $item) {
+            foreach ($items as $index => $item) {
                 if ($withShipping || !$item->isShipping()) {
                     $item->applyDiscountCoefficient($coefficient);
                     $realAmount += $item->getAmount();
@@ -252,5 +348,23 @@ class Receipt extends AbstractObject implements ReceiptInterface
                 }
             }
         }
+    }
+
+    public function fromArray($sourceArray)
+    {
+        if (!empty($sourceArray['items'])) {
+            for ($i = 0; $i < count($sourceArray['items']); $i++) {
+                if (is_array($sourceArray['items'][$i])) {
+                    $item = new ReceiptItem();
+                    $amount = new MonetaryAmount();
+                    $amount->fromArray($sourceArray['items'][$i]['amount']);
+                    $sourceArray['items'][$i]['price'] = $amount;
+                    unset($sourceArray['items'][$i]['amount']);
+                    $item->fromArray($sourceArray['items'][$i]);
+                    $sourceArray['items'][$i] = $item;
+                }
+            }
+        }
+        parent::fromArray($sourceArray);
     }
 }

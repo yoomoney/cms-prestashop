@@ -1,14 +1,38 @@
 <?php
 
-namespace YaMoney\Common;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Common\Exceptions\InvalidPropertyException;
-use YaMoney\Common\Exceptions\InvalidRequestException;
+namespace YandexCheckout\Common;
+
+use YandexCheckout\Common\Exceptions\InvalidPropertyException;
+use YandexCheckout\Common\Exceptions\InvalidRequestException;
 
 /**
  * Базовый класс билдера запросов
  *
- * @package YaMoney\Common
+ * @package YandexCheckout\Common
  */
 abstract class AbstractRequestBuilder
 {
@@ -81,6 +105,12 @@ abstract class AbstractRequestBuilder
             $method = 'set' . ucfirst($property);
             if (method_exists($this, $method)) {
                 $this->{$method} ($value);
+            } else {
+                $tmp = preg_replace('/\_(\w)/', '\1', $property);
+                $method = 'set' . ucfirst($tmp);
+                if (method_exists($this, $method)) {
+                    $this->{$method} ($value);
+                }
             }
         }
         return $this;
