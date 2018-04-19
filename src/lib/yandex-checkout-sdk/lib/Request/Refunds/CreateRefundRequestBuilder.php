@@ -1,21 +1,46 @@
 <?php
 
-namespace YaMoney\Request\Refunds;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Common\AbstractRequestBuilder;
-use YaMoney\Common\Exceptions\EmptyPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueTypeException;
-use YaMoney\Model\AmountInterface;
-use YaMoney\Model\MonetaryAmount;
-use YaMoney\Model\Receipt;
-use YaMoney\Model\ReceiptItem;
-use YaMoney\Model\ReceiptItemInterface;
+namespace YandexCheckout\Request\Refunds;
+
+use YandexCheckout\Common\AbstractRequestBuilder;
+use YandexCheckout\Common\Exceptions\EmptyPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueTypeException;
+use YandexCheckout\Model\AmountInterface;
+use YandexCheckout\Model\MonetaryAmount;
+use YandexCheckout\Model\Receipt;
+use YandexCheckout\Model\ReceiptInterface;
+use YandexCheckout\Model\ReceiptItem;
+use YandexCheckout\Model\ReceiptItemInterface;
 
 /**
  * Класс билдера запросов к API на создание возврата средств
  *
- * @package YaMoney\Request\Refunds
+ * @package YandexCheckout\Request\Refunds
  */
 class CreateRefundRequestBuilder extends AbstractRequestBuilder
 {
@@ -64,7 +89,7 @@ class CreateRefundRequestBuilder extends AbstractRequestBuilder
 
     /**
      * Устанавливает сумму возвращаемых средств
-     * @param AmountInterface $value Сумма возврата
+     * @param AmountInterface|array $value Сумма возврата
      * @return CreateRefundRequestBuilder Инстанс текущего билдера
      *
      * @throws EmptyPropertyValueException Генерируется если было передано пустое значение
@@ -76,6 +101,8 @@ class CreateRefundRequestBuilder extends AbstractRequestBuilder
         if ($value instanceof AmountInterface) {
             $this->amount->setValue($value->getValue());
             $this->amount->setCurrency($value->getCurrency());
+        } elseif (is_array($value)) {
+            $this->amount->fromArray($value);
         } else {
             $this->amount->setValue($value);
         }
@@ -109,6 +136,21 @@ class CreateRefundRequestBuilder extends AbstractRequestBuilder
     {
         $this->currentObject->setComment($value);
         return $this;
+    }
+
+    /**
+     * Устанавливает чек для проведения возврата
+     * @param ReceiptInterface|array $value Инстанс чека и массив с его описанием
+     */
+    public function setReceipt($value)
+    {
+        if (is_array($value)) {
+            $this->receipt->fromArray($value);
+        } elseif ($value instanceof ReceiptInterface) {
+            $this->receipt = clone $value;
+        } else {
+            throw new InvalidPropertyValueTypeException('Invalid receipt value type', 0, 'receipt', $value);
+        }
     }
 
     /**

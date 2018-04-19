@@ -6,9 +6,9 @@ define('YANDEX_MONEY_MODULE_CLASS_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR
 
 function yandexMoneyLoadClass($className)
 {
-    if (strncmp('YaMoney', $className, 7) === 0) {
+    if (strncmp('YandexCheckout', $className, 14) === 0) {
         $path = YANDEX_MONEY_SDK_ROOT_PATH;
-        $length = 7;
+        $length = 14;
     } elseif (strncmp('Psr\Log', $className, 7) === 0) {
         $path = YANDEX_MONEY_PSR_LOG_PATH;
         $length = 7;

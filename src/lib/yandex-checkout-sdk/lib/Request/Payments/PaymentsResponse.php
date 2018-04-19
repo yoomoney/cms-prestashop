@@ -1,23 +1,46 @@
 <?php
 
-namespace YaMoney\Request\Payments;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Model\Confirmation\ConfirmationRedirect;
-use YaMoney\Model\Confirmation\ConfirmationExternal;
-use YaMoney\Model\ConfirmationType;
-use YaMoney\Model\Metadata;
-use YaMoney\Model\MonetaryAmount;
-use YaMoney\Model\Payment;
-use YaMoney\Model\PaymentError;
-use YaMoney\Model\PaymentInterface;
-use YaMoney\Model\PaymentMethod\AbstractPaymentMethod;
-use YaMoney\Model\PaymentMethod\PaymentMethodFactory;
-use YaMoney\Model\Recipient;
+namespace YandexCheckout\Request\Payments;
+
+use YandexCheckout\Model\Confirmation\ConfirmationRedirect;
+use YandexCheckout\Model\Confirmation\ConfirmationExternal;
+use YandexCheckout\Model\ConfirmationType;
+use YandexCheckout\Model\Metadata;
+use YandexCheckout\Model\MonetaryAmount;
+use YandexCheckout\Model\Payment;
+use YandexCheckout\Model\PaymentInterface;
+use YandexCheckout\Model\PaymentMethod\AbstractPaymentMethod;
+use YandexCheckout\Model\PaymentMethod\PaymentMethodFactory;
+use YandexCheckout\Model\Recipient;
 
 /**
  * Класс объекта ответа от API со списком платежей магазина
  *
- * @package YaMoney\Request\Payments
+ * @package YandexCheckout\Request\Payments
  */
 class PaymentsResponse
 {
@@ -46,19 +69,13 @@ class PaymentsResponse
                 $paymentInfo['amount']['value'],
                 $paymentInfo['amount']['currency']
             ));
+            if (!empty($paymentInfo['description'])) {
+                $payment->setDescription($paymentInfo['description']);
+            }
             $payment->setCreatedAt(strtotime($paymentInfo['created_at']));
             $payment->setPaymentMethod($this->factoryPaymentMethod($paymentInfo['payment_method']));
             $payment->setPaid($paymentInfo['paid']);
 
-            if (!empty($paymentInfo['error'])) {
-                $error = new PaymentError();
-                $error->setCode($paymentInfo['error']['code']);
-                if (!empty($paymentInfo['error']['description'])) {
-                    $error->setDescription($paymentInfo['error']['description']);
-                }
-                $payment->setError($error);
-
-            }
             if (!empty($paymentInfo['recipient'])) {
                 $recipient = new Recipient();
                 $recipient->setAccountId($paymentInfo['recipient']['account_id']);

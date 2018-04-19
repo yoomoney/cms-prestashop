@@ -17,24 +17,21 @@ use DbQuery;
 use Product;
 use Tax;
 use Tools;
-use YaMoney\Client\YandexMoneyApi;
-use YaMoney\Common\Exceptions\ApiException;
-use YaMoney\Common\Exceptions\AuthorizeException;
-use YaMoney\Common\Exceptions\UnauthorizedException;
-use YaMoney\Common\Exceptions\NotFoundException;
-use YaMoney\Model\ConfirmationType;
-use YaMoney\Model\Payment;
-use YaMoney\Model\PaymentInterface;
-use YaMoney\Model\PaymentMethodType;
-use YaMoney\Model\RefundInterface;
-use YaMoney\Model\RefundStatus;
-use YaMoney\Request\Payments\CreatePaymentRequest;
-use YaMoney\Request\Payments\CreatePaymentRequestBuilder;
-use YaMoney\Request\Payments\CreatePaymentResponse;
-use YaMoney\Request\Payments\Payment\CreateCaptureRequest;
-use YaMoney\Request\Payments\Payment\CreateCaptureRequestSerializer;
-use YaMoney\Request\Payments\Payment\CreateCaptureResponse;
-use YaMoney\Request\Refunds\CreateRefundRequest;
+
+use YandexCheckout\Client;
+use YandexCheckout\Common\Exceptions\NotFoundException;
+use YandexCheckout\Model\ConfirmationType;
+use YandexCheckout\Model\Payment;
+use YandexCheckout\Model\PaymentMethodType;
+use YandexCheckout\Model\RefundInterface;
+use YandexCheckout\Model\RefundStatus;
+use YandexCheckout\Request\Payments\CreatePaymentRequest;
+use YandexCheckout\Request\Payments\CreatePaymentRequestBuilder;
+use YandexCheckout\Request\Payments\CreatePaymentResponse;
+use YandexCheckout\Request\Payments\Payment\CreateCaptureRequest;
+use YandexCheckout\Request\Payments\Payment\CreateCaptureRequestSerializer;
+use YandexCheckout\Request\Payments\Payment\CreateCaptureResponse;
+use YandexCheckout\Request\Refunds\CreateRefundRequest;
 
 class KassaModel extends AbstractPaymentModel
 {
@@ -64,7 +61,7 @@ class KassaModel extends AbstractPaymentModel
         $this->defaultTaxRate = (int)Configuration::get('YA_KASSA_DEFAULT_TAX_RATE');
         $this->minimumAmount = (float)Configuration::get('YA_KASSA_MIN');
         $this->debugLog = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
-        $this->createStatusId = Configuration::get('PS_OS_CHEQUE');
+        $this->createStatusId = Configuration::get('PS_OS_PREPARATION');
         //$this->createStatusId = (int)Configuration::get('YA_KASSA_CREATE_STATUS_ID');
         $this->successStatusId = (int)Configuration::get('YA_KASSA_SUCCESS_STATUS_ID');
         //$this->failureStatusId = (int)Configuration::get('YA_KASSA_FAILURE_STATUS_ID');
@@ -402,7 +399,7 @@ class KassaModel extends AbstractPaymentModel
 
             $builder->setAmount($totalAmount)
                 ->setCurrency('RUB')
-                ->setCapture(false)
+                ->setCapture(true)
                 ->setClientIp($_SERVER['REMOTE_ADDR'])
                 ->setMetadata(array(
                     'cms_name'       => 'ya_api_ycms_prestashop',
@@ -641,15 +638,6 @@ class KassaModel extends AbstractPaymentModel
             }
             $key = microtime(true);
             $response = $this->getApiClient()->capturePayment($request, $payment->getId(), $key);
-            $tries = 0;
-            while ($response === null) {
-                sleep(2);
-                $response = $this->getApiClient()->capturePayment($request, $payment->getId(), $key);
-                $tries++;
-                if ($tries >= 3) {
-                    break;
-                }
-            }
         } catch (\Exception $e) {
             $this->module->log('error', 'Capture error: ' . $e->getMessage());
             $response = $payment;
@@ -768,12 +756,12 @@ class KassaModel extends AbstractPaymentModel
     }
 
     /**
-     * @return YandexMoneyApi
+     * @return Client
      */
     private function getApiClient()
     {
         if ($this->apiClient === null) {
-            $this->apiClient = new YandexMoneyApi();
+            $this->apiClient = new Client();
             $this->apiClient->setAuth($this->getShopId(), $this->getPassword());
             $this->apiClient->setLogger($this->module);
         }

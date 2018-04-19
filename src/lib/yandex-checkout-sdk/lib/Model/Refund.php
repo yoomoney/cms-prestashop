@@ -1,24 +1,49 @@
 <?php
 
-namespace YaMoney\Model;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Common\AbstractObject;
-use YaMoney\Common\Exceptions\EmptyPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueTypeException;
-use YaMoney\Helpers\TypeCast;
+namespace YandexCheckout\Model;
+
+use YandexCheckout\Common\AbstractObject;
+use YandexCheckout\Common\Exceptions\EmptyPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueTypeException;
+use YandexCheckout\Helpers\TypeCast;
 
 /**
  * Класс объекта с информацией о возврате платежа
  *
  * @property string $id Идентификатор возврата платежа
  * @property string $paymentId Идентификатор платежа
+ * @property string $payment_id Идентификатор платежа
  * @property string $status Статус возврата
- * @property RefundErrorInterface $error Описание ошибки или null если ошибок нет
  * @property \DateTime $createdAt Время создания возврата
- * @property \DateTime $authorizedAt Время проведения возврата
+ * @property \DateTime $created_at Время создания возврата
  * @property AmountInterface $amount Сумма возврата
  * @property string $receiptRegistration Статус регистрации чека
+ * @property string $receipt_registration Статус регистрации чека
  * @property string $comment Комментарий, основание для возврата средств покупателю
  */
 class Refund extends AbstractObject implements RefundInterface
@@ -39,19 +64,9 @@ class Refund extends AbstractObject implements RefundInterface
     private $_status;
 
     /**
-     * @var RefundErrorInterface Описание ошибки или null если ошибок нет
-     */
-    private $_error;
-
-    /**
      * @var \DateTime Время создания возврата
      */
     private $_createdAt;
-
-    /**
-     * @var \DateTime Время проведения возврата
-     */
-    private $_authorizedAt;
 
     /**
      * @var MonetaryAmount Сумма возврата
@@ -178,24 +193,6 @@ class Refund extends AbstractObject implements RefundInterface
     }
 
     /**
-     * Возвращает описание ошибки, если она есть, либо null
-     * @return RefundErrorInterface Инстанс объекта с описанием ошибки или null
-     */
-    public function getError()
-    {
-        return $this->_error;
-    }
-
-    /**
-     * Устанавливает информацию о ошибке проведения возврата
-     * @param RefundErrorInterface $value Инстанс объекта с описанием ошибки
-     */
-    public function setError(RefundErrorInterface $value)
-    {
-        $this->_error = $value;
-    }
-
-    /**
      * Возвращает дату создания возврата
      * @return \DateTime Время создания возврата
      */
@@ -225,40 +222,6 @@ class Refund extends AbstractObject implements RefundInterface
             $this->_createdAt = $dateTime;
         } else {
             throw new InvalidPropertyValueTypeException('Invalid created_at value', 0, 'Refund.createdAt', $value);
-        }
-    }
-
-    /**
-     * Возвращает дату проведения возврата
-     * @return \DateTime|null Время проведения возврата
-     *
-     * @throws InvalidPropertyValueException Выбрасывается если переданную строку или число не удалось интерпретировать
-     * как дату и время
-     * @throws InvalidPropertyValueTypeException Выбрасывается если было передано значение невалидного типа
-     */
-    public function getAuthorizedAt()
-    {
-        return $this->_authorizedAt;
-    }
-
-    /**
-     * Устанавливает время проведения возврата
-     * @param \DateTime|null $value Время проведения возврата
-     *
-     *
-     */
-    public function setAuthorizedAt($value)
-    {
-        if ($value === null || $value === '') {
-            $this->_authorizedAt = null;
-        } elseif (TypeCast::canCastToDateTime($value)) {
-            $dateTime = TypeCast::castToDateTime($value);
-            if ($dateTime === null) {
-                throw new InvalidPropertyValueException('Invalid authorizedAt value', 0, 'Refund.authorizedAt', $value);
-            }
-            $this->_authorizedAt = $dateTime;
-        } else {
-            throw new InvalidPropertyValueTypeException('Invalid authorizedAt value', 0, 'Refund.authorizedAt', $value);
         }
     }
 

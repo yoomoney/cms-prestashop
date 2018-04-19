@@ -1,33 +1,65 @@
 <?php
 
-namespace YaMoney\Model\Notification;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Common\Exceptions\EmptyPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueTypeException;
-use YaMoney\Helpers\TypeCast;
-use YaMoney\Model\NotificationEventType;
-use YaMoney\Model\NotificationType;
+namespace YandexCheckout\Model\Notification;
+
+use YandexCheckout\Common\AbstractObject;
+use YandexCheckout\Common\Exceptions\EmptyPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueTypeException;
+use YandexCheckout\Helpers\TypeCast;
+use YandexCheckout\Model\NotificationEventType;
+use YandexCheckout\Model\NotificationType;
 
 /**
+ * Базовый класс уведомлений
  *
+ * @package YandexCheckout\Model\Notification
  *
- * @package YaMoney\Model\Notification
+ * @property-read string $type Тип уведомления в виде строки
+ * @property-read string $event Тип события
  */
-abstract class AbstractNotification
+abstract class AbstractNotification extends AbstractObject
 {
     /**
-     * @var string
+     * @var string Тип уведомления
      */
     private $_type;
 
     /**
-     * @var string
+     * @var string Тип произошедшего события
      */
     private $_event;
 
     /**
-     * @return string
+     * Возвращает тип уведомления
+     *
+     * Тип уведомления - одна из констант, указанных в перечислении {@link NotificationType}.
+     *
+     * @return string Тип уведомления в виде строки
      */
     public function getType()
     {
@@ -35,7 +67,14 @@ abstract class AbstractNotification
     }
 
     /**
-     * @param string $value
+     * Устанавливает тип уведомления
+     *
+     * @param string $value Тип уведомления
+     *
+     * @throws EmptyPropertyValueException Выбрасывается если в качестве значения было передано пустое значение
+     * @throws InvalidPropertyValueException Выбрасывается если переданное значение не найдено в перечислении типов
+     * нотификаций
+     * @throws InvalidPropertyValueTypeException Выбрасывается если переданное значение не является строкой
      */
     protected function _setType($value)
     {
@@ -57,7 +96,11 @@ abstract class AbstractNotification
     }
 
     /**
-     * @return string
+     * Возвращает тип события
+     *
+     * Тип события - одна из констант, указанных в перечислении {@link NotificationEventType}.
+     *
+     * @return string Тип события
      */
     public function getEvent()
     {
@@ -65,7 +108,14 @@ abstract class AbstractNotification
     }
 
     /**
-     * @param string $value
+     * Устанавливает тип события
+     *
+     * @param string $value Тип события
+     *
+     * @throws EmptyPropertyValueException Выбрасывается если в качестве значения было передано пустое значение
+     * @throws InvalidPropertyValueException Выбрасывается если переданное значение не найдено в перечислении типов
+     * событий
+     * @throws InvalidPropertyValueTypeException Выбрасывается если переданное значение не является строкой
      */
     protected function _setEvent($value)
     {

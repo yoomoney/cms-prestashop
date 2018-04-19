@@ -4,6 +4,11 @@
  * @copyright © 2015-2017 NBCO Yandex.Money LLC
  * @license  https://money.yandex.ru/doc.xml?id=527052
  */
+use YandexCheckout\Model\Notification\NotificationSucceeded;
+use YandexCheckout\Model\Notification\NotificationWaitingForCapture;
+use YandexCheckout\Model\NotificationEventType;
+use YandexCheckout\Model\Payment;
+use YandexCheckout\Model\PaymentStatus;
 
 /**
  * Class YandexModulePaymentKassaModuleFrontController
@@ -45,14 +50,41 @@ class YandexModuleNotifyCaptureModuleFrontController extends ModuleFrontControll
             return;
         }
         try {
-            $object = new YaMoney\Model\Notification\NotificationWaitingForCapture($json);
+            if ($json['event'] == NotificationEventType::PAYMENT_WAITING_FOR_CAPTURE) {
+                $object = new NotificationWaitingForCapture($json);
+                $this->module->log('info', 'Notification waiting for capture init.');
+                $result = $this->module->capturePayment($object->getObject());
+            } else {
+                $webhookObject = new NotificationSucceeded($json);
+                $this->module->log('info', 'Notification succeeded init.');
+                $paymentData   = $webhookObject->getObject();
+                $kassa         = $this->module->getKassaModel();
+                $paymentModel  = $kassa->getPayment($paymentData->getId());
+                if ($paymentModel->status === PaymentStatus::SUCCEEDED) {
+                    $kassa->updatePaymentStatus($paymentModel);
+                    $orderId           = $kassa->getOrderIdByPayment($paymentModel);
+                    $orderStatusId     = $kassa->getSuccessStatusId();
+                    $history           = new OrderHistory();
+                    $history->id_order = $orderId;
+                    $history->changeIdOrderState($orderStatusId, $orderId);
+                    $history->addWithemail(true);
+                    // обновляем номер транзакции, привязанной к заказу
+                    $this->module->getKassaModel()->updateOrderPaymentId($orderId, $paymentData);
+                    echo json_encode(array('success' => true));
+                    exit();
+                } else {
+                    $result = false;
+                }
+
+            }
+
         } catch (\Exception $e) {
             $this->module->log('error', 'Invalid notification object - '.$e->getMessage());
             header('HTTP/1.1 500 Server error: '.$e->getMessage());
 
             return;
         }
-        $result = $this->module->capturePayment($object->getObject());
+
         if (!$result) {
             header('HTTP/1.1 500 Server error 1');
             exit();

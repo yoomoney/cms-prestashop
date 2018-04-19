@@ -1,28 +1,56 @@
 <?php
 
-namespace YaMoney\Request\Payments;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Common\AbstractRequestBuilder;
-use YaMoney\Common\Exceptions\EmptyPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueException;
-use YaMoney\Common\Exceptions\InvalidPropertyValueTypeException;
-use YaMoney\Common\Exceptions\InvalidRequestException;
-use YaMoney\Model\AmountInterface;
-use YaMoney\Model\ConfirmationAttributes\AbstractConfirmationAttributes;
-use YaMoney\Model\ConfirmationAttributes\ConfirmationAttributesFactory;
-use YaMoney\Model\Metadata;
-use YaMoney\Model\MonetaryAmount;
-use YaMoney\Model\PaymentData\AbstractPaymentData;
-use YaMoney\Model\PaymentData\PaymentDataFactory;
-use YaMoney\Model\Receipt;
-use YaMoney\Model\ReceiptItem;
-use YaMoney\Model\ReceiptItemInterface;
-use YaMoney\Model\Recipient;
+namespace YandexCheckout\Request\Payments;
+
+use YandexCheckout\Common\AbstractRequestBuilder;
+use YandexCheckout\Common\Exceptions\EmptyPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueException;
+use YandexCheckout\Common\Exceptions\InvalidPropertyValueTypeException;
+use YandexCheckout\Common\Exceptions\InvalidRequestException;
+use YandexCheckout\Model\Airline;
+use YandexCheckout\Model\AirlineInterface;
+use YandexCheckout\Model\AmountInterface;
+use YandexCheckout\Model\ConfirmationAttributes\AbstractConfirmationAttributes;
+use YandexCheckout\Model\ConfirmationAttributes\ConfirmationAttributesFactory;
+use YandexCheckout\Model\Metadata;
+use YandexCheckout\Model\MonetaryAmount;
+use YandexCheckout\Model\PaymentData\AbstractPaymentData;
+use YandexCheckout\Model\PaymentData\PaymentDataFactory;
+use YandexCheckout\Model\Receipt;
+use YandexCheckout\Model\ReceiptInterface;
+use YandexCheckout\Model\ReceiptItem;
+use YandexCheckout\Model\ReceiptItemInterface;
+use YandexCheckout\Model\Recipient;
+use YandexCheckout\Model\RecipientInterface;
 
 /**
  * Класс билдера объектов запрсов к API на создание платежа
  *
- * @package YaMoney\Request\Payments
+ * @package YandexCheckout\Request\Payments
  */
 class CreatePaymentRequestBuilder extends AbstractRequestBuilder
 {
@@ -57,6 +85,11 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
     private $confirmationFactory;
 
     /**
+     * @var Airline Длинная запись
+     */
+    private $airline;
+
+    /**
      * Инициализирует объект запроса, который в дальнейшем будет собираться билдером
      * @return CreatePaymentRequest Инстанс собираемого объекта запроса к API
      */
@@ -65,6 +98,7 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
         $request = new CreatePaymentRequest();
 
         $this->recipient = new Recipient();
+        $this->airline = new Airline();
         $this->receipt = new Receipt();
         $this->amount = new MonetaryAmount();
 
@@ -100,8 +134,25 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
     }
 
     /**
+     * Устанавливает получателя платежа из объекта или ассоциативного массива
+     * @param RecipientInterface|array $value Получатель платежа
+     * @throws InvalidPropertyValueTypeException Выбрасывается если передан аргумент не валидного типа
+     */
+    public function setRecipient($value)
+    {
+        if (is_array($value)) {
+            $this->recipient->fromArray($value);
+        } elseif ($value instanceof RecipientInterface) {
+            $this->recipient->setAccountId($value->getAccountId());
+            $this->recipient->setGatewayId($value->getGatewayId());
+        } else {
+            throw new InvalidPropertyValueTypeException('Invalid recipient value', 0, 'recipient', $value);
+        }
+    }
+
+    /**
      * Устанавливает сумму заказа
-     * @param AmountInterface|string $value Сумма заказа
+     * @param AmountInterface|string|array $value Сумма заказа
      * @return CreatePaymentRequestBuilder Инстанс текущего билдера
      *
      * @throws EmptyPropertyValueException Выбрасывается если было передано пустое значение
@@ -115,6 +166,8 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
             $this->amount->setCurrency($value->getCurrency());
         } elseif ($value === null || $value === '') {
             throw new EmptyPropertyValueException('Empty payment amount value', 0, 'CreatePaymentRequest.amount');
+        } elseif (is_array($value)) {
+            $this->amount->fromArray($value);
         } elseif (!is_numeric($value)) {
             throw new InvalidPropertyValueTypeException(
                 'Invalid payment amount value type', 0, 'CreatePaymentRequest.amount', $value
@@ -143,6 +196,44 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
         $this->amount->setCurrency($value);
         foreach ($this->receipt->getItems() as $item) {
             $item->getPrice()->setCurrency($value);
+        }
+        return $this;
+    }
+
+    /**
+     * @param AirlineInterface|array $value объект данных длинной записи или ассоциативный массив с данными
+     *
+     * @return CreatePaymentRequestBuilder
+     */
+    public function setAirline($value)
+    {
+        if (is_array($value)) {
+            $this->airline->fromArray($value);
+        } elseif ($value instanceof AirlineInterface) {
+            $this->receipt = clone $value;
+        } else {
+            throw new InvalidPropertyValueTypeException('Invalid receipt value type', 0, 'receipt', $value);
+        }
+
+
+        return $this;
+    }
+
+    /**
+     * Устанавливает чек
+     *
+     * @param ReceiptInterface|array $value Инстанс чека или ассоциативный массив с данными чека
+     *
+     * @return $this
+     */
+    public function setReceipt($value)
+    {
+        if (is_array($value)) {
+            $this->receipt->fromArray($value);
+        } elseif ($value instanceof ReceiptInterface) {
+            $this->receipt = clone $value;
+        } else {
+            throw new InvalidPropertyValueTypeException('Invalid receipt value type', 0, 'receipt', $value);
         }
         return $this;
     }
@@ -274,7 +365,7 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
      * @param string $value Одноразовый токен для проведения оплаты
      * @return CreatePaymentRequestBuilder Инстанс текущего билдера
      *
-     * @throws InvalidPropertyValueException Выбрасывается если переданное значение длинее 200 символов
+     * @throws InvalidPropertyValueException Выбрасывается если переданное значение превышает допустимую длину
      * @throws InvalidPropertyValueTypeException Выбрасывается если переданное значение не является строкой
      */
     public function setPaymentToken($value)
@@ -385,7 +476,7 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
 
     /**
      * Устанавливает метаданные, привязанные к платежу
-     * @param Metadata|null $value Метаданные платежа, устанавливаемые мерчантом
+     * @param Metadata|array|null $value Метаданные платежа, устанавливаемые мерчантом
      * @return CreatePaymentRequestBuilder Инстанс текущего билдера
      *
      * @throws InvalidPropertyValueTypeException Выбрасывается если переданные данные не удалось интерпретировать как
@@ -394,6 +485,20 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
     public function setMetadata($value)
     {
         $this->currentObject->setMetadata($value);
+        return $this;
+    }
+
+    /**
+     * Устанавливает описание транзакции
+     * @param string $value Описание транзакции
+     * @return CreatePaymentRequestBuilder Инстанс текущего билдера
+     *
+     * @throws InvalidPropertyValueException Выбрасывается если переданное значение превышает допустимую длину
+     * @throws InvalidPropertyValueTypeException Выбрасывается если переданное значение не является строкой
+     */
+    public function setDescription($value)
+    {
+        $this->currentObject->setDescription($value);
         return $this;
     }
 
@@ -416,6 +521,9 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
         }
         if ($this->receipt->notEmpty()) {
             $this->currentObject->setReceipt($this->receipt);
+        }
+        if($this->airline->notEmpty()){
+            $this->currentObject->setAirline($this->airline);
         }
         $this->currentObject->setAmount($this->amount);
         return parent::build();

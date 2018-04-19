@@ -9,6 +9,8 @@
  * @category  Front Office Features
  * @package   Yandex Payment Solution
  */
+use YandexCheckout\Model\Confirmation\ConfirmationRedirect;
+use YandexCheckout\Model\PaymentMethodType;
 
 /**
  * Class YandexModulePaymentKassaModuleFrontController
@@ -72,13 +74,13 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
             );
         } else {
             $paymentMethodInfo = $kassa->getPaymentMethodInfo($paymentMethod);
-            if ($paymentMethod === \YaMoney\Model\PaymentMethodType::ALFABANK) {
+            if ($paymentMethod === PaymentMethodType::ALFABANK) {
                 $login = trim(Tools::getValue('alfaLogin'));
                 if (empty($login)) {
                     $this->errorRedirect('Alfa login is empty', 'index.php?controller=order&step=3');
                 }
             }
-            if ($paymentMethod === \YaMoney\Model\PaymentMethodType::QIWI) {
+            if ($paymentMethod === PaymentMethodType::QIWI) {
                 $phone = preg_replace('/[^\d]+/', '', Tools::getValue('qiwiPhone'));
                 if (empty($phone)) {
                     $this->errorRedirect('Qiwi phone is empty', 'index.php?controller=order&step=3');
@@ -119,7 +121,7 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
         }
 
         $confirmation = $payment->getConfirmation();
-        if ($confirmation instanceof \YaMoney\Model\Confirmation\ConfirmationRedirect) {
+        if ($confirmation instanceof ConfirmationRedirect) {
             $this->module->log('info', 'Redirect user to payment page ' . $confirmation->getConfirmationUrl());
             Tools::redirect($confirmation->getConfirmationUrl());
         } else {

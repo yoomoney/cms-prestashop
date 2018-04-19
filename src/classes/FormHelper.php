@@ -19,7 +19,7 @@ use Module;
 use OrderState;
 use Tax;
 use Tools;
-use YaMoney\Model\PaymentMethodType;
+use YandexCheckout\Model\PaymentMethodType;
 use yandexmodule;
 
 class FormHelper

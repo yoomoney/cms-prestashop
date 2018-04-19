@@ -1,30 +1,54 @@
 <?php
 
-namespace YaMoney\Request\Payments;
+/**
+ * The MIT License
+ *
+ * Copyright (c) 2017 NBCO Yandex.Money LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-use YaMoney\Model\AmountInterface;
-use YaMoney\Model\ConfirmationType;
-use YaMoney\Model\PaymentData\AbstractPaymentData;
-use YaMoney\Model\PaymentData\PaymentDataAlfabank;
-use YaMoney\Model\PaymentData\PaymentDataBankCard;
-use YaMoney\Model\PaymentData\PaymentDataSberbank;
-use YaMoney\Model\PaymentData\PaymentDataYandexWallet;
-use YaMoney\Model\PaymentMethodType;
+namespace YandexCheckout\Request\Payments;
+
+use YandexCheckout\Model\AmountInterface;
+use YandexCheckout\Model\ConfirmationType;
+use YandexCheckout\Model\LegInterface;
+use YandexCheckout\Model\PassengerInterface;
+use YandexCheckout\Model\PaymentData\AbstractPaymentData;
+use YandexCheckout\Model\PaymentData\PaymentDataAlfabank;
+use YandexCheckout\Model\PaymentData\PaymentDataBankCard;
+use YandexCheckout\Model\PaymentData\PaymentDataSberbank;
+use YandexCheckout\Model\PaymentData\PaymentDataYandexWallet;
+use YandexCheckout\Model\PaymentMethodType;
 
 /**
  * Класс сериалайзера объекта запроса к API на проведение платежа
  *
- * @package YaMoney\Request\Payments
+ * @package YandexCheckout\Request\Payments
  */
 class CreatePaymentRequestSerializer
 {
     private static $propertyMap = array(
-        'reference_id'        => 'referenceId',
-        'payment_token'       => 'paymentToken',
-        'payment_method_id'   => 'paymentMethodId',
-        'save_payment_method' => 'savePaymentMethod',
-        'capture'             => 'capture',
-        'client_ip'           => 'clientIp',
+        'reference_id'      => 'referenceId',
+        'payment_token'     => 'paymentToken',
+        'payment_method_id' => 'paymentMethodId',
+        'client_ip'         => 'clientIp',
     );
 
     private static $paymentDataSerializerMap = array(
@@ -45,6 +69,9 @@ class CreatePaymentRequestSerializer
         $result = array(
             'amount' => $this->serializeAmount($request->getAmount()),
         );
+        if ($request->hasDescription()) {
+            $result['description'] = $request->getDescription();
+        }
         if ($request->hasReceipt()) {
             $receipt = $request->getReceipt();
             if ($receipt->notEmpty()) {
@@ -80,14 +107,14 @@ class CreatePaymentRequestSerializer
             $result['recipient']['gateway_id'] = $request->getRecipient()->getGatewayId();
         }
         if ($request->hasPaymentMethodData()) {
-            $method = self::$paymentDataSerializerMap[$request->getPaymentMethodData()->getType()];
+            $method                        = self::$paymentDataSerializerMap[$request->getPaymentMethodData()->getType()];
             $result['payment_method_data'] = $this->{$method}($request->getPaymentMethodData());
         }
         if ($request->hasConfirmation()) {
             $result['confirmation'] = array(
                 'type' => $request->getConfirmation()->getType(),
             );
-            $confirmation = $request->getConfirmation();
+            $confirmation           = $request->getConfirmation();
             if ($confirmation->getType() === ConfirmationType::REDIRECT) {
                 if ($confirmation->getEnforce()) {
                     $result['confirmation']['enforce'] = $confirmation->getEnforce();
@@ -98,6 +125,42 @@ class CreatePaymentRequestSerializer
         if ($request->hasMetadata()) {
             $result['metadata'] = $request->getMetadata()->toArray();
         }
+        if ($request->hasCapture()) {
+            $result['capture'] = $request->getCapture();
+        }
+        if ($request->hasSavePaymentMethod()) {
+            $result['save_payment_method'] = $request->getSavePaymentMethod();
+        }
+        if ($request->hasAirline()) {
+            $airline           = $request->getAirline();
+            $result['airline'] = array();
+
+            $ticketNumber = $airline->getTicketNumber();
+            if (!empty($ticketNumber)) {
+                $result['airline']['ticket_number'] = $ticketNumber;
+            }
+            $bookingReference = $airline->getBookingReference();
+            if (!empty($bookingReference)) {
+                $result['airline']['booking_reference'] = $bookingReference;
+            }
+
+            /** @var PassengerInterface $passenger */
+            foreach ($airline->getPassengers() as $passenger) {
+                $result['airline']['passengers'][] = array(
+                    'first_name' => $passenger->getFirstName(),
+                    'last_name'  => $passenger->getLastName(),
+                );
+            }
+
+            /** @var LegInterface $leg */
+            foreach ($airline->getLegs() as $leg) {
+                $result['airline']['legs'][] = array(
+                    'departure_airport'   => $leg->getDepartureAirport(),
+                    'destination_airport' => $leg->getDestinationAirport(),
+                    'departure_date'      => $leg->getDepartureDate(),
+                );
+            }
+        }
 
         foreach (self::$propertyMap as $name => $property) {
             $value = $request->{$property};
@@ -105,9 +168,10 @@ class CreatePaymentRequestSerializer
                 $result[$name] = $value;
             }
         }
+
         return $result;
     }
-    
+
     private function serializeAmount(AmountInterface $amount)
     {
         return array(
@@ -121,15 +185,16 @@ class CreatePaymentRequestSerializer
         $result = array(
             'type' => $paymentData->getType(),
         );
-        if ($paymentData->getBankCard() !== null) {
-            $result['bank_card'] = array(
-                'cardholder' => $paymentData->getBankCard()->getCardholder(),
-                'expiry_year' => $paymentData->getBankCard()->getExpiryYear(),
-                'expiry_month' => $paymentData->getBankCard()->getExpiryMonth(),
-                'number' => $paymentData->getBankCard()->getNumber(),
-                'csc' => $paymentData->getBankCard()->getCsc(),
+        if ($paymentData->getCard() !== null) {
+            $result['card'] = array(
+                'cardholder'   => $paymentData->getCard()->getCardholder(),
+                'expiry_year'  => $paymentData->getCard()->getExpiryYear(),
+                'expiry_month' => $paymentData->getCard()->getExpiryMonth(),
+                'number'       => $paymentData->getCard()->getNumber(),
+                'csc'          => $paymentData->getCard()->getCsc(),
             );
         }
+
         return $result;
     }
 
@@ -138,12 +203,7 @@ class CreatePaymentRequestSerializer
         $result = array(
             'type' => $paymentData->getType(),
         );
-        if ($paymentData->getAccountNumber() !== null) {
-            $result['account_number'] = $paymentData->getAccountNumber();
-        }
-        if ($paymentData->getPhone() !== null) {
-            $result['phone'] = $paymentData->getPhone();
-        }
+
         return $result;
     }
 
@@ -155,6 +215,7 @@ class CreatePaymentRequestSerializer
         if ($paymentData->getPaymentData() !== null) {
             $result['payment_data'] = $paymentData->getPaymentData();
         }
+
         return $result;
     }
 
@@ -163,12 +224,10 @@ class CreatePaymentRequestSerializer
         $result = array(
             'type' => $paymentData->getType(),
         );
-        if ($paymentData->getBindId() !== null) {
-            $result['bind_id'] = $paymentData->getBindId();
-        }
         if ($paymentData->getPhone() !== null) {
             $result['phone'] = $paymentData->getPhone();
         }
+
         return $result;
     }
 
@@ -180,13 +239,14 @@ class CreatePaymentRequestSerializer
         if ($paymentData->getLogin() !== null) {
             $result['login'] = $paymentData->getLogin();
         }
+
         return $result;
     }
 
     private function serializePaymentData(AbstractPaymentData $paymentData)
     {
         return array(
-            'type'  => $paymentData->getType(),
+            'type' => $paymentData->getType(),
         );
     }
 
@@ -198,6 +258,7 @@ class CreatePaymentRequestSerializer
         if ($paymentData->getPhone() !== null) {
             $result['phone'] = $paymentData->getPhone();
         }
+
         return $result;
     }
 }
