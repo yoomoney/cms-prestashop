@@ -78,7 +78,7 @@ class YandexModuleRedirectWalletModuleFrontController extends ModuleFrontControl
                 }
                 $auth_url = YandexApi::buildObtainTokenUrl(
                     Configuration::get('YA_WALLET_APPLICATION_ID'),
-                    $this->context->link->getModuleLink('yandexmodule', 'redirect_wallet', array(), true),
+                    $this->context->link->getModuleLink('yandexmodule', 'redirectwallet', array(), true),
                     $scope
                 );
 

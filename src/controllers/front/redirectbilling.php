@@ -101,7 +101,7 @@ class YandexModuleRedirectBillingModuleFrontController extends ModuleFrontContro
                 $cart->id,
                 _PS_OS_PREPARATION_,
                 $cart->getOrderTotal(true, Cart::BOTH),
-                $this->module->displayName." Яндекс.Платёжка",
+                $this->module->displayName.$this->module->l(" Яндекс.Платёжка"),
                 null,
                 array(),
                 null,

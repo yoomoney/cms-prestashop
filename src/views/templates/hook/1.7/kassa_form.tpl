@@ -10,7 +10,6 @@
 *
 * @var KassaModel $model
 *}
-
 <form method="post" action="{$action|escape:'htmlall':'UTF-8'}" id="ya-form">
     <fieldset class="form-group">
         <legend>{$label|escape:'htmlall':'UTF-8'}</legend>
@@ -24,13 +23,13 @@
             </div>
             {if $method.value == 'alfabank'}
                 <div id="alfa-login-container" class="form-group additional-fields" style="display: none;">
-                    <label for="alfa-login">{l s='Укажите логин, и мы выставим счет в Альфа-Клике. После этого останется подтвердить платеж на сайте интернет-банка.' mod='yandexmodule'}</label>
+                    <label for="alfa-login">{l s='Specify the login, and we\'ll send the bill in Alfa-Click. All you have do after that is confirm the payment online at the bank\'s website.' mod='yandexmodule'}</label>
                     <input type="text" name="alfaLogin" id="alfa-login" value="" />
                 </div>
             {/if}
             {if $method.value == 'qiwi'}
                 <div id="qiwi-phone-container" class="form-group additional-fields" style="display: none;">
-                    <label for="qiwi-phone">{l s='Телефон, который привязан к Qiwi Wallet' mod='yandexmodule'}</label>
+                    <label for="qiwi-phone">{l s='Phone number linked to QIWI Wallet' mod='yandexmodule'}</label>
                     <input type="text" name="qiwiPhone" id="qiwi-phone" value="" />
                 </div>
             {/if}

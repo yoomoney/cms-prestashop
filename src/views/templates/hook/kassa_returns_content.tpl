@@ -24,15 +24,15 @@
             {/if}
                 <table class="table table-bordered">
                     <tr>
-                        <td>{l s='Номер транзакции Яндекс.Касса' mod='yandexmodule'}</td>
+                        <td>{l s='Transaction\'s number in Yandex.Checkout' mod='yandexmodule'}</td>
                         <td>{$payment->getId()|escape:'htmlall':'UTF-8'}</td>
                     </tr>
                     <tr>
-                        <td>{l s='Номер заказа' mod='yandexmodule'}</td>
+                        <td>{l s='Order number' mod='yandexmodule'}</td>
                         <td>{$orderId|escape:'htmlall':'UTF-8'}</td>
                     </tr>
                     <tr>
-                        <td>{l s='Способ оплаты' mod='yandexmodule'}</td>
+                        <td>{l s='Payment method' mod='yandexmodule'}</td>
                         <td>
                             {l s=$paymentType mod='yandexmodule'}
                             {if $additionalPaymentInfo}
@@ -41,18 +41,18 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>{l s='Сумма платежа' mod='yandexmodule'}</td>
+                        <td>{l s='Order amount' mod='yandexmodule'}</td>
                         <td>
                             {displayPrice price=$payment->getAmount()->getValue()}&nbsp;
                         </td>
                     </tr>
                     <tr>
-                        <td>{l s='Возвращено' mod='yandexmodule'}</td>
+                        <td>{l s='Refunded' mod='yandexmodule'}</td>
                         <td>{$returnTotal|escape:'htmlall':'UTF-8'}</td>
                     </tr>
                     {if $refundableAmount > 0}
                     <tr>
-                        <td>{l s='Сумма возврата' mod='yandexmodule'}</td>
+                        <td>{l s='Refund amount' mod='yandexmodule'}</td>
                         <td style="width: 350px;">
                             <div class="input-group">
                                 <span class="input-group-addon"> руб</span>
@@ -62,11 +62,11 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>{l s='Причина возврата' mod='yandexmodule'}</td>
+                        <td>{l s='Comment to the refund' mod='yandexmodule'}</td>
                         <td><textarea class="control-form" name="return_comment"></textarea></td>
                     </tr>
                     <tr>
-                        <td colspan='2'><button type="submit" class="btn btn-success">{l s='Сделать возврат' mod='yandexmodule'}</button></td>
+                        <td colspan='2'><button type="submit" class="btn btn-success">{l s='Make the refund' mod='yandexmodule'}</button></td>
                     </tr>
                     {/if}
                 </table>
@@ -74,22 +74,22 @@
             </form>
             {/if}
             {else}
-                <p>Не найден платёж</p>
+                <p>{l s='Не найден платёж' mod='yandexmodule'}</p>
             {/if}
         </div>
         <div class="tab-pane" id="kassa_return_table">
             <div id="history"></div>
             <br />
-            <legend>{l s='Список возвратов' mod='yandexmodule'}</legend>
+            <legend>{l s='List of the refunds' mod='yandexmodule'}</legend>
             <form class="form-horizontal">
                 <div class="form-group">
                     <div class="col-lg-12">
                         <table class='table'>
                             <tr>
-                                <td>{l s='Дата возврата' mod='yandexmodule'}</td>
-                                <td>{l s='Сумма возврата' mod='yandexmodule'}</td>
-                                <td>{l s='Состояние' mod='yandexmodule'}</td>
-                                <td>{l s='Причина возврата' mod='yandexmodule'}</td>
+                                <td>{l s='Date of the refund' mod='yandexmodule'}</td>
+                                <td>{l s='Refund amount' mod='yandexmodule'}</td>
+                                <td>{l s='Status' mod='yandexmodule'}</td>
+                                <td>{l s='Comment to the refund' mod='yandexmodule'}</td>
                             </tr>
                             {if $refunds}
                                 {foreach $refunds as $refund}
@@ -102,7 +102,7 @@
                                 {/foreach}
                             {else}
                                 <tr>
-                                    <td colspan='3'><div class='alert alert-danger'>{l s='Успешные возвраты по данному платежу отсутствуют' mod='yandexmodule'}</div></td>
+                                    <td colspan='3'><div class='alert alert-danger'>{l s='No successful refunds for this payment' mod='yandexmodule'}</div></td>
                                 </tr>
                             {/if}
                         </table>

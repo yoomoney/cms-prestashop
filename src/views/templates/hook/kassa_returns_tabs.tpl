@@ -22,13 +22,13 @@
         <li class="active">
             <a href="#kassa_return">
                 <i class="icon-time"></i>
-                {l s='Возврат' mod='yandexmodule'}</span>
+                {l s='Return' mod='yandexmodule'}</span>
             </a>
         </li>
         <li>
             <a href="#kassa_return_table">
                 <i class="icon-time"></i>
-                {l s='История' mod='yandexmodule'} {*<span class="badge">{$kassa_returns|@count}</span>*}
+                {l s='History' mod='yandexmodule'} {*<span class="badge">{$kassa_returns|@count}</span>*}
             </a>
         </li>
     </ul>

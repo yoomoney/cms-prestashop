@@ -18,12 +18,12 @@
             <label for="yandex_money_wallet" class="form-check-label">
                 <input type="radio" class="form-check-input" name="payment_method" id="yandex_money_wallet" value="yandex_money_wallet" />
                 <img src="{$image_dir|escape:'htmlall':'UTF-8'}yandex_money.png" />
-                {l s='Оплата через Яндекс кошелёк' mod='yandexmodule'}
+                {l s='Yandex.Money' mod='yandexmodule'}
             </label><br />
             <label for="yandex_money_card" class="form-check-label">
                 <input type="radio" class="form-check-input" name="payment_method" id="yandex_money_card" value="yandex_money_card" />
                 <img src="{$image_dir|escape:'htmlall':'UTF-8'}bank_card.png" />
-                {l s='Оплата банковской картой' mod='yandexmodule'}
+                {l s='Bank cards' mod='yandexmodule'}
             </label>
         </div>
     </fieldset>

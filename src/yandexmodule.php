@@ -125,15 +125,11 @@ class YandexModule extends PaymentModule
 
         include_once(dirname(__FILE__).'/lib/YandexApi.php');
         include_once(dirname(__FILE__).'/lib/external_payment.php');
-        if (!class_exists(YandexCheckout\Client::class)) {
-            var_dump(1);
-            die();
-        }
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.0.3';
-        $this->author          = 'Яндекс.Деньги';
+        $this->version         = '1.0.4';
+        $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
         $this->module_key      = 'f51f5c45095c7d4eec9d2266901d793e';
@@ -667,8 +663,9 @@ class YandexModule extends PaymentModule
         $headers[] = 'Content-Type: application/x-www-form-urlencoded';
 
         $array = array(
+
             'url'      => Tools::getShopDomainSsl(true),
-            'cms'      => 'prestashop',
+            'cms'      => 'api-prestashop',
             'version'  => _PS_VERSION_,
             'ver_mod'  => $this->version,
             'email'    => $this->context->employee->email,
@@ -699,17 +696,10 @@ class YandexModule extends PaymentModule
         $curl = curl_init($url);
         curl_setopt_array($curl, $curlOpt);
         curl_exec($curl);
-        //$rcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        /*
-          $json=json_decode($rbody);
-            if ($rcode==200 && isset($json->new_version)){
-                return $json->new_version;
-            }else{*/
-
         return false;
-        // }
+
     }
 
     public function getContent()
@@ -726,6 +716,7 @@ class YandexModule extends PaymentModule
                 array(
                     'YA_KASSA_PAYMENT_MODE_ON',
                     'YA_KASSA_PAY_LOGO_ON',
+                    'YA_KASSA_INSTALLMENTS_BUTTON_ON',
                     'YA_KASSA_LOGGING_ON',
                 ),
                 $kassa->getTaxesArray(),
@@ -806,14 +797,10 @@ class YandexModule extends PaymentModule
 
         $vars_market_orders['YA_MARKET_ORDERS_FD'] = 'JSON';
         $vars_market_orders['YA_MARKET_ORDERS_TA'] = 'URL';
-        $vars_org['YA_ORG_TEXT_INSIDE']            = "Shop ID, scid, ShopPassword можно посмотреть".
-                                                     " в <a href='https://money.yandex.ru/joinups' target='_blank'>личном кабинете</a>".
-                                                     " после подключения Яндекс.Кассы.";
-        $vars_p2p['YA_WALLET_TEXT_INSIDE']         = "ID и секретное слово вы получите после".
-                                                     " <a href=\"https://sp-money.yandex.ru/myservices/new.xml\"".
-                                                     " target=\"_blank\">регистрации приложения</a>".
-                                                     " на сайте Яндекс.Денег";
-        $vars_p2p['YA_WALLET_LOGGING_ON']          = Configuration::get('YA_WALLET_LOGGING_ON');
+
+        $vars_org['YA_ORG_TEXT_INSIDE']    = $this->l('shopID и Секретное слово можно посмотреть в ')."<a href='https://money.yandex.ru/joinups' target='_blank'>".$this->l('личном кабинете')."</a>".$this->l('после подключения Яндекс.Кассы.');
+        $vars_p2p['YA_WALLET_TEXT_INSIDE'] = $this->l('ID и секретное слово вы получите после').'<a href="https://sp-money.yandex.ru/myservices/new.xml" target="_blank">'.$this->l(' регистрации приложения').'</a> '.$this->l('на сайте Яндекс.Денег');
+        $vars_p2p['YA_WALLET_LOGGING_ON']  = Configuration::get('YA_WALLET_LOGGING_ON');
         $this->context->smarty->assign(array(
             'ya_version'           => $this->version,
             'orders_link'          => $this->context->link->getAdminLink('AdminOrders', false)
@@ -909,27 +896,27 @@ class YandexModule extends PaymentModule
         $customer = new Customer($params['order']->id_customer);
 
         $names                 = array(
-            \YandexCheckout\Model\PaymentMethodType::BANK_CARD      => 'Банковские карты',
-            \YandexCheckout\Model\PaymentMethodType::YANDEX_MONEY   => 'Яндекс.Деньги',
-            \YandexCheckout\Model\PaymentMethodType::SBERBANK       => 'Сбербанк Онлайн',
-            \YandexCheckout\Model\PaymentMethodType::QIWI           => 'QIWI Wallet',
-            \YandexCheckout\Model\PaymentMethodType::WEBMONEY       => 'Webmoney',
-            \YandexCheckout\Model\PaymentMethodType::CASH           => 'Наличные через терминалы',
-            \YandexCheckout\Model\PaymentMethodType::MOBILE_BALANCE => 'Баланс мобильного',
-            \YandexCheckout\Model\PaymentMethodType::ALFABANK       => 'Альфа-Клик',
+            \YandexCheckout\Model\PaymentMethodType::BANK_CARD      => $this->l('Bank cards'),
+            \YandexCheckout\Model\PaymentMethodType::YANDEX_MONEY   => $this->l('Yandex.Money'),
+            \YandexCheckout\Model\PaymentMethodType::SBERBANK       => $this->l('Sberbank Online'),
+            \YandexCheckout\Model\PaymentMethodType::QIWI           => $this->l('QIWI Wallet'),
+            \YandexCheckout\Model\PaymentMethodType::WEBMONEY       => $this->l('Webmoney'),
+            \YandexCheckout\Model\PaymentMethodType::CASH           => $this->l('Cash via payment kiosks'),
+            \YandexCheckout\Model\PaymentMethodType::MOBILE_BALANCE => $this->l('Direct carrier billing'),
+            \YandexCheckout\Model\PaymentMethodType::ALFABANK       => $this->l('Alfa-Click'),
         );
-        $paymentType           = 'Способ оплаты не определён';
+        $paymentType           = $this->l('Способ оплаты не определён');
         $additionalPaymentInfo = '';
         if ($payment->getPaymentMethod() !== null) {
             $method = $payment->getPaymentMethod();
             if (isset($names[$method->getType()])) {
                 $paymentType = $names[$payment->getPaymentMethod()->getType()];
                 if ($method instanceof \YandexCheckout\Model\PaymentMethod\PaymentMethodYandexWallet) {
-                    $additionalPaymentInfo = 'номер кошелька: '.$method->getAccountNumber();
+                    $additionalPaymentInfo = $this->l('номер кошелька: ').$method->getAccountNumber();
                 } elseif ($method instanceof \YandexCheckout\Model\PaymentMethod\PaymentMethodAlfaBank) {
-                    $additionalPaymentInfo = 'логин в Альфа-клике: '.$method->getLogin();
+                    $additionalPaymentInfo = $this->l('логин в Альфа-клике: ').$method->getLogin();
                 } elseif ($method instanceof \YandexCheckout\Model\PaymentMethod\PaymentMethodSberbank) {
-                    $additionalPaymentInfo = 'телефон: '.$method->getPhone();
+                    $additionalPaymentInfo = $this->l('телефон: ').$method->getPhone();
                 }
             }
         }
@@ -1030,6 +1017,7 @@ class YandexModule extends PaymentModule
 
             return null;
         }
+
         $model = $this->getPaymentModel();
         if ($model === null) {
             // если отключен приём платежей - ничего не делаем
@@ -1048,7 +1036,62 @@ class YandexModule extends PaymentModule
                 true
             ),
         ));
-        $template = $model->assignVariables($this->context->smarty);
+
+        if ($model instanceof \YandexMoneyModule\Models\KassaModel && $model->isEnabled()) {
+            if ($model->getEPL()) {
+                // если используется выбор на стороне кассы
+                // отображаем шаблон пустым типом платежа
+                $this->log('debug', 'Show EPL page');
+                $template = 'module:yandexmodule/views/templates/hook/1.7/kassa_epl_form.tpl';
+            } else {
+                // если используется выбор на стороне магазина,
+                // добавляем в шаблон список способов оплаты
+                $this->log('debug', 'Show select payment method page');
+                $methods  = $model->getEnabledPaymentMethods();
+                $payments = Configuration::getMultiple(array_values($model->getPaymentMethods()));
+                $key      = 'YA_KASSA_PAYMENT_INSTALLMENTS';
+                /** @var \Cart $cart */
+                $cart  = $params['cart'];
+                $total = $cart->getOrderTotal();
+                if (isset($payments[$key]) && $payments[$key] == '1') {
+                    $monthlyInstallment = \YandexMoneyModule\InstallmentsApi::creditPreSchedule(
+                        $model->getShopId(),
+                        $total
+                    );
+                    if (!isset($monthlyInstallment['amount'])) {
+                        $errorMessage = \YandexMoneyModule\InstallmentsApi::getLastError() ?: 'Unknown error. Could not get installment amount';
+                        $this->log('error', $errorMessage);
+                    } else {
+                        $installmentLabel = sprintf($this->l('Installments (%s ₽ per month)'),
+                            $monthlyInstallment['amount']);
+                        $this->log('info', 'Label: '.$installmentLabel);
+                        foreach ($methods as $key => $method) {
+                            if ($method['value'] == \YandexCheckout\Model\PaymentMethodType::INSTALLMENTS) {
+                                if ($total > \YandexMoneyModule\Models\KassaModel::MIN_INSTALLMENTS_AMOUNT) {
+                                    $methods[$key]['name'] = $installmentLabel;
+                                } else {
+                                    unset($methods[$key]);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (empty($methods)) {
+                    // если мерчант не выбрал ни одного способа оплаты, не
+                    // отображаем ничего, модуль настроен некорректно
+                    $this->module->log('warning', 'Empty payment method list');
+
+                    return null;
+                }
+                $template = 'module:yandexmodule/views/templates/hook/1.7/kassa_form.tpl';
+                $this->context->smarty->assign('label', 'Please select payment method');
+                $this->context->smarty->assign('payment_methods', $methods);
+            }
+        } else {
+            $template = $model->assignVariables($this->context->smarty);
+        }
+
         if ($template === null) {
             $this->log('debug', 'Template is empty');
 
@@ -1068,7 +1111,7 @@ class YandexModule extends PaymentModule
         $paymentOption->setModuleName($this->name)
                       ->setCallToActionText(
                           $this->trans(
-                              'Яндекс.Касса (банковские карты, электронные деньги и другое)',
+                              'Yandex.Checkout (bank cards, e-money, etc.)',
                               array(),
                               'Modules.YandexModule.Shop'
                           )
@@ -1117,6 +1160,7 @@ class YandexModule extends PaymentModule
                 // for epl show template without payment type options
                 $this->log('debug', 'Show EPL page');
                 $template = 'kassa_epl_form.tpl';
+                $this->smarty->assign('amount', $total_to_pay);
             } else {
                 // add payment type options to template variables
                 $this->log('debug', 'Show select payment method page');
@@ -1126,9 +1170,30 @@ class YandexModule extends PaymentModule
                     $this->log('warning', 'Empty payment method list');
 
                     return null;
+                } else {
+                    foreach ($methods as $key => $method) {
+                        if ($method['value'] == \YandexCheckout\Model\PaymentMethodType::INSTALLMENTS) {
+                            if ($total_to_pay > \YandexMoneyModule\Models\KassaModel::MIN_INSTALLMENTS_AMOUNT) {
+                                $monthlyInstallment = \YandexMoneyModule\InstallmentsApi::creditPreSchedule(
+                                    $kassa->getShopId(),
+                                    $total_to_pay
+                                );
+                                if (!isset($monthlyInstallment['amount'])) {
+                                    $errorMessage = \YandexMoneyModule\InstallmentsApi::getLastError() ?: 'Unknown error. Could not get installment amount';
+                                    $this->log('error', $errorMessage);
+                                } else {
+                                    $installmentLabel = sprintf($this->l('Installments (%s ₽ per month)'),
+                                        $monthlyInstallment['amount']);
+                                    $methods[$key]['name'] = $installmentLabel;
+                                }
+                            } else {
+                                unset($methods[$key]);
+                            }
+                        }
+                    }
                 }
                 $template = 'kassa_form.tpl';
-                $this->smarty->assign('label', 'Выберите способ оплаты');
+                $this->smarty->assign('label', $this->l('Please select payment method'));
                 $this->smarty->assign('payment_methods', $methods);
             }
             // получаем отображаемый контент
@@ -1214,7 +1279,7 @@ class YandexModule extends PaymentModule
                     $response = $kassa->capturePayment($payment);
                     if ($response === null) {
                         $success = false;
-                        $this->smarty->assign('message', 'Не удалось провести платёж');
+                        $this->smarty->assign('message', $this->l('Не удалось провести платёж'));
                     } else {
                         $orderStatusId = $kassa->getSuccessStatusId();
                     }
@@ -1222,7 +1287,7 @@ class YandexModule extends PaymentModule
                     // если платёж был отменён, сообщаем об этом
                     $this->log('debug', 'Order#'.$order->id.' is cancelled');
                     $success = false;
-                    $this->smarty->assign('message', 'Платёж был отменён');
+                    $this->smarty->assign('message', $this->l('Payment was canceled'));
                 } elseif ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
                     $orderStatusId = $kassa->getSuccessStatusId();
                 }
@@ -1487,7 +1552,7 @@ class YandexModule extends PaymentModule
                 'The requested method of payment (money_source) '.
                 'is not available for this payment'
             ),
-            'illegal_param_csc'          => $this->l('Tsutstvuet or an invalid parameter value cs'),
+            'illegal_param_csc'          => $this->l('Empty or an invalid parameter value cs'),
             'payment_refused'            => $this->l('Shop for whatever reason, refused to accept payment.'),
         );
         if (array_key_exists($error, $error_array)) {

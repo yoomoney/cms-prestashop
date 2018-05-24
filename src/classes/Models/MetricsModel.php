@@ -53,9 +53,10 @@ class MetricsModel extends AbstractModel
         }
 
         if ($errors == '') {
-            $errors = $this->module->displayConfirmation($this->module->l('Settings saved successfully!'));
+            $errors      = $this->module->displayConfirmation($this->module->l('Settings saved successfully!'));
             $this->valid = true;
         }
+
         return $errors;
     }
 
@@ -70,55 +71,55 @@ class MetricsModel extends AbstractModel
 
     public function sendData()
     {
-        $m = new \YandexMoneyModule\Metrics();
+        $m        = new \YandexMoneyModule\Metrics();
         $response = $m->run();
 
         $data = array(
-            'YA_METRICS_CART' =>  array(
-                'name' => 'YA_METRICS_CART',
-                'flag' => 'basket',
-                'type' => 'action',
-                'class' => 1,
-                'depth' => 0,
+            'YA_METRICS_CART'     => array(
+                'name'       => 'YA_METRICS_CART',
+                'flag'       => 'basket',
+                'type'       => 'action',
+                'class'      => 1,
+                'depth'      => 0,
                 'conditions' => array(
                     array(
-                        'url' => 'metrikaCart',
-                        'type' => 'exact'
-                    )
-                )
+                        'url'  => 'metrikaCart',
+                        'type' => 'exact',
+                    ),
+                ),
 
             ),
-            'YA_METRICS_ORDER' => array(
-                'name' => 'YA_METRICS_ORDER',
-                'flag' => 'order',
-                'type' => 'action',
-                'class' => 1,
-                'depth' => 0,
+            'YA_METRICS_ORDER'    => array(
+                'name'       => 'YA_METRICS_ORDER',
+                'flag'       => 'order',
+                'type'       => 'action',
+                'class'      => 1,
+                'depth'      => 0,
                 'conditions' => array(
                     array(
-                        'url' => 'metrikaOrder',
-                        'type' => 'exact'
-                    )
-                )
+                        'url'  => 'metrikaOrder',
+                        'type' => 'exact',
+                    ),
+                ),
 
             ),
             'YA_METRICS_WISHLIST' => array(
-                'name' => 'YA_METRICS_WISHLIST',
-                'flag' => '',
-                'type' => 'action',
-                'class' => 1,
-                'depth' => 0,
+                'name'       => 'YA_METRICS_WISHLIST',
+                'flag'       => '',
+                'type'       => 'action',
+                'class'      => 1,
+                'depth'      => 0,
                 'conditions' => array(
                     array(
-                        'url' => 'metrikaWishlist',
-                        'type' => 'exact'
-                    )
-                )
+                        'url'  => 'metrikaWishlist',
+                        'type' => 'exact',
+                    ),
+                ),
 
             ),
         );
 
-        $ret = array();
+        $ret   = array();
         $error = '';
         if (Configuration::get('YA_METRICS_TOKEN') != '') {
             if ($response) {
@@ -127,30 +128,34 @@ class MetricsModel extends AbstractModel
                     Configuration::UpdateValue('YA_METRICS_CODE', $counter->counter->code, true);
                 }
                 $otvet = $m->editCounter();
-                if ($otvet->counter->id != Configuration::get('YA_METRICS_NUMBER')) {
-                    $error .= $this->displayError(
-                        $this->module->l(
-                            'Saving the settings the meter is not the meter number is incorrect.'
-                        )
-                    );
-                } else {
-                    $tmp_goals = $m->getCounterGoals();
-                    $goals = array();
-                    foreach ($tmp_goals->goals as $goal) {
-                        $goals[$goal->name] = $goal;
-                    }
+                if (!is_null($otvet)) {
+                    if ($otvet->counter->id != Configuration::get('YA_METRICS_NUMBER')) {
+                        $error .= $this->module->displayError(
+                            $this->module->l(
+                                'Saving the settings the meter is not the meter number is incorrect.'
+                            )
+                        );
+                    } else {
+                        $tmp_goals = $m->getCounterGoals();
+                        $goals     = array();
+                        foreach ($tmp_goals->goals as $goal) {
+                            $goals[$goal->name] = $goal;
+                        }
 
-                    $types = array('YA_METRICS_ORDER', 'YA_METRICS_WISHLIST', 'YA_METRICS_CART');
-                    foreach ($types as $type) {
-                        $conf = explode('_', $type);
-                        $conf = $conf[0].'_'.$conf[1].'_CELI_'.$conf[2];
-                        if (Configuration::get($conf) == 0 && isset($goals[$type])) {
-                            $ret['delete_'.$type] = $m->deleteCounterGoal($goals[$type]->id);
-                        } elseif (Configuration::get($conf) == 1 && !isset($goals[$type])) {
-                            $params = $data[$type];
-                            $ret['add_'.$type] = $m->addCounterGoal(array('goal' => $params));
+                        $types = array('YA_METRICS_ORDER', 'YA_METRICS_WISHLIST', 'YA_METRICS_CART');
+                        foreach ($types as $type) {
+                            $conf = explode('_', $type);
+                            $conf = $conf[0].'_'.$conf[1].'_CELI_'.$conf[2];
+                            if (Configuration::get($conf) == 0 && isset($goals[$type])) {
+                                $ret['delete_'.$type] = $m->deleteCounterGoal($goals[$type]->id);
+                            } elseif (Configuration::get($conf) == 1 && !isset($goals[$type])) {
+                                $params            = $data[$type];
+                                $ret['add_'.$type] = $m->addCounterGoal(array('goal' => $params));
+                            }
                         }
                     }
+                } else {
+                    $error .= $this->module->displayError($m->errors);
                 }
             } elseif (!empty($m->errors)) {
                 $error .= $this->module->displayError($m->errors);

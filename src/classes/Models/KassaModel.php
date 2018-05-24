@@ -35,10 +35,16 @@ use YandexCheckout\Request\Refunds\CreateRefundRequest;
 
 class KassaModel extends AbstractPaymentModel
 {
+    /**
+     * Минимальная сумма заказа для платежа с методом кредитования.
+     */
+    const MIN_INSTALLMENTS_AMOUNT = 3000;
+
     private $shopId;
     private $password;
     private $epl;
     private $showYandexButton;
+    private $showInstallmentsButton;
     private $availablePaymentMethods;
     private $enabledPaymentMethods;
     private $sendReceipt;
@@ -52,20 +58,22 @@ class KassaModel extends AbstractPaymentModel
 
     public function initConfiguration()
     {
-        $this->enabled = Configuration::get('YA_KASSA_ACTIVE') == '1';
-        $this->shopId = Configuration::get('YA_KASSA_SHOP_ID');
-        $this->password = Configuration::get('YA_KASSA_PASSWORD');
-        $this->epl = Configuration::get('YA_KASSA_PAYMENT_MODE') == 'kassa';
-        $this->showYandexButton = Configuration::get('YA_KASSA_PAY_LOGO_ON') == 'on';
-        $this->sendReceipt = Configuration::get('YA_KASSA_SEND_RECEIPT') == '1';
-        $this->defaultTaxRate = (int)Configuration::get('YA_KASSA_DEFAULT_TAX_RATE');
-        $this->minimumAmount = (float)Configuration::get('YA_KASSA_MIN');
-        $this->debugLog = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
-        $this->createStatusId = Configuration::get('PS_OS_PREPARATION');
+        $this->enabled                = Configuration::get('YA_KASSA_ACTIVE') == '1';
+        $this->shopId                 = Configuration::get('YA_KASSA_SHOP_ID');
+        $this->password               = Configuration::get('YA_KASSA_PASSWORD');
+        $this->epl                    = Configuration::get('YA_KASSA_PAYMENT_MODE') == 'kassa';
+        $this->showYandexButton       = Configuration::get('YA_KASSA_PAY_LOGO_ON') == 'on';
+        $this->showInstallmentsButton = Configuration::get('YA_KASSA_INSTALLMENTS_BUTTON_ON') == 'on';
+        $this->sendReceipt            = Configuration::get('YA_KASSA_SEND_RECEIPT') == '1';
+        $this->defaultTaxRate         = (int)Configuration::get('YA_KASSA_DEFAULT_TAX_RATE');
+        $this->minimumAmount          = (float)Configuration::get('YA_KASSA_MIN');
+        $this->debugLog               = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
+        $this->createStatusId         = Configuration::get('PS_OS_PREPARATION');
+        $this->successStatusId        = (int)Configuration::get('YA_KASSA_SUCCESS_STATUS_ID');
+        $this->failureStatusId        = Configuration::get('PS_OS_ERROR');
+
         //$this->createStatusId = (int)Configuration::get('YA_KASSA_CREATE_STATUS_ID');
-        $this->successStatusId = (int)Configuration::get('YA_KASSA_SUCCESS_STATUS_ID');
         //$this->failureStatusId = (int)Configuration::get('YA_KASSA_FAILURE_STATUS_ID');
-        $this->failureStatusId = Configuration::get('PS_OS_ERROR');
 
         $this->paymentActionController = 'paymentkassa';
     }
@@ -140,9 +148,10 @@ class KassaModel extends AbstractPaymentModel
         if ($this->availablePaymentMethods === null) {
             $this->availablePaymentMethods = array();
             foreach (PaymentMethodType::getEnabledValues() as $value) {
-                $this->availablePaymentMethods[$value] = 'YA_KASSA_PAYMENT_' . Tools::strtoupper($value);
+                $this->availablePaymentMethods[$value] = 'YA_KASSA_PAYMENT_'.Tools::strtoupper($value);
             }
         }
+
         return $this->availablePaymentMethods;
     }
 
@@ -153,19 +162,22 @@ class KassaModel extends AbstractPaymentModel
     {
         if ($this->enabledPaymentMethods === null) {
             $this->enabledPaymentMethods = array();
-            $paymentMethodNames = array(
-                PaymentMethodType::YANDEX_MONEY => $this->module->l('Яндекс.Деньги'),
-                PaymentMethodType::BANK_CARD => $this->module->l('Банковские карты — Visa, Mastercard и Maestro, «Мир»'),
-                PaymentMethodType::MOBILE_BALANCE => $this->module->l('Баланс мобильного — Билайн, Мегафон, МТС, Tele2'),
-                PaymentMethodType::WEBMONEY => $this->module->l('Webmoney'),
-                PaymentMethodType::CASH => $this->module->l('Наличные'),
-                PaymentMethodType::SBERBANK => $this->module->l('Сбербанк Онлайн'),
-                PaymentMethodType::ALFABANK => $this->module->l('Альфа-Клик'),
-                PaymentMethodType::QIWI => $this->module->l('Кошелёк QIWI'),
+            $paymentMethodNames          = array(
+                PaymentMethodType::YANDEX_MONEY   => $this->module->l('Yandex.Money'),
+                PaymentMethodType::BANK_CARD      => $this->module->l('Bank cards'),
+                PaymentMethodType::MOBILE_BALANCE => $this->module->l('Direct carrier billing'),
+                PaymentMethodType::WEBMONEY       => $this->module->l('Webmoney'),
+                PaymentMethodType::CASH           => $this->module->l('Cash via payment kiosks'),
+                PaymentMethodType::SBERBANK       => $this->module->l('Sberbank Online'),
+                PaymentMethodType::ALFABANK       => $this->module->l('Alfa-Click'),
+                PaymentMethodType::QIWI           => $this->module->l('QIWI Wallet'),
+                PaymentMethodType::INSTALLMENTS   => $this->module->l('Installments (%s Р per month)'),
             );
+
             $payments = Configuration::getMultiple(array_values($this->getPaymentMethods()));
+
             foreach ($paymentMethodNames as $id => $loc) {
-                $key = 'YA_KASSA_PAYMENT_' . Tools::strtoupper($id);
+                $key = 'YA_KASSA_PAYMENT_'.Tools::strtoupper($id);
                 if (isset($payments[$key]) && $payments[$key] == '1') {
                     $this->enabledPaymentMethods[] = array(
                         'name'  => $loc,
@@ -175,12 +187,15 @@ class KassaModel extends AbstractPaymentModel
                 }
             }
         }
+
         return $this->enabledPaymentMethods;
     }
 
     /**
      * Проеряет, доступен ли переданный способ оплаты
+     *
      * @param string $methodId Код способа оплаты
+     *
      * @return bool True если способ оплаты доступен, false если нет
      */
     public function isPaymentMethodEnabled($methodId)
@@ -190,12 +205,15 @@ class KassaModel extends AbstractPaymentModel
                 return true;
             }
         }
+
         return false;
     }
 
     /**
      * Возвращает информацию о способе оплаты
+     *
      * @param string $methodId Код способа оплаты
+     *
      * @return array|null Массив с информацией о способе оплаты, или null если
      * способ оплаты не найден или не активен
      */
@@ -206,6 +224,7 @@ class KassaModel extends AbstractPaymentModel
                 return $method;
             }
         }
+
         return null;
     }
 
@@ -268,6 +287,10 @@ class KassaModel extends AbstractPaymentModel
         Configuration::UpdateValue('YA_KASSA_PAY_LOGO_ON', Tools::getValue('YA_KASSA_PAY_LOGO_ON'));
         $this->showYandexButton = Tools::getValue('YA_KASSA_PAY_LOGO_ON') == 'on';
 
+        Configuration::UpdateValue('YA_KASSA_INSTALLMENTS_BUTTON_ON',
+            Tools::getValue('YA_KASSA_INSTALLMENTS_BUTTON_ON'));
+        $this->showYandexButton = Tools::getValue('YA_KASSA_INSTALLMENTS_BUTTON_ON') == 'on';
+
         Configuration::UpdateValue('YA_KASSA_PAYMENT_MODE', Tools::getValue('YA_KASSA_PAYMENT_MODE'));
         $this->epl = Tools::getValue('YA_KASSA_PAYMENT_MODE') == 'kassa';
 
@@ -289,7 +312,7 @@ class KassaModel extends AbstractPaymentModel
             $errors .= $this->module->displayError($this->module->l('ShopId not specified!'));
         } else {
             $isShopIdValid = true;
-            $this->shopId = trim(Tools::getValue('YA_KASSA_SHOP_ID'));
+            $this->shopId  = trim(Tools::getValue('YA_KASSA_SHOP_ID'));
             Configuration::UpdateValue('YA_KASSA_SHOP_ID', $this->shopId);
         }
 
@@ -302,8 +325,8 @@ class KassaModel extends AbstractPaymentModel
             if ($isShopIdValid) {
                 if (!$this->testConnection()) {
                     $errors .= $this->module->displayError(
-                        'Проверьте shopId и Секретный ключ — где-то есть ошибка. А лучше скопируйте их прямо из '
-                        . '<a href="https://kassa.yandex.ru/my" target="_blank">личного кабинета Яндекс.Кассы</a>'
+                        $this->module->l('Check shopId and Secret key—there is an error somewhere. Better yet, copy them directly from your ')
+                        .'<a href="https://kassa.yandex.ru/my" target="_blank">'.$this->module->l('Yandex.Checkout\'s Merchant Profile').'</a>'
                     );
                     if ($this->enabled) {
                         $this->enabled = false;
@@ -311,9 +334,8 @@ class KassaModel extends AbstractPaymentModel
                     }
                 } elseif (strncmp('test_', Tools::getValue('YA_KASSA_PASSWORD'), 5) === 0) {
                     $errors .= $this->module->displayWarning(
-                        'Вы включили тестовый режим приема платежей. Проверьте, как проходит оплата, и напишите '
-                        . 'менеджеру Кассы. Он выдаст рабочие shopId и Секретный ключ. '
-                        . '<a href="https://yandex.ru/support/checkout/payments/api.html#api__04" target="_blank">Инструкция</a>'
+                        $this->module->l('You have enabled the test mode. Check the payment making process and contact Yandex.Checkout\'s manager. They will provide you with shopId the Secret key. ')
+                        .'<a href="https://yandex.ru/support/checkout/payments/api.html#api__04" target="_blank">'.$this->module->l('Manual').'</a>'
                     );
                 }
             }
@@ -321,7 +343,7 @@ class KassaModel extends AbstractPaymentModel
 
         if (!$this->epl && $count == 0) {
             $errors .= $this->module->displayError(
-                $this->module->l('Выберите хотя бы один способ оплаты')
+                $this->module->l('Please select at least one option from the list')
             );
         }
 
@@ -334,30 +356,27 @@ class KassaModel extends AbstractPaymentModel
 
     /**
      * @param \Smarty $smarty
+     *
      * @return null|string
      */
     public function assignVariables($smarty)
     {
         if ($this->getEPL()) {
-            // если используется выбор на стороне кассы
-            // отображаем шаблон пустым типом платежа
-            $this->module->log('debug', 'Show EPL page');
             $template = 'module:yandexmodule/views/templates/hook/1.7/kassa_epl_form.tpl';
         } else {
-            // если используется выбор на стороне магазина,
-            // добавляем в шаблон список способов оплаты
-            $this->module->log('debug', 'Show select payment method page');
             $methods = $this->getEnabledPaymentMethods();
             if (empty($methods)) {
                 // если мерчант не выбрал ни одного способа оплаты, не
                 // отображаем ничего, модуль настроен некорректно
                 $this->module->log('warning', 'Empty payment method list');
+
                 return null;
             }
             $template = 'module:yandexmodule/views/templates/hook/1.7/kassa_form.tpl';
-            $smarty->assign('label', 'Выберите способ оплаты');
+            $smarty->assign('label', $this->module->l('Please select payment method'));
             $smarty->assign('payment_methods', $methods);
         }
+
         return $template;
     }
 
@@ -367,12 +386,13 @@ class KassaModel extends AbstractPaymentModel
 
         $taxArray = array();
         foreach ($taxes as $tax) {
-            $taxArray[] = 'YA_KASSA_TAX_RATE_' . $tax['id_tax'];
+            $taxArray[] = 'YA_KASSA_TAX_RATE_'.$tax['id_tax'];
         }
 
         if ($config) {
             return Configuration::getMultiple($taxArray);
         }
+
         return $taxArray;
     }
 
@@ -381,6 +401,7 @@ class KassaModel extends AbstractPaymentModel
      * @param Cart $cart
      * @param string $paymentMethod
      * @param string $returnUrl
+     *
      * @return CreatePaymentResponse|null
      */
     public function createPayment(Context $context, Cart $cart, $paymentMethod, $returnUrl)
@@ -388,38 +409,38 @@ class KassaModel extends AbstractPaymentModel
         try {
             $builder = CreatePaymentRequest::builder();
 
-            $totalAmount = $cart->getOrderTotal(true);
+            $totalAmount   = $cart->getOrderTotal(true);
             $rubCurrencyId = Currency::getIdByIsoCode('RUB');
             if ($cart->id_currency != $rubCurrencyId) {
                 $from = new Currency($cart->id_currency);
-                $to = new Currency($rubCurrencyId);
-                $this->module->log('debug', 'Convert amount from "' . $from->name . '" to "' . $to->name . '"');
+                $to   = new Currency($rubCurrencyId);
+                $this->module->log('debug', 'Convert amount from "'.$from->name.'" to "'.$to->name.'"');
                 $totalAmount = Tools::convertPriceFull($totalAmount, $from, $to);
             }
 
             $builder->setAmount($totalAmount)
-                ->setCurrency('RUB')
-                ->setCapture(true)
-                ->setClientIp($_SERVER['REMOTE_ADDR'])
-                ->setMetadata(array(
-                    'cms_name'       => 'ya_api_ycms_prestashop',
-                    'module_version' => $this->module->version,
-                ));
+                    ->setCurrency('RUB')
+                    ->setCapture(true)
+                    ->setClientIp($_SERVER['REMOTE_ADDR'])
+                    ->setMetadata(array(
+                        'cms_name'       => 'ya_api_ycms_prestashop',
+                        'module_version' => $this->module->version,
+                    ));
 
             $confirmation = array(
-                'type' => ConfirmationType::REDIRECT,
+                'type'      => ConfirmationType::REDIRECT,
                 'returnUrl' => $returnUrl,
             );
             if ($paymentMethod !== null) {
                 if ($paymentMethod === PaymentMethodType::ALFABANK) {
                     $paymentMethod = array(
-                        'type' => $paymentMethod,
+                        'type'  => $paymentMethod,
                         'login' => trim(Tools::getValue('alfaLogin')),
                     );
-                    $confirmation = ConfirmationType::EXTERNAL;
+                    $confirmation  = ConfirmationType::EXTERNAL;
                 } elseif ($paymentMethod === PaymentMethodType::QIWI) {
                     $paymentMethod = array(
-                        'type' => $paymentMethod,
+                        'type'  => $paymentMethod,
                         'phone' => preg_replace('/[^\d]+/', '', Tools::getValue('qiwiPhone')),
                     );
                 }
@@ -436,25 +457,14 @@ class KassaModel extends AbstractPaymentModel
                 );
             }
         } catch (\Exception $e) {
-            $this->module->log('error', 'Failed to create payment: ' . $e->getMessage());
+            $this->module->log('error', 'Failed to create payment: '.$e->getMessage());
+
             return null;
         }
 
         try {
-            $idempotencyKey = microtime(true);
-            $this->module->log('debug', 'Idempotency key: ' . $idempotencyKey);
-            $payment = $this->getApiClient()->createPayment($request, $idempotencyKey);
-            $tries = 1;
-            while ($payment === null) {
-                $this->module->log('info', 'Create payment request retry: try#' . ($tries + 1));
-                sleep(2);
-                $payment = $this->getApiClient()->createPayment($request, $idempotencyKey);
-                $tries++;
-                if ($tries > 3) {
-                    break;
-                }
-            }
-            $this->module->log('info', 'Create payment response: ' . ($payment === null ? 'null' : $payment->getId()));
+            $payment = $this->getApiClient()->createPayment($request);
+            $this->module->log('info', 'Create payment response: '.($payment === null ? 'null' : $payment->getId()));
             if ($payment !== null) {
                 if (!$this->insertPaymentInfo($payment, $this->module->currentOrder)) {
                     $this->module->log('error', 'Failed to insert payment info object');
@@ -463,8 +473,9 @@ class KassaModel extends AbstractPaymentModel
             }
         } catch (\Exception $e) {
             $payment = null;
-            $this->module->log('error', 'Failed to create payment object: ' . $e->getMessage());
+            $this->module->log('error', 'Failed to create payment object: '.$e->getMessage());
         }
+
         return $payment;
     }
 
@@ -472,7 +483,8 @@ class KassaModel extends AbstractPaymentModel
     {
         $paymentInfo = $this->findPaymentInfoByOrderId($orderId);
         if (empty($paymentInfo)) {
-            $this->module->log('warning', 'Order#' . $orderId . ' payment not found in database');
+            $this->module->log('warning', 'Order#'.$orderId.' payment not found in database');
+
             return false;
         }
 
@@ -481,10 +493,12 @@ class KassaModel extends AbstractPaymentModel
         } catch (\Exception $e) {
             $this->module->log(
                 'warning',
-                'API do not return payment ' . $paymentInfo['payment_id'] . ' for order#' . $orderId
+                'API do not return payment '.$paymentInfo['payment_id'].' for order#'.$orderId
             );
+
             return null;
         }
+
         return $payment;
     }
 
@@ -493,6 +507,7 @@ class KassaModel extends AbstractPaymentModel
      * @param \Order $order
      * @param float $amount
      * @param string $comment
+     *
      * @return RefundInterface|null
      */
     public function createRefund($payment, $order, $amount, $comment)
@@ -500,17 +515,19 @@ class KassaModel extends AbstractPaymentModel
         try {
             $builder = CreateRefundRequest::builder();
             $builder->setPaymentId($payment->getId())
-                ->setAmount($amount)
-                ->setComment($comment);
+                    ->setAmount($amount)
+                    ->setComment($comment);
             $request = $builder->build();
         } catch (\Exception $e) {
-            $this->module->log('error', 'Failed to create refund request: ' . $e->getMessage());
+            $this->module->log('error', 'Failed to create refund request: '.$e->getMessage());
+
             return null;
         }
 
+        /* @TODO Убрать цикл и протестить работоспобность. */
         try {
             $tries = 0;
-            $key = uniqid('', true);
+            $key   = uniqid('', true);
             do {
                 $refund = $this->getApiClient()->createRefund($request, $key);
                 if ($refund === null) {
@@ -522,12 +539,14 @@ class KassaModel extends AbstractPaymentModel
                 }
             } while ($refund === null);
         } catch (\Exception $e) {
-            $this->module->log('error', 'Failed to create refund: ' . $e->getMessage());
+            $this->module->log('error', 'Failed to create refund: '.$e->getMessage());
+
             return null;
         }
         if ($refund !== null) {
             $this->insertRefundInfo($refund, $order->id, $comment);
         }
+
         return $refund;
     }
 
@@ -539,11 +558,13 @@ class KassaModel extends AbstractPaymentModel
                 // $response = $this->getApiClient()->getRefundInfo($refund['id']);
             }
         }
+
         return $refunds;
     }
 
     /**
      * @param int $orderId
+     *
      * @return array
      */
     public function fetchRefundsByOrderId($orderId)
@@ -551,7 +572,7 @@ class KassaModel extends AbstractPaymentModel
         $query = new DbQuery();
         $query->select('*');
         $query->from('ya_money_refunds');
-        $query->where('order_id = ' . (int)$orderId);
+        $query->where('order_id = '.(int)$orderId);
         $recordSet = Db::getInstance()->query($query);
         if ($recordSet) {
             $result = array();
@@ -561,34 +582,32 @@ class KassaModel extends AbstractPaymentModel
         } else {
             $result = null;
         }
+
         return $result;
     }
 
     /**
      * @param string $paymentId
+     *
      * @return Payment|null
      */
     public function getPayment($paymentId)
     {
-        $tries = 0;
         $payment = $this->getApiClient()->getPaymentInfo($paymentId);
-        while ($payment === null) {
-            sleep(2);
-            $payment = $this->getApiClient()->getPaymentInfo($paymentId);
-            $tries++;
-            if ($tries >= 3) {
-                break;
-            }
-        }
+
         if ($payment === null) {
-            $this->module->log('warning', 'API do not return payment ' . $paymentId);
+            $this->module->log('warning', 'API do not return payment '.$paymentId);
+
             return null;
         }
+
+        /** @var Payment $payment */
         return $payment;
     }
 
     /**
      * @param Payment $payment
+     *
      * @return int
      */
     public function getOrderIdByPayment($payment)
@@ -596,11 +615,12 @@ class KassaModel extends AbstractPaymentModel
         $query = new DbQuery();
         $query->select('order_id');
         $query->from('ya_money_payments');
-        $query->where('payment_id = \'' . $payment->getId() . '\'');
+        $query->where('payment_id = \''.$payment->getId().'\'');
         $row = Db::getInstance()->getRow($query);
         if (!empty($row)) {
             return (int)$row['order_id'];
         }
+
         return 0;
     }
 
@@ -611,16 +631,17 @@ class KassaModel extends AbstractPaymentModel
     {
         $update = array(
             'status' => $payment->getStatus(),
-            'paid' => $payment->getPaid() ? 'Y' : 'N',
+            'paid'   => $payment->getPaid() ? 'Y' : 'N',
         );
         if ($payment->getCapturedAt() !== null) {
             $update['captured_at'] = $payment->getCapturedAt()->format('Y-m-d H:i:s');
         }
-        Db::getInstance()->update('ya_money_payments', $update, '`payment_id` = \'' . $payment->getId() . '\'');
+        Db::getInstance()->update('ya_money_payments', $update, '`payment_id` = \''.$payment->getId().'\'');
     }
 
     /**
      * @param Payment $payment
+     *
      * @return CreateCaptureResponse|null
      */
     public function capturePayment($payment)
@@ -629,19 +650,19 @@ class KassaModel extends AbstractPaymentModel
         try {
             $request = CreateCaptureRequest::builder()->setAmount($payment->getAmount())->build();
             if ($this->debugLog) {
-                $serializer = new CreateCaptureRequestSerializer();
+                $serializer   = new CreateCaptureRequestSerializer();
                 $requestArray = $serializer->serialize($request);
                 $this->module->log(
                     'info',
-                    'Capture payment request: paymentID=' . $payment->getId() . ', body: ' . json_encode($requestArray)
+                    'Capture payment request: paymentID='.$payment->getId().', body: '.json_encode($requestArray)
                 );
             }
-            $key = microtime(true);
-            $response = $this->getApiClient()->capturePayment($request, $payment->getId(), $key);
+            $response = $this->getApiClient()->capturePayment($request, $payment->getId());
         } catch (\Exception $e) {
-            $this->module->log('error', 'Capture error: ' . $e->getMessage());
+            $this->module->log('error', 'Capture error: '.$e->getMessage());
             $response = $payment;
         }
+
         return $response;
     }
 
@@ -658,10 +679,10 @@ class KassaModel extends AbstractPaymentModel
 
         $products = $cart->getProducts(true);
         $taxValue = $this->getTaxesArray(true);
-        $carrier = new Carrier($cart->id_carrier, $context->language->id);
+        $carrier  = new Carrier($cart->id_carrier, $context->language->id);
 
         foreach ($products as $product) {
-            $taxIndex = 'YA_NALOG_STAVKA_' . Product::getIdTaxRulesGroupByIdProduct($product['id_product']);
+            $taxIndex = 'YA_NALOG_STAVKA_'.Product::getIdTaxRulesGroupByIdProduct($product['id_product']);
             if (isset($taxValue[$taxIndex])) {
                 $taxId = $taxValue[$taxIndex];
                 $builder->addReceiptItem($product['name'], $product['price_wt'], $product['cart_quantity'], $taxId);
@@ -671,7 +692,7 @@ class KassaModel extends AbstractPaymentModel
         }
 
         if ($carrier->id && $cart->getPackageShippingCost()) {
-            $taxIndex = 'YA_NALOG_STAVKA_' . Carrier::getIdTaxRulesGroupByIdCarrier($carrier->id, $context);
+            $taxIndex = 'YA_NALOG_STAVKA_'.Carrier::getIdTaxRulesGroupByIdCarrier($carrier->id, $context);
             if (isset($taxValue[$taxIndex])) {
                 $taxId = $taxValue[$taxIndex];
                 $builder->addReceiptShipping($carrier->name, $cart->getPackageShippingCost(), $taxId);
@@ -684,44 +705,48 @@ class KassaModel extends AbstractPaymentModel
     private function insertPaymentInfo(CreatePaymentResponse $payment, $orderId)
     {
         $paymentMethod = $payment->getPaymentMethod();
-        $row = array(
-            'order_id' => $orderId,
-            'payment_id' => $payment->getId(),
-            'status' => $payment->getStatus(),
-            'amount' => $payment->getAmount()->getValue(),
-            'currency' => $payment->getAmount()->getCurrency(),
+        $row           = array(
+            'order_id'          => $orderId,
+            'payment_id'        => $payment->getId(),
+            'status'            => $payment->getStatus(),
+            'amount'            => $payment->getAmount()->getValue(),
+            'currency'          => $payment->getAmount()->getCurrency(),
             'payment_method_id' => empty($paymentMethod) ? '' : $payment->getPaymentMethod()->getType(),
-            'paid' => $payment->getPaid() ? 'Y' : 'N',
-            'created_at' => $payment->getCreatedAt()->format('Y-m-d H:i:s'),
+            'paid'              => $payment->getPaid() ? 'Y' : 'N',
+            'created_at'        => $payment->getCreatedAt()->format('Y-m-d H:i:s'),
         );
+
         return Db::getInstance()->insert('ya_money_payments', array($row));
     }
 
     /**
      * @param RefundInterface $refund
      * @param int $orderId
+     *
      * @return bool
      */
     private function insertRefundInfo(RefundInterface $refund, $orderId, $comment)
     {
         $row = array(
-            'refund_id' => $refund->getId(),
-            'order_id' => $orderId,
+            'refund_id'  => $refund->getId(),
+            'order_id'   => $orderId,
             'payment_id' => $refund->getPaymentId(),
-            'status' => $refund->getStatus(),
-            'amount' => $refund->getAmount()->getValue(),
-            'currency' => $refund->getAmount()->getCurrency(),
+            'status'     => $refund->getStatus(),
+            'amount'     => $refund->getAmount()->getValue(),
+            'currency'   => $refund->getAmount()->getCurrency(),
             'created_at' => $refund->getCreatedAt()->format('Y-m-d H:i:s'),
-            'comment' => $comment,
+            'comment'    => $comment,
         );
         if ($refund->getAuthorizedAt() !== null) {
             $row['authorized_at'] = $refund->getAuthorizedAt()->format('Y-m-d H:i:s');
         }
+
         return Db::getInstance()->insert('ya_money_refunds', array($row));
     }
 
     /**
      * @param int $orderId
+     *
      * @return array
      */
     private function findPaymentInfoByOrderId($orderId)
@@ -730,6 +755,7 @@ class KassaModel extends AbstractPaymentModel
         $query->select('*');
         $query->from('ya_money_payments');
         $query->where('order_id = '.(int)$orderId);
+
         return Db::getInstance()->GetRow($query);
     }
 
@@ -741,7 +767,7 @@ class KassaModel extends AbstractPaymentModel
         $query->where('id_order = '.(int)$orderId);
         $row = Db::getInstance()->getRow($query);
         if (!empty($row)) {
-            return (int) $row['id_order_payment'];
+            return (int)$row['id_order_payment'];
         } else {
             return -1;
         }
@@ -752,7 +778,8 @@ class KassaModel extends AbstractPaymentModel
         $update = array(
             'transaction_id' => $paymentId,
         );
-        return Db::getInstance()->update('order_payment', $update, 'id_order_payment = ' . $orderPaymentId);
+
+        return Db::getInstance()->update('order_payment', $update, 'id_order_payment = '.$orderPaymentId);
     }
 
     /**
@@ -765,6 +792,7 @@ class KassaModel extends AbstractPaymentModel
             $this->apiClient->setAuth($this->getShopId(), $this->getPassword());
             $this->apiClient->setLogger($this->module);
         }
+
         return $this->apiClient;
     }
 
@@ -780,6 +808,15 @@ class KassaModel extends AbstractPaymentModel
         } catch (\Exception $e) {
             return false;
         }
+
         return false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getShowInstallmentsButton()
+    {
+        return $this->showInstallmentsButton;
     }
 }

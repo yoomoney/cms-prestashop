@@ -62,6 +62,7 @@ class CreatePaymentRequestSerializer
         PaymentMethodType::QIWI           => 'serializePaymentDataMobilePhone',
         PaymentMethodType::CASH           => 'serializePaymentDataMobilePhone',
         PaymentMethodType::MOBILE_BALANCE => 'serializePaymentDataMobilePhone',
+        PaymentMethodType::INSTALLMENTS   => 'serializePaymentData',
     );
 
     public function serialize(CreatePaymentRequestInterface $request)

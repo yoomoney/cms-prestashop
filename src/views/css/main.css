@@ -9,14 +9,10 @@
 */
 
 p.payment_module a.yandex_money_card {
-	background: url(../img/ac.png) 23px 30px no-repeat #fbfbfb;
+	background: url(../img/bank_card.png) 23px 30px no-repeat #fbfbfb;
 }
 p.payment_module a.yandex_money_yandex_money {
 	background: url(../img/yandex_money.png) 23px 30px no-repeat #fbfbfb;
-}
-
-p.payment_module a.ym_AC {
-	background: url(../img/ac.png) 23px 30px no-repeat #fbfbfb;
 }
 
 p.payment_module a.yandex_money_webmoney {
@@ -31,10 +27,6 @@ p.payment_module a.yandex_money_cash {
 	background: url(../img/cash.png) 23px 30px no-repeat #fbfbfb;
 }
 
-p.payment_module a.ym_MC {
-	background: url(../img/mc.png) 23px 30px no-repeat #fbfbfb;
-}
-
 p.payment_module a.yandex_money_alfabank {
 	background: url(../img/alfabank.png) 23px 30px no-repeat #fbfbfb;
 }
@@ -47,16 +39,12 @@ p.payment_module a.ym_mobile_balance {
 	background: url(../img/mobile_balance.png) 23px 30px no-repeat #fbfbfb;
 }
 
-p.payment_module a.ym_MA {
-	background: url(../img/ma.png) 23px 30px no-repeat #fbfbfb;
-}
-
 p.payment_module a.yandex_money_qiwi {
 	background: url(../img/qiwi.png) 23px 30px no-repeat #fbfbfb;
 }
 
-p.payment_module a.ym_QP {
-	background: url(../img/qp.png) 23px 30px no-repeat #fbfbfb;
+p.payment_module a.yandex_money_installments {
+	background: url(../img/installments.png) 23px 30px no-repeat #fbfbfb;
 }
 
 p.payment_module a.yandex_money_yandex_money:hover,
@@ -69,6 +57,7 @@ p.payment_module a.ym_PC:hover,
 p.payment_module a.yandex_money_alfabank:hover,
 p.payment_module a.yandex_money_sberbank:hover,
 p.payment_module a.yandex_money_qiwi:hover,
+p.payment_module a.yandex_money_installments:hover,
 p.payment_module a.ym_QP:hover,
 p.payment_module a.ym_MC:hover{
 	background-color: #f6f6f6;
@@ -92,6 +81,7 @@ p.payment_module a.ym_MA:after,
 p.payment_module a.yandex_money_card:after,
 p.payment_module a.yandex_money_alfabank:after,
 p.payment_module a.yandex_money_sberbank:after,
+p.payment_module a.yandex_money_installments:after,
 p.payment_module a.ym_PC:after,
 p.payment_module a.ym_MC:after{
 	display: block;

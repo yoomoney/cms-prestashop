@@ -57,7 +57,7 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
 
         $customer = new Customer($cart->id_customer);
         if (!Validate::isLoadedObject($customer)) {
-            $this->errorRedirect('customer with id#' . $cart->id_customer . ' not exists');
+            $this->errorRedirect('customer with id#'.$cart->id_customer.' not exists');
         }
 
         $kassa = $this->module->getKassaModel();
@@ -65,7 +65,8 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
         $paymentMethod = Tools::getValue('payment_method', '');
         if (empty($paymentMethod)) {
             if (!$kassa->getEPL()) {
-                $this->errorRedirect('payment is empty, but epl disabled', 'index.php?controller=order&step=3');
+                $this->errorRedirect($this->module->l('payment is empty, but epl disabled'),
+                    'index.php?controller=order&step=3');
             }
         } elseif (!$kassa->isPaymentMethodEnabled($paymentMethod)) {
             $this->errorRedirect(
@@ -77,26 +78,35 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
             if ($paymentMethod === PaymentMethodType::ALFABANK) {
                 $login = trim(Tools::getValue('alfaLogin'));
                 if (empty($login)) {
-                    $this->errorRedirect('Alfa login is empty', 'index.php?controller=order&step=3');
+                    $this->errorRedirect($this->module->l('Alfa login is empty'), 'index.php?controller=order&step=3');
                 }
             }
             if ($paymentMethod === PaymentMethodType::QIWI) {
                 $phone = preg_replace('/[^\d]+/', '', Tools::getValue('qiwiPhone'));
                 if (empty($phone)) {
-                    $this->errorRedirect('Qiwi phone is empty', 'index.php?controller=order&step=3');
+                    $this->errorRedirect($this->module->l('Qiwi phone is empty'), 'index.php?controller=order&step=3');
                 }
             }
         }
 
         $currency = $this->context->currency;
-        $total = (float)$cart->getOrderTotal(true, Cart::BOTH);
+        $total    = (float)$cart->getOrderTotal(true, Cart::BOTH);
+        if (isset($paymentMethodInfo)) {
+            $paymentLabel          = $paymentMethodInfo['value'] == PaymentMethodType::INSTALLMENTS
+                ? $this->module->l('Installments')
+                : $paymentMethodInfo['name'];
+            $paymentMethodInfoName = ': '.$paymentLabel;
+        } else {
+            $paymentMethodInfoName = '';
+        }
+
 
         $isOrderValid = $this->module->validateOrder(
             $cart->id,
             $kassa->getCreateStatusId(),
             $total,
-            'Оплата через Яндекс.Кассу'
-                . (isset($paymentMethodInfo) ? ': ' . $paymentMethodInfo['name'] : ''),
+            $this->module->l('Оплата через Яндекс.Кассу')
+            .$paymentMethodInfoName,
             null,
             null,
             (int)$currency->id,
@@ -104,35 +114,35 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
             $customer->secure_key
         );
         if (!$isOrderValid) {
-            $this->errorRedirect('Failed to validate order', 'index.php?controller=order&step=1');
+            $this->errorRedirect($this->module->l('Failed to validate order'), 'index.php?controller=order&step=1');
         }
 
         $returnUrl = 'index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$this->module->id
-            .'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key;
-        $payment = $kassa->createPayment(
+                     .'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key;
+        $payment   = $kassa->createPayment(
             $this->context,
             $cart,
             $paymentMethod,
-            Tools::getShopDomain(true) . __PS_BASE_URI__ . $returnUrl
+            Tools::getShopDomain(true).__PS_BASE_URI__.$returnUrl
         );
-        $errorUrl = 'index.php?controller=order&submitReorder=&id_order=' . $this->module->currentOrder;
+        $errorUrl  = 'index.php?controller=order&submitReorder=&id_order='.$this->module->currentOrder;
         if ($payment === null) {
             $this->errorRedirect('payment creation failed', $errorUrl);
         }
 
         $confirmation = $payment->getConfirmation();
         if ($confirmation instanceof ConfirmationRedirect) {
-            $this->module->log('info', 'Redirect user to payment page ' . $confirmation->getConfirmationUrl());
+            $this->module->log('info', 'Redirect user to payment page '.$confirmation->getConfirmationUrl());
             Tools::redirect($confirmation->getConfirmationUrl());
         } else {
-            $this->module->log('info', 'Redirect user to confirmation page ' . $returnUrl);
+            $this->module->log('info', 'Redirect user to confirmation page '.$returnUrl);
             Tools::redirect($returnUrl);
         }
     }
 
     private function errorRedirect($message, $link = null)
     {
-        $this->module->log('info', 'Redirect from payment page: ' . $message);
+        $this->module->log('info', 'Redirect from payment page: '.$message);
         if ($link === null) {
             $link = 'index.php?controller=order&step=1';
         }

@@ -175,11 +175,11 @@ class Partner
         $b = array();
         if ($add) {
             $delivery = isset($data->$type->delivery->address) ? $data->$type->delivery->address : new stdClass();
-            $street = isset($delivery->street) ? ' Улица: '.$delivery->street : 'Самовывоз';
-            $subway = isset($delivery->subway) ? ' Метро: '.$delivery->subway : '';
-            $block = isset($delivery->block) ? ' Корпус/Строение: '.$delivery->block : '';
-            $floor = isset($delivery->floor) ? ' Этаж: '.$delivery->floor : '';
-            $house = isset($delivery->house) ? ' Дом: '.$delivery->house : '';
+            $street = isset($delivery->street) ? $this->module->l(' Улица: ').$delivery->street : $this->module->l('Самовывоз');
+            $subway = isset($delivery->subway) ? $this->module->l(' Метро: ').$delivery->subway : '';
+            $block = isset($delivery->block) ? $this->module->l(' Корпус/Строение: ').$delivery->block : '';
+            $floor = isset($delivery->floor) ? $this->module->l(' Этаж: ').$delivery->floor : '';
+            $house = isset($delivery->house) ? $this->module->l(' Дом: ').$delivery->house : '';
             $address1 = $street.$subway.$block.$floor.$house;
             $customer = new Customer(Configuration::get('YA_MARKET_ORDERS_CUSTOMER'));
             $address = new Address();

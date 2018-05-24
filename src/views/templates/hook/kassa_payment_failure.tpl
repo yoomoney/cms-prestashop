@@ -9,7 +9,7 @@
 * @package   Yandex Payment Solution
 *}
 
-<p>Не удалось провести платёж</p>
+<p>{l s='Не удалось провести платёж' mod='yandexmodule'}</p>
 {if $message}
     <p>{$message|escape:'htmlall':'UTF-8'}</p>
 {/if}

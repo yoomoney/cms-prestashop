@@ -9,15 +9,15 @@
  * @package   Yandex Payment Solution
  */
 
-$(document).ready(function(){
+$(document).ready(function () {
     $('#tabs').tabs();
     var view = $.totalStorage('tab_ya');
-    if(view == null)
+    if (view == null)
         $.totalStorage('tab_ya', 'money');
     else
-        $('.ui-tabs-nav li a[href="#'+ view +'"]').click();
+        $('.ui-tabs-nav li a[href="#' + view + '"]').click();
 
-    $('.ui-tabs-nav li').live('click', function(){
+    $('.ui-tabs-nav li').live('click', function () {
         var view = $(this).find('a').first().attr('href').replace('#', '');
         $.totalStorage('tab_ya', view);
     });
@@ -34,9 +34,10 @@ $(document).ready(function(){
 });
 
 function bindModeTrigger(root) {
-    var kassa = root.next();
-    var shop = kassa.next();
-    var input = jQuery('input[name=YA_KASSA_PAYMENT_MODE]');
+    const paymentMethodWrapper = jQuery('.payment-mode-shop').parents('.form-group');
+    const eplButtonWrapper = jQuery('#YA_KASSA_PAY_LOGO_ON').parents('.form-group');
+    const installmentsButtonWrapper = jQuery('#YA_KASSA_INSTALLMENTS_BUTTON_ON').parents('.form-group');
+    const input = jQuery('input[name=YA_KASSA_PAYMENT_MODE]');
     input.change(function () {
         triggerMode(this.value);
     });
@@ -45,16 +46,19 @@ function bindModeTrigger(root) {
     } else if (input[1].checked) {
         triggerMode(input[1].value);
     } else {
-        kassa.slideUp();
-        shop.slideUp();
+        eplButtonWrapper.hide();
+        installmentsButtonWrapper.hide();
+        paymentMethodWrapper.show();
     }
     function triggerMode(value) {
         if (value == 'kassa') {
-            kassa.slideDown();
-            shop.slideUp();
+            jQuery(eplButtonWrapper).show();
+            jQuery(installmentsButtonWrapper).show();
+            jQuery(paymentMethodWrapper).hide();
         } else {
-            kassa.slideUp();
-            shop.slideDown();
+            jQuery(eplButtonWrapper).hide();
+            jQuery(installmentsButtonWrapper).hide();
+            jQuery(paymentMethodWrapper).show();
         }
     }
 }
