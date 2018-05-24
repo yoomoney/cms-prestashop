@@ -24,18 +24,18 @@
 {if $method.value == 'qiwi'}
 <div class="row additional-fields" style="display: none;margin-bottom: 10px;" id="qiwi-phone-container">
     <div class="col-xs-12">
-        <label for="qiwi-phone">{l s='Телефон, который привязан к Qiwi Wallet' mod='yandexmodule'}</label>
+        <label for="qiwi-phone">{l s='Phone number linked to QIWI Wallet' mod='yandexmodule'}</label>
         <input type="text" id="qiwi-phone" value="" />
-        <button type="button" data-value="{$method.value|escape:'htmlall':'UTF-8'}">{l s='Оплатить заказ' mod='yandexmodule'}</button>
+        <button type="button" data-value="{$method.value|escape:'htmlall':'UTF-8'}">{l s='Pay' mod='yandexmodule'}</button>
     </div>
 </div>
 {/if}
 {if $method.value == 'alfabank'}
 <div class="row additional-fields" style="display: none;margin-bottom: 10px;" id="alfa-login-container">
     <div class="col-xs-12">
-        <label for="alfa-login">{l s='Укажите логин, и мы выставим счет в Альфа-Клике. После этого останется подтвердить платеж на сайте интернет-банка.' mod='yandexmodule'}</label>
+        <label for="alfa-login">{l s='Specify the login, and we\'ll send the bill in Alfa-Click. All you have do after that is confirm the payment online at the bank\'s website.' mod='yandexmodule'}</label>
         <input type="text" id="alfa-login" value="" />
-        <button type="button" data-value="{$method.value|escape:'htmlall':'UTF-8'}">{l s='Оплатить заказ' mod='yandexmodule'}</button>
+        <button type="button" data-value="{$method.value|escape:'htmlall':'UTF-8'}">{l s='Pay' mod='yandexmodule'}</button>
     </div>
 </div>
 {/if}

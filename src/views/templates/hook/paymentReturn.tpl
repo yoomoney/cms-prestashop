@@ -10,8 +10,8 @@
 *}
 
 <div class="box">
-	<p class = "success">{l s='Платёж успешно завершён' mod='yandexmodule'}</p>
-	<h2>{l s='Список заказанных товаров:' mod='yandexmodule'}</h2>
+	<p class = "success">{l s='Payment captured' mod='yandexmodule'}</p>
+	<h2>{l s='List of products in the order:' mod='yandexmodule'}</h2>
 	<ul>
 	{foreach from=$products item=product}
 		<li>{if $product.download_hash}

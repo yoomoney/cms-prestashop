@@ -31,7 +31,7 @@ class Installer
     {
         $status = array(
             'DELIVERY' => array(
-                'name' => 'YA Ждёт отправки',
+                'name' => $this->module->l('YA Ждёт отправки'),
                 'color' => '#8A2BE2',
                 'id' => 900,
                 'paid' => true,
@@ -40,7 +40,7 @@ class Installer
                 'delivery' => true
             ),
             'CANCELLED' => array(
-                'name' => 'YA Отменен',
+                'name' => $this->module->l('YA Отменен'),
                 'color' => '#b70038',
                 'id' => 901,
                 'paid' => false,
@@ -49,7 +49,7 @@ class Installer
                 'delivery' => false
             ),
             'PICKUP' => array(
-                'name' => 'YA В пункте самовывоза',
+                'name' => $this->module->l('YA В пункте самовывоза'),
                 'color' => '#cd98ff',
                 'id' => 902,
                 'paid' => true,
@@ -58,7 +58,7 @@ class Installer
                 'delivery' => true
             ),
             'PROCESSING' => array(
-                'name' => 'YA В процессе подготовки',
+                'name' => $this->module->l('YA В процессе подготовки'),
                 'color' => '#FF8C00',
                 'id' => 903,
                 'paid' => true,
@@ -67,7 +67,7 @@ class Installer
                 'delivery' => true
             ),
             'DELIVERED' => array(
-                'name' => 'YA Доставлен',
+                'name' => $this->module->l('YA Доставлен'),
                 'color' => '#108510',
                 'id' => 904,
                 'paid' => true,
@@ -76,7 +76,7 @@ class Installer
                 'delivery' => true
             ),
             'UNPAID' => array(
-                'name' => 'YA Не оплачен',
+                'name' => $this->module->l('YA Не оплачен'),
                 'color' => '#ff1c30',
                 'id' => 905,
                 'paid' => false,
@@ -85,7 +85,7 @@ class Installer
                 'delivery' => false
             ),
             'RESERVATION_EXPIRED' => array(
-                'name' => 'YA Резерв отменён',
+                'name' => $this->module->l('YA Резерв отменён'),
                 'color' => '#ff2110',
                 'id' => 906,
                 'paid' => false,
@@ -94,7 +94,7 @@ class Installer
                 'delivery' => false
             ),
             'RESERVATION' => array(
-                'name' => 'YA Резерв',
+                'name' => $this->module->l('YA Резерв'),
                 'color' => '#0f00d3',
                 'id' => 907,
                 'paid' => false,
@@ -210,10 +210,10 @@ class Installer
     public function addServiceCustomer()
     {
         $customer = new \Customer();
-        $customer->firstname = 'Service user for YCMS';
-        $customer->lastname = 'Service user for YCMS';
+        $customer->firstname = $this->module->l('Service user for YCMS');
+        $customer->lastname = $this->module->l('Service user for YCMS');
         if (property_exists($customer, 'middlename')) {
-            $customer->middlename = 'Service user for YCMS';
+            $customer->middlename = $this->module->l('Service user for YCMS');
         }
         $customer->email = 'service@example.com';
         if (version_compare(_PS_VERSION_, '1.7.0') < 0) {

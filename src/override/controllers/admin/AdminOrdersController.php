@@ -28,8 +28,8 @@ class AdminOrdersController extends AdminOrdersControllerCore
     {
         if (Tools::isSubmit('viewReturns')) {
             $id_order = Tools::getValue('id_order', 0);
+            $module = new yandexmodule();
             if ($id_order) {
-                $module = new yandexmodule();
                 $params = array('order' => new Order($id_order));
                 $this->content .= $module->displayReturnsContentTabs($params);
                 $this->content .= $module->displayReturnsContent($params);

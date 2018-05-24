@@ -90,7 +90,7 @@ class FormHelper
                         'disabled' => 1,
                         'type' => 'text',
                         'name' => 'YA_MARKET_ORDERS_TA',
-                        'label' => $this->l('Тип авторизации'),
+                        'label' => $this->l('Type of Authorization'),
                     ),
                     array(
                         'type' => 'checkbox',
@@ -632,14 +632,15 @@ class FormHelper
             'name'  => 'name',
         );
         $names = array(
-            PaymentMethodType::BANK_CARD => 'Банковские карты',
-            PaymentMethodType::YANDEX_MONEY => 'Яндекс.Деньги',
-            PaymentMethodType::SBERBANK => 'Сбербанк Онлайн',
-            PaymentMethodType::QIWI => 'QIWI Wallet',
-            PaymentMethodType::WEBMONEY => 'Webmoney',
-            PaymentMethodType::CASH => 'Наличные через терминалы',
-            PaymentMethodType::MOBILE_BALANCE => 'Баланс мобильного',
-            PaymentMethodType::ALFABANK => 'Альфа-Клик',
+            PaymentMethodType::BANK_CARD => $this->l('Bank cards'),
+            PaymentMethodType::YANDEX_MONEY => $this->l('Yandex.Money'),
+            PaymentMethodType::SBERBANK => $this->l('Sberbank Online'),
+            PaymentMethodType::QIWI => $this->l('QIWI Wallet'),
+            PaymentMethodType::WEBMONEY => $this->l('Webmoney'),
+            PaymentMethodType::CASH => $this->l('Cash via payment kiosks'),
+            PaymentMethodType::MOBILE_BALANCE => $this->l('Direct carrier billing'),
+            PaymentMethodType::ALFABANK => $this->l('Alfa-Click'),
+            PaymentMethodType::INSTALLMENTS => $this->l('Installments')
         );
         foreach (array_keys($model->getPaymentMethods()) as $key) {
             $paymentMethodOptions['query'][] = array(
@@ -655,7 +656,7 @@ class FormHelper
                     array(
                         'type' => 'radio',
                         'label' => $this->l(
-                            'Включить приём платежей через Яндекс.Кассу'
+                            'Activate payments via Yandex.Checkout'
                         ),
                         'name' => 'YA_KASSA_ACTIVE',
                         'required' => false,
@@ -692,18 +693,18 @@ class FormHelper
                         'class' => 't',
                         'type' => 'text',
                         'required' => true,
-                        'desc' => 'Выпустите и активируйте секретный ключ в '
+                        'desc' => $this->l('Выпустите и активируйте секретный ключ в ')
                             . '<a href="https://kassa.yandex.ru/my" target="_blank">'
-                            . 'личном кабинете Яндекс.Кассы</a>. '
-                            . 'Потом скопируйте его сюда.'
+                            . $this->l('личном кабинете Яндекс.Кассы').'</a>. '
+                            . $this->l('Потом скопируйте его сюда.')
                         ,
                         'name' => 'YA_KASSA_PASSWORD',
-                        'label' => $this->l('Секретный ключ'),
+                        'label' => $this->l('Secret key'),
                         'value' => $model->getPassword(),
                     ),
                     array(
                         'type' => 'radio',
-                        'label' => $this->l('Выбор способа оплаты'),
+                        'label' => $this->l('Select payment method'),
                         'desc' => '',
                         'name' => 'YA_KASSA_PAYMENT_MODE',
                         'required' => false,
@@ -713,12 +714,12 @@ class FormHelper
                             array(
                                 'id' => 'payment_mode_kassa',
                                 'value' => 'kassa',
-                                'label' => $this->l('На стороне Кассы'),
+                                'label' => $this->l("On Yandex.Checkout's site"),
                             ),
                             array(
                                 'id' => 'payment_mode_shop',
                                 'value' => 'shop',
-                                'label' => $this->l('На стороне магазина'),
+                                'label' => $this->l("On the store's site"),
                             ),
                         ),
                     ),
@@ -733,6 +734,23 @@ class FormHelper
                                 array(
                                     'id' => 'ON',
                                     'name' => $this->l('Use "Pay with Yandex" button'),
+                                ),
+                            ),
+                            'id' => 'id',
+                            'name' => 'name',
+                        ),
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'label' => '',
+                        'name' => 'YA_KASSA_INSTALLMENTS_BUTTON',
+                        'class' => 'text-inside payment-mode-kassa',
+                        'desc' => $this->l(''),
+                        'values' => array(
+                            'query' => array(
+                                array(
+                                    'id' => 'ON',
+                                    'name' => $this->l('Add the Installments payment method to checkout page'),
                                 ),
                             ),
                             'id' => 'id',
@@ -757,12 +775,12 @@ class FormHelper
                         'values' => array(
                             array(
                                 'id' => 'kassa_send_receipt_enable',
-                                'label' => $this->l('Включить'),
+                                'label' => $this->l('Enable'),
                                 'value' => 1,
                             ),
                             array(
                                 'id' => 'kassa_send_receipt_disable',
-                                'label' => $this->l('Отключить'),
+                                'label' => $this->l('Disable'),
                                 'value' => 0,
                             ),
                         ),
@@ -787,7 +805,7 @@ class FormHelper
             'query' => array(
                 array(
                     'id' => 1,
-                    'name' => 'Без НДС',
+                    'name' => $this->l('Without VAT'),
                 ),
                 array(
                     'id' => 2,
@@ -803,11 +821,11 @@ class FormHelper
                 ),
                 array(
                     'id' => 5,
-                    'name' => 'Расчётная ставка 10/110',
+                    'name' => $this->l('Applicable rate 10/110'),
                 ),
                 array(
                     'id' => 6,
-                    'name' => 'Расчётная ставка 18/118',
+                    'name' => $this->l('Applicable rate 18/118'),
                 )
             ),
             'id' => 'id',
@@ -816,7 +834,7 @@ class FormHelper
 
         $form['form']['input'][] = array(
             'type'  => 'html',
-            'label' => $this->l('НДС'),
+            'label' => $this->l('VAT'),
             'html_content' => '',
             'desc' => '',
             'name' => '',
@@ -824,7 +842,7 @@ class FormHelper
 
         $form['form']['input'][] = array(
             'type'  => 'select',
-            'label' => $this->l('Ставка по умолчанию'),
+            'label' => $this->l('Default rate'),
             'name'  => 'YA_KASSA_DEFAULT_TAX_RATE',
             'options' => $taxRateOptions,
             'value' => $model->getDefaultTaxRate(),
@@ -834,7 +852,7 @@ class FormHelper
 
         $form['form']['input'][] = array(
             'type'  => 'html',
-            'label' => $this->l('Сопоставьте ставки'),
+            'label' => $this->l('Compare rates'),
             'html_content' => '',
             'desc' => $this->l(''),
             'name' => '',
@@ -843,9 +861,9 @@ class FormHelper
 
         $form['form']['input'][] = array(
             'type'  => 'html',
-            'label' => $this->l('Ставка в вашем магазине'),
+            'label' => $this->l('Rate at your store'),
             'html_content' => '',
-            'desc' => $this->l('Ставка для чека в налоговую.'),
+            'desc' => $this->l('Rate for the receipt to the tax service'),
             'name' => '',
             'class' => 'kassa_tax_rate',
         );
@@ -876,7 +894,7 @@ class FormHelper
                 . 'попросят специалисты Яндекс.Кассы'
             ),
             'name' => 'YA_KASSA_NOTIFICATION_URL',
-            'label' => $this->l('Адрес для уведомлений'),
+            'label' => $this->l('Address for notifications'),
             'disabled' => true
         );
 
@@ -889,7 +907,7 @@ class FormHelper
         );*/
         $form['form']['input'][] = array(
             'type' => 'select',
-            'label' => $this->l('Статус заказа после подтверждения платежа'),
+            'label' => $this->l('Order status after the payment'),
             'name' => 'YA_KASSA_SUCCESS_STATUS_ID',
             'value' => $model->getSuccessStatusId(),
             'options' => $statusOptions,
@@ -914,11 +932,10 @@ class FormHelper
         );
         $form['form']['input'][] = array(
             'type' => 'checkbox',
-            'label' => $this->l('Запись отладочной информации'),
+            'label' => $this->l('Debug log'),
             'name' => 'YA_KASSA_LOGGING',
             'desc' => $this->l(
-                'Настройку нужно будет поменять, '
-                . 'если попросят специалисты Яндекс.Кассы'
+                'Настройку нужно будет поменять, если попросят специалисты Яндекс.Кассы'
             ),
             'values' => array(
                 'query' => array(
@@ -942,7 +959,7 @@ class FormHelper
                     array(
                         'type' => 'radio',
                         'label' => $this->l(
-                            'Включить прием платежей в кошелек на Яндексе'
+                            'Activate payments via Yandex Wallet'
                         ),
                         'name' => 'YA_WALLET_ACTIVE',
                         'required' => false,
@@ -965,9 +982,9 @@ class FormHelper
                     array(
                         'col' => 6,
                         'class' => 't',
-                        'desc' => "Скопируйте эту ссылку в поле Redirect URL на ".
-                            "<a href=\"https://sp-money.yandex.ru/myservices/new.xml\" target=\"_blank\">"
-                            .$this->l("странице регистрации приложения")."</a>",
+                        'desc' => $this->l('Скопируйте эту ссылку в поле Redirect URL на').
+                            '<a href="https://sp-money.yandex.ru/myservices/new.xml" target="_blank"> '.
+                            $this->l('странице регистрации приложения'). ' </a>',
                         'type' => 'text',
                         'name' => 'YA_WALLET_REDIRECT',
                         'label' => $this->l('RedirectURL'),
@@ -992,7 +1009,7 @@ class FormHelper
                     ),
                     array(
                         'type' => 'textarea',
-                        'label' => $this->l('Секретное слово'),
+                        'label' => $this->l('Codeword'),
                         'name' => 'YA_WALLET_PASSWORD',
                         'rows' => 5,
                         'cols' => 30,
@@ -1017,7 +1034,7 @@ class FormHelper
                     ),
                     array(
                         'type' => 'checkbox',
-                        'label' => $this->l('Запись отладочной информации'),
+                        'label' => $this->l('Debug log'),
                         'desc' => $this->l('Настройку нужно будет поменять, ".
                             "только если попросят специалисты Яндекс.Денег'),
                         'name' => 'YA_WALLET_LOGGING',

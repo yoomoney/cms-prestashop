@@ -10,50 +10,46 @@
 *}
 
 {capture name=path}
-    {l s='Оплата через Яндекс деньги.' mod='yandexmodule'}
+    {l s='Payment via Yandex.Money.' mod='yandexmodule'}
 {/capture}
 
 <h1 class="page-heading">
-    {l s='Информация о заказе' mod='yandexmodule'}
+    {l s='Order details' mod='yandexmodule'}
 </h1>
 
 {assign var='current_step' value='payment'}
-{include file="$tpl_dir./order-steps.tpl"}
+{*{include file="$tpl_dir./checkout-step.tpl"}*}
 
 {if $nbProducts <= 0}
     <p class="alert alert-warning">
-        {l s='Ваша корзина пуста.' mod='yandexmodule'}
+        {l s='Your cart is empty.' mod='yandexmodule'}
     </p>
 {else}
     <form action="{$payment_link|escape:'quotes':'UTF-8'}" method="post">
         <input type="hidden" name="cnf" value="1" checked />
         <div class="box cheque-box">
             <h3 class="page-subheading">
-                {l s='Оплата через Яндекс деньги.' mod='yandexmodule'}
+                {l s='Payment via Yandex.Money.' mod='yandexmodule'}
             </h3>
             <p class="cheque-indent">
                 <strong class="dark">
-                    {l s='Вы выбрали оплату через Яндекс деньги.' mod='yandexmodule'} {l s='Краткая инфомация о заказе:' mod='yandexmodule'}
+                    {l s='You selected payment via Yandex.Money.' mod='yandexmodule'} {l s='Short description of the order:' mod='yandexmodule'}
                 </strong>
             </p>
             <p>
-                - {l s='Сумма вашего заказа' mod='yandexmodule'}
-                <span id="amount" class="price">{displayPrice price=$total}</span>
+                - {l s='Total amount' mod='yandexmodule'}
+                {*<span id="amount" class="price">{displayPrice price=$total}</span>*}
                 {if $use_taxes == 1}
-                    {l s='(вкл. налог)' mod='yandexmodule'}
+                    {l s='(incl. VAT)' mod='yandexmodule'}
                 {/if}
             </p>
         </div>
         <p class="cart_navigation clearfix" id="cart_navigation">
-        	<a 
-            class="button-exclusive btn btn-default" 
-            href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}">
-                <i class="icon-chevron-left"></i>{l s='Другие методы оплаты' mod='yandexmodule'}
+        	<a class="button-exclusive btn btn-default" href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}">
+                <i class="icon-chevron-left"></i>{l s='Other payment methods' mod='yandexmodule'}
             </a>
-            <button 
-            class="button btn btn-default button-medium" 
-            type="submit">
-                <span>{l s='Я подтверждаю заказ' mod='yandexmodule'}<i class="icon-chevron-right right"></i></span>
+            <button class="button btn btn-default button-medium" type="submit">
+                <span>{l s='I confirm the order' mod='yandexmodule'}<i class="icon-chevron-right right"></i></span>
             </button>
         </p>
     </form>

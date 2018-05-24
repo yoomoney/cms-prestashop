@@ -10,6 +10,6 @@
 *}
 
 <form method="post" action="{$action|escape:'htmlall':'UTF-8'}">
-    <label for="ym-billing-fio">{l s='ФИО плательщика' mod='yandexmodule'}</label>
+    <label for="ym-billing-fio">{l s='Payer\'s full name' mod='yandexmodule'}</label>
     <input name="ym_billing_fio" id="ym-billing-fio" value="{$fio|escape:'htmlall':'UTF-8'}" />
 </form>

@@ -98,7 +98,7 @@ class WalletModel extends AbstractPaymentModel
     public function assignVariables($smarty)
     {
         $template = 'module:yandexmodule/views/templates/hook/1.7/wallet_form.tpl';
-        $smarty->assign('label', 'Выберите способ оплаты');
+        $smarty->assign('label', $this->module->l('Выберите способ оплаты'));
         return $template;
     }
 }

@@ -10,11 +10,11 @@
 *}
 
 {capture name=path}
-    {l s='Оплата Банковской картой.' mod='yandexmodule'}
+    {l s='Payment via bank card.' mod='yandexmodule'}
 {/capture}
 
 <h1 class="page-heading">
-    {l s='Информация о оплате' mod='yandexmodule'}
+    {l s='Payment details' mod='yandexmodule'}
 </h1>
 
 {assign var='current_step' value='payment'}
@@ -22,23 +22,23 @@
 
 {if $nbProducts <= 0}
 	<p class="alert alert-warning">
-        {l s='Ваша корзина пуста.' mod='yandexmodule'}
+        {l s='Your cart is empty.' mod='yandexmodule'}
     </p>
 {else}
     <form action="{$payment_link|escape:'quotes':'UTF-8'}" method="post">
 	<input type="hidden" name="cnf" value="1" checked />
         <div class="box cheque-box">
             <h3 class="page-subheading">
-                {l s='Оплата Банковской картой.' mod='yandexmodule'}
+                {l s='Сredit card payment.' mod='yandexmodule'}
             </h3>
             <p class="cheque-indent">
                 <strong class="dark">
-                    {l s='Вы выбрали оплату через Банковскую карту.' mod='yandexmodule'} {l s='Во время заказа произошли следующие ошибки:' mod='yandexmodule'}
+                    {l s='You selected payment via bank card.' mod='yandexmodule'} {l s='Following errors occured during the order processing:' mod='yandexmodule'}
                 </strong>
             </p>
             <p>
                 <div class="alert alert-danger">
-					<p>{l s='Колличество ошибок ' mod='yandexmodule'} {$errors|count}</p>
+					<p>{l s='Errors count ' mod='yandexmodule'} {$errors|count}</p>
 					<ol>
 						{foreach $errors as $e}
 							<li>{$e|escape:'htmlall':'UTF-8'}</li>
@@ -51,7 +51,7 @@
         	<a 
             class="button-exclusive btn btn-default" 
             href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}">
-                <i class="icon-chevron-left"></i>{l s='Другие методы оплаты' mod='yandexmodule'}
+                <i class="icon-chevron-left"></i>{l s='Other payment methods' mod='yandexmodule'}
             </a>
         </p>
     </form>

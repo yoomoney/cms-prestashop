@@ -9,4 +9,4 @@
 * @package   Yandex Payment Solution
 *}
 
-<p>Заказ создан</p>
+<p>{l s='Заказ создан' mod='yandexmodule'}</p>

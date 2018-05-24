@@ -10,11 +10,11 @@
 *}
 
 {capture name=path}
-    {l s='Оплата банковской картой.' mod='yandexmodule'}
+    {l s='Payment via bank card.' mod='yandexmodule'}
 {/capture}
 
 <h1 class="page-heading">
-    {l s='Общая информация' mod='yandexmodule'}
+    {l s='General information' mod='yandexmodule'}
 </h1>
 
 {assign var='current_step' value='payment'}
@@ -22,25 +22,25 @@
 
 {if $nbProducts <= 0}
     <p class="alert alert-warning">
-        {l s='Ваша корзина пуста.' mod='yandexmodule'}
+        {l s='Your cart is empty.' mod='yandexmodule'}
     </p>
 {else}
     <form action="{$payment_link|escape:'quotes':'UTF-8'}" method="post">
         <input type="hidden" name="cnf" value="1" checked />
         <div class="box cheque-box">
             <h3 class="page-subheading">
-               {l s='credit card payment.' mod='yandexmodule'}
+               {l s='Сredit card payment.' mod='yandexmodule'}
             </h3>
             <p class="cheque-indent">
                 <strong class="dark">
-                    {l s='Вы выбрали оплату банковской картой.' mod='yandexmodule'} {l s='Краткая информация о заказе:' mod='yandexmodule'}
+                    {l s='You selected payment via bank card.' mod='yandexmodule'} {l s='Short description of the order:' mod='yandexmodule'}
                 </strong>
             </p>
             <p>
-                - {l s='Сумма вашего заказа' mod='yandexmodule'}
+                - {l s='Total amount' mod='yandexmodule'}
                 <span id="amount" class="price">{displayPrice price=$total}</span>
                 {if $use_taxes == 1}
-                    {l s='(вкл. налог)' mod='yandexmodule'}
+                    {l s='(incl. VAT)' mod='yandexmodule'}
                 {/if}
             </p>
         </div>
@@ -48,12 +48,12 @@
             <a
             class="button-exclusive btn btn-default"
             href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}">
-                <i class="icon-chevron-left"></i>{l s='Другие методы оплаты' mod='yandexmodule'}
+                <i class="icon-chevron-left"></i>{l s='Other payment methods' mod='yandexmodule'}
             </a>
             <button 
             class="button btn btn-default button-medium" 
             type="submit">
-                <span>{l s='Я подтверждаю заказ' mod='yandexmodule'}<i class="icon-chevron-right right"></i></span>
+                <span>{l s='I confirm the order' mod='yandexmodule'}<i class="icon-chevron-right right"></i></span>
             </button>
         </p>
     </form>
