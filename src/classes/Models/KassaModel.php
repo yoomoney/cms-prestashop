@@ -50,6 +50,7 @@ class KassaModel extends AbstractPaymentModel
     private $sendReceipt;
     private $defaultTaxRate;
     private $minimumAmount;
+    private $paymentDescription;
     private $debugLog;
     private $createStatusId;
     private $successStatusId;
@@ -71,7 +72,11 @@ class KassaModel extends AbstractPaymentModel
         $this->createStatusId         = Configuration::get('PS_OS_PREPARATION');
         $this->successStatusId        = (int)Configuration::get('YA_KASSA_SUCCESS_STATUS_ID');
         $this->failureStatusId        = Configuration::get('PS_OS_ERROR');
+        $this->paymentDescription     = Configuration::get('YA_KASSA_PAYMENT_DESCRIPTION');
 
+        if (!$this->paymentDescription) {
+            $this->paymentDescription = $this->module->l('Payment for order No. %cart_id%');
+        }
         //$this->createStatusId = (int)Configuration::get('YA_KASSA_CREATE_STATUS_ID');
         //$this->failureStatusId = (int)Configuration::get('YA_KASSA_FAILURE_STATUS_ID');
 
@@ -291,6 +296,10 @@ class KassaModel extends AbstractPaymentModel
             Tools::getValue('YA_KASSA_INSTALLMENTS_BUTTON_ON'));
         $this->showYandexButton = Tools::getValue('YA_KASSA_INSTALLMENTS_BUTTON_ON') == 'on';
 
+        Configuration::UpdateValue('YA_KASSA_PAYMENT_DESCRIPTION',
+            Tools::getValue('YA_KASSA_PAYMENT_DESCRIPTION'));
+        $this->paymentDescription = Tools::getValue('YA_KASSA_PAYMENT_DESCRIPTION');
+
         Configuration::UpdateValue('YA_KASSA_PAYMENT_MODE', Tools::getValue('YA_KASSA_PAYMENT_MODE'));
         $this->epl = Tools::getValue('YA_KASSA_PAYMENT_MODE') == 'kassa';
 
@@ -417,10 +426,11 @@ class KassaModel extends AbstractPaymentModel
                 $this->module->log('debug', 'Convert amount from "'.$from->name.'" to "'.$to->name.'"');
                 $totalAmount = Tools::convertPriceFull($totalAmount, $from, $to);
             }
-
+            $description = $this->generateDescription($cart);
             $builder->setAmount($totalAmount)
                     ->setCurrency('RUB')
                     ->setCapture(true)
+                    ->setDescription($description)
                     ->setClientIp($_SERVER['REMOTE_ADDR'])
                     ->setMetadata(array(
                         'cms_name'       => 'ya_api_ycms_prestashop',
@@ -818,5 +828,21 @@ class KassaModel extends AbstractPaymentModel
     public function getShowInstallmentsButton()
     {
         return $this->showInstallmentsButton;
+    }
+
+    public function getPaymentDescription()
+    {
+        return $this->paymentDescription;
+    }
+
+    private function generateDescription($cart)
+    {
+        $descriptionTemplate = $this->getPaymentDescription();
+
+        $description = str_replace('%cart_id%', $cart->id, $descriptionTemplate);
+
+        $description = (string)mb_substr($description, 0, Payment::MAX_LENGTH_DESCRIPTION);
+
+        return $description;
     }
 }
