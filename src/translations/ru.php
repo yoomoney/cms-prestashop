@@ -135,6 +135,8 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_683531b1938c0a3144bd2ec2c3b018ca'
 $_MODULE['<{yandexmodule}prestashop>formhelper_34fc70d33c11c98da9f853f815099b38'] = 'На стороне магазина';
 $_MODULE['<{yandexmodule}prestashop>formhelper_65b42007117fefeb9d122c9d582c2e7e'] = 'Назвать кнопку оплаты «Заплатить через Яндекс»';
 $_MODULE['<{yandexmodule}prestashop>formhelper_08dd74d5ebac2acb6dbf78593ae75a4e'] = 'Добавить кнопку «Заплатить по частям»';
+$_MODULE['<{yandexmodule}prestashop>formhelper_0f6ec6c603cd5935515aecd633d0fde7'] = 'Это описание транзакции, которое пользователь увидит при оплате, а вы — в личном кабинете Яндекс.Кассы. Например, «Оплата заказа №72». Чтобы в описание подставлялся номер заказа (как в примере), поставьте на его месте %cart_id% (Оплата заказа %cart_id%). Ограничение для описания — 128 символов.';
+$_MODULE['<{yandexmodule}prestashop>formhelper_9ffebefa70eb18ef4b2008f8faaee976'] = 'Описание платежа';
 $_MODULE['<{yandexmodule}prestashop>formhelper_27dda3cb0fb2c7da8fd7751641582a5f'] = 'Отправлять в Яндекс.Кассу данные для чеков (54-ФЗ)';
 $_MODULE['<{yandexmodule}prestashop>formhelper_417b334759a9581d16440d075aa1cd12'] = 'Включить';
 $_MODULE['<{yandexmodule}prestashop>formhelper_b278285aeff5cffad70c9838b3566f5d'] = 'Отключить';
@@ -165,6 +167,7 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_57297718fdb439175177cf6b196172d1'
 $_MODULE['<{yandexmodule}prestashop>billingmodel_feac4e0fd871a458032a22b5aa390bda'] = 'Не указан ID формы';
 $_MODULE['<{yandexmodule}prestashop>billingmodel_f332904a747849559c3283be380caa6d'] = 'Не указано назначение платежа';
 $_MODULE['<{yandexmodule}prestashop>billingmodel_fc724a540ce30b0b634163c922d60bed'] = 'Настройки были сохранены';
+$_MODULE['<{yandexmodule}prestashop>kassamodel_fd4add29fdb8e6334120320fd1fa5d10'] = 'Оплата заказа №%cart_id%';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_faef1666296f6eb16b2a4f390ea30d62'] = 'Яндекс.Деньги';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Банковские карты';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_a63593a811927ba64204f7171601ff6e'] = 'Мобильный баланс';

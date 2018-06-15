@@ -765,7 +765,16 @@ class FormHelper
                         'class' => 'payment-mode-shop',
                         'values' => $paymentMethodOptions,
                     ),
-
+                    array(
+                        'col' => 4,
+                        'class' => 't',
+                        'type' => 'text',
+                        'desc' => $this->l('Full description of the transaction that the user will see during the checkout process. You can find it in your Yandex.Checkout Merchant Profile. For example, "Payment for order No. 72 by user@yandex.ru". Limitations: no more than 128 symbols'),
+                        'name' => 'YA_KASSA_PAYMENT_DESCRIPTION',
+                        'required' => true,
+                        'label' => $this->l('Transaction data'),
+                        'value' => $model->getPaymentDescription(),
+                    ),
                     array(
                         'type' => 'radio',
                         'label' => $this->l('Send receipt to Yandex.Kassa (54 federal law)'),
