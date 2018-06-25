@@ -68,11 +68,6 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
                 $this->errorRedirect($this->module->l('payment is empty, but epl disabled'),
                     'index.php?controller=order&step=3');
             }
-        } elseif (!$kassa->isPaymentMethodEnabled($paymentMethod)) {
-            $this->errorRedirect(
-                'payment method "'.$paymentMethod.'" do\'s not enabled',
-                'index.php?controller=order&step=3'
-            );
         } else {
             $paymentMethodInfo = $kassa->getPaymentMethodInfo($paymentMethod);
             if ($paymentMethod === PaymentMethodType::ALFABANK) {
