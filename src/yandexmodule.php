@@ -16,7 +16,6 @@ class YandexModule extends PaymentModule
     private $org_status = '';
     private $market_status = '';
     private $metrics_status = '';
-    private $market_orders_status = '';
     private $billing_status = '';
     private $metrika_valid;
     private $update_status;
@@ -35,11 +34,6 @@ class YandexModule extends PaymentModule
      * @var \YandexMoneyModule\Models\BillingModel
      */
     private $billingModel;
-
-    /**
-     * @var YandexMoneyModule\Models\OrderModel
-     */
-    private $orderModel;
 
     /**
      * @var YandexMoneyModule\Models\MarketModel
@@ -68,35 +62,6 @@ class YandexModule extends PaymentModule
     );
 
     private static $moduleRoutes = array(
-        'market_orders_cart' => array(
-            'controller' => 'marketorders',
-            'rule'       => 'yandexmodule/{controller}/{type}',
-            'keywords'   => array(
-                'type'       => array('regexp' => '[_a-zA-Z0-9-\pL]*', 'param' => 'type'),
-                'module'     => array('regexp' => '[\w]+', 'param' => 'module'),
-                'controller' => array('regexp' => '[\w]+', 'param' => 'controller'),
-            ),
-            'params'     => array(
-                'fc'         => 'module',
-                'module'     => 'yandexmodule',
-                'controller' => 'marketorders',
-            ),
-        ),
-        'market_order'       => array(
-            'controller' => 'marketorders',
-            'rule'       => 'yandexmodule/{controller}/{type}/{func}',
-            'keywords'   => array(
-                'type'       => array('regexp' => '[_a-zA-Z0-9-\pL]*', 'param' => 'type'),
-                'func'       => array('regexp' => '[_a-zA-Z0-9-\pL]*', 'param' => 'func'),
-                'module'     => array('regexp' => '[\w]+', 'param' => 'module'),
-                'controller' => array('regexp' => '[\w]+', 'param' => 'controller'),
-            ),
-            'params'     => array(
-                'fc'         => 'module',
-                'module'     => 'yandexmodule',
-                'controller' => 'marketorders',
-            ),
-        ),
         'generate_price'     => array(
             'controller' => null,
             'rule'       => 'yandexmodule/{controller}',
@@ -128,7 +93,7 @@ class YandexModule extends PaymentModule
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.0.5';
+        $this->version         = '1.0.6';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -141,7 +106,7 @@ class YandexModule extends PaymentModule
 
         $this->displayName      = $this->l('Y.CMS 2.0 Prestashop');
         $this->description      = $this->l(
-            'Yandex.Money, Yandex.Service, Yandex.Metrika, Yandex.Market Orders in the Market'
+            'Yandex.Money, Yandex.Service, Yandex.Metrika, Yandex.Market'
         );
         $this->confirmUninstall = $this->l('Really uninstall the module?');
         if (!count(Currency::checkPaymentCurrencies($this->id))) {
@@ -238,347 +203,6 @@ class YandexModule extends PaymentModule
         return parent::uninstall();
     }
 
-    public function hookDisplayAdminOrder($params)
-    {
-        $ya_order_db = $this->getOrderModel()->getMarketOrderByOrderId($params['id_order']);
-        $ht          = '';
-        if ($ya_order_db['id_market_order']) {
-            $partner  = new YandexMoneyModule\Partner();
-            $ya_order = $partner->getOrder($ya_order_db['id_market_order']);
-            if ($ya_order) {
-                $array = array();
-                $state = $ya_order->order->status;
-                if ($state == 'PROCESSING') {
-                    $array = array(
-                        $this->status['RESERVATION_EXPIRED'],
-                        $this->status['RESERVATION'],
-                        $this->status['PROCESSING'],
-                        $this->status['DELIVERED'],
-                        $this->status['PICKUP'],
-                        $this->status['UNPAID'],
-                    );
-                } elseif ($state == 'DELIVERY') {
-                    $array = array(
-                        $this->status['RESERVATION_EXPIRED'],
-                        $this->status['RESERVATION'],
-                        $this->status['PROCESSING'],
-                        $this->status['DELIVERY'],
-                        $this->status['UNPAID'],
-                    );
-                    if (!isset($ya_order->order->delivery->outletId)
-                        || $ya_order->order->delivery->outletId < 1
-                        || $ya_order->order->delivery->outletId == ''
-                    ) {
-                        $array[] = $this->status['PICKUP'];
-                    }
-                } elseif ($state == 'PICKUP') {
-                    $array = array(
-                        $this->status['RESERVATION_EXPIRED'],
-                        $this->status['RESERVATION'],
-                        $this->status['PROCESSING'],
-                        $this->status['PICKUP'],
-                        $this->status['DELIVERY'],
-                        $this->status['UNPAID'],
-                    );
-                } else {
-                    $array = array(
-                        $this->status['RESERVATION_EXPIRED'],
-                        $this->status['RESERVATION'],
-                        $this->status['PROCESSING'],
-                        $this->status['DELIVERED'],
-                        $this->status['PICKUP'],
-                        $this->status['CANCELLED'],
-                        $this->status['DELIVERY'],
-                        $this->status['UNPAID'],
-                    );
-                }
-            }
-        } else {
-            $array = array(
-                $this->status['RESERVATION_EXPIRED'],
-                $this->status['RESERVATION'],
-                $this->status['PROCESSING'],
-                $this->status['DELIVERED'],
-                $this->status['PICKUP'],
-                $this->status['CANCELLED'],
-                $this->status['DELIVERY'],
-                $this->status['UNPAID'],
-            );
-        }
-
-        if (Tools::version_compare(_PS_VERSION_, '1.7.0') < 0) {
-            $array = Tools::jsonEncode($array);
-        } else {
-            $array = json_encode($array);
-        }
-        $ht .= '<script type="text/javascript">
-            $(document).ready(function(){
-                var array = JSON.parse("'.$array.'");
-                for(var k in array){
-                    $("#id_order_state option[value="+ array[k] +"]").attr({disabled: "disabled"});
-                };
-
-                $("#id_order_state").trigger("chosen:updated");
-            });
-        </script>';
-
-        // if(Configuration::get('YA_MARKET_ORDERS_SET_CHANGEC') && $ya_order->order->paymentType != 'PREPAID')
-        if (Configuration::get('YA_MARKET_ORDERS_SET_CHANGEC')) {
-            $ht .= $this->displayTabContent((int)$params['id_order']);
-        }
-
-        return $ht;
-    }
-
-    public function hookActionOrderStatusUpdate($params)
-    {
-        $new_os      = $params['newOrderStatus'];
-        $status_flip = array_flip($this->status);
-        if (in_array($new_os->id, $this->status)) {
-            $ya_order_db = $this->getOrderModel()->getMarketOrderByOrderId($params['id_order']);
-            $id_ya_order = $ya_order_db['id_market_order'];
-            if ($id_ya_order) {
-                $partner  = new YandexMoneyModule\Partner();
-                $ya_order = $partner->getOrder($id_ya_order);
-                $state    = $ya_order->order->status;
-                if ($state == 'PROCESSING'
-                    && ($new_os->id == $this->status['DELIVERY']
-                        || $new_os->id == $this->status['CANCELLED'])
-                ) {
-                    $partner->sendOrder($status_flip[$new_os->id], $id_ya_order);
-                } elseif ($state == 'DELIVERY'
-                          && ($new_os->id == $this->status['DELIVERED']
-                              || $new_os->id == $this->status['PICKUP']
-                              || $new_os->id == $this->status['CANCELLED'])
-                ) {
-                    $partner->sendOrder($status_flip[$new_os->id], $id_ya_order);
-                } elseif ($state == 'PICKUP'
-                          && ($new_os->id == $this->status['DELIVERED'] || $new_os->id == $this->status['CANCELLED'])
-                ) {
-                    $partner->sendOrder($status_flip[$new_os->id], $id_ya_order);
-                } elseif ($state == 'RESERVATION_EXPIRED' || $state == 'RESERVATION') {
-                    return false;
-                } else {
-                    return false;
-                }
-            }
-        }
-    }
-
-    public function displayTabContent($id)
-    {
-        $partner     = new YandexMoneyModule\Partner();
-        $order_ya_db = $this->getOrderModel()->getMarketOrderByOrderId($id);
-        $ht          = '';
-        if ($order_ya_db['id_market_order']) {
-            $ya_order = $partner->getOrder($order_ya_db['id_market_order']);
-            $types    = unserialize(Configuration::get('YA_MARKET_ORDERS_CARRIER_SERIALIZE'));
-            $state    = $ya_order->order->status;
-            $st       = array('PROCESSING', 'DELIVERY', 'PICKUP');
-            // Tools::d($ya_order);
-            if (!in_array($state, $st)) {
-                return false;
-            }
-
-            $this->context->controller->AddJS($this->_path.'/views/js/back.js');
-            $this->context->controller->AddCss($this->_path.'/views/css/back.css');
-            $order = new Order($id);
-            $cart  = new Cart($order->id_cart);
-            if (Tools::version_compare(_PS_VERSION_, '1.7.0') < 0) {
-                $carriers = $cart->simulateCarriersOutput();
-            } else {
-                $carriers = $cart->getDeliveryOptionList();
-            }
-            $ht                   = '';
-            $i                    = 1;
-            $tmp                  = array();
-            $tmp[0]['id_carrier'] = 0;
-            $tmp[0]['name']       = $this->l('-- Please select carrier --');
-            foreach ($carriers as $c) {
-                $id   = str_replace(',', '', Cart::desintifier($c['id_carrier']));
-                $type = isset($types[$id]) ? $types[$id] : 'POST';
-                if (!Configuration::get('YA_MARKET_SET_ROZNICA') && $type == 'PICKUP') {
-                    continue;
-                }
-
-                $tmp[$i]['id_carrier'] = $id;
-                $tmp[$i]['name']       = $c['name'];
-                $i++;
-            }
-
-            if (count($tmp) <= 1) {
-                return false;
-            }
-
-            $fields_form = array(
-                'form' => array(
-                    'legend'  => array(
-                        'title' => $this->l('Carrier Available'),
-                        'icon'  => 'icon-cogs',
-                    ),
-                    'input'   => array(
-                        'sel_delivery' => array(
-                            'type'          => 'select',
-                            'label'         => $this->l('Carrier'),
-                            'name'          => 'new_carrier',
-                            'required'      => true,
-                            'default_value' => 0,
-                            'class'         => 't sel_delivery',
-                            'options'       => array(
-                                'query' => $tmp,
-                                'id'    => 'id_carrier',
-                                'name'  => 'name',
-                            ),
-                        ),
-                        array(
-                            'col'   => 3,
-                            'class' => 't pr_in',
-                            'type'  => 'text',
-                            'desc'  => $this->l('Carrier price tax incl.'),
-                            'name'  => 'price_incl',
-                            'label' => $this->l('Price tax incl.'),
-                        ),
-                        array(
-                            'col'   => 3,
-                            'class' => 't pr_ex',
-                            'type'  => 'text',
-                            'desc'  => $this->l('Carrier price tax excl.'),
-                            'name'  => 'price_excl',
-                            'label' => $this->l('Price tax excl.'),
-                        ),
-                    ),
-                    'buttons' => array(
-                        'updcarrier' => array(
-                            'title' => $this->l('Update carrier'),
-                            'name'  => 'updcarrier',
-                            'type'  => 'button',
-                            'class' => 'btn btn-default pull-right changec_submit',
-                            'icon'  => 'process-icon-refresh',
-                        ),
-                    ),
-                ),
-            );
-
-            $helper                                          = new HelperForm();
-            $helper->show_toolbar                            = false;
-            $helper->table                                   = $this->table;
-            $helper->module                                  = $this;
-            $helper->identifier                              = $this->identifier;
-            $helper->submit_action                           = 'submitChangeCarrier';
-            $helper->currentIndex                            = AdminController::$currentIndex.'?id_order='.$order->id
-                                                               .'&vieworder&token='.Tools::getAdminTokenLite('AdminOrders');
-            $helper->token                                   = Tools::getAdminTokenLite('AdminOrders');
-            $helper->tpl_vars['fields_value']['price_excl']  = '';
-            $helper->tpl_vars['fields_value']['price_incl']  = '';
-            $helper->tpl_vars['fields_value']['new_carrier'] = 0;
-            $path_module_http                                = __PS_BASE_URI__.'modules/yandexmodule/';
-
-            $this->context->smarty->assign('employee_id', $this->context->employee->id);
-            $this->context->smarty->assign('path_module_http', $path_module_http);
-            $this->context->smarty->assign('token_lite', Tools::getAdminTokenLite('AdminOrders'));
-            $this->context->smarty->assign('orderid', $order->id);
-
-            $ht .= $this->context->smarty->fetch(dirname(__FILE__).'\views\templates\front\carrier.tpl');
-
-            $ht .= $helper->generateForm(array($fields_form)).'</div>';
-        }
-
-        return $ht;
-    }
-
-    public function processLoadPrice()
-    {
-        $id_order       = (int)Tools::getValue('id_o');
-        $id_new_carrier = (int)Tools::getValue('new_carrier');
-        $order          = new Order($id_order);
-        $cart           = new Cart($order->id_cart);
-        $carrier_list   = $cart->getDeliveryOptionList();
-        if (isset($carrier_list[$order->id_address_delivery][$id_new_carrier.',']['carrier_list'][$id_new_carrier])) {
-            $carrier = $carrier_list[$order->id_address_delivery][$id_new_carrier.',']['carrier_list'][$id_new_carrier];
-            $pr_incl = $carrier['price_with_tax'];
-            $pr_excl = $carrier['price_without_tax'];
-            $result  = array(
-                'price_without_tax' => $pr_excl,
-                'price_with_tax'    => $pr_incl,
-            );
-        } else {
-            $result = array('error' => $this->l('Wrong carrier'));
-        }
-
-        return $result;
-    }
-
-    public function processChangeCarrier()
-    {
-        $id_order        = (int)Tools::getValue('id_o');
-        $id_new_carrier  = (int)Tools::getValue('new_carrier');
-        $price_incl      = (float)Tools::getValue('pr_incl');
-        $price_excl      = (float)Tools::getValue('pr_excl');
-        $order           = new Order($id_order);
-        $result          = array();
-        $result['error'] = '';
-        if ($id_new_carrier == 0) {
-            $result['error'] = $this->l('Error: cannot select carrier');
-        } else {
-            if ($order->id < 1) {
-                $result['error'] = $this->l('Error: cannot find order');
-            } else {
-                $total_carrierwt = (float)$order->total_products_wt + (float)$price_incl;
-                $total_carrier   = (float)$order->total_products + (float)$price_excl;
-
-                $order->total_paid              = (float)$total_carrierwt;
-                $order->total_paid_tax_incl     = (float)$total_carrierwt;
-                $order->total_paid_tax_excl     = (float)$total_carrier;
-                $order->total_paid_real         = (float)$total_carrierwt;
-                $order->total_shipping          = (float)$price_incl;
-                $order->total_shipping_tax_excl = (float)$price_excl;
-                $order->total_shipping_tax_incl = (float)$price_incl;
-                $order->carrier_tax_rate        = (float)$order->carrier_tax_rate;
-                $order->id_carrier              = (int)$id_new_carrier;
-                if (!$order->update()) {
-                    $result['error']  = $this->l('Error: cannot update order');
-                    $result['status'] = false;
-                } else {
-                    if ($order->invoice_number > 0) {
-                        $order_invoice                          = new OrderInvoice($order->invoice_number);
-                        $order_invoice->total_paid_tax_incl     = (float)$total_carrierwt;
-                        $order_invoice->total_paid_tax_excl     = (float)$total_carrier;
-                        $order_invoice->total_shipping_tax_excl = (float)$price_excl;
-                        $order_invoice->total_shipping_tax_incl = (float)$price_incl;
-                        if (!$order_invoice->update()) {
-                            $result['error']  = $this->l('Error: cannot update order invoice');
-                            $result['status'] = false;
-                        }
-                    }
-
-                    $id_order_carrier = Db::getInstance()->getValue('
-                            SELECT `id_order_carrier`
-                            FROM `'._DB_PREFIX_.'order_carrier`
-                            WHERE `id_order` = '.(int)$order->id);
-
-                    if ($id_order_carrier) {
-                        $order_carrier                         = new OrderCarrier($id_order_carrier);
-                        $order_carrier->id_carrier             = $order->id_carrier;
-                        $order_carrier->shipping_cost_tax_excl = (float)$price_excl;
-                        $order_carrier->shipping_cost_tax_incl = (float)$price_incl;
-                        if (!$order_carrier->update()) {
-                            $result['error']  = $this->l('Error: cannot update order carrier');
-                            $result['status'] = false;
-                        }
-                    }
-
-                    $result['status'] = true;
-                }
-            }
-        }
-
-        if ($result['status']) {
-            $this->getOrderModel()->sendCarrierToYandex($order, $this->status);
-        }
-
-        return $result;
-    }
-
     public function hookDisplayFooter($params)
     {
         $data = '';
@@ -648,9 +272,6 @@ class YandexModule extends PaymentModule
             $this->p2p_status = $this->getWalletModel()->validateOptions();
         } elseif (Tools::isSubmit('submitbilling_formModule')) {
             $this->billing_status = $this->getBillingModel()->validateOptions();
-        } elseif (Tools::isSubmit('submitMarket_ordersModule')) {
-            $this->market_orders_status = $this->getOrderModel()->validateOptions();
-            $this->update_status        = $this->sendStatistics();
         } elseif (Tools::isSubmit('submitmarketModule')) {
             $this->market_status = $this->getMarketModel()->validateOptions();
             $this->update_status = $this->sendStatistics();
@@ -748,21 +369,7 @@ class YandexModule extends PaymentModule
         $vars_billing       = array(
             'billing' => $this->getBillingModel(),
         );
-        $vars_market_orders = Configuration::getMultiple(array(
-            'YA_MARKET_ORDERS_PUNKT',
-            'YA_MARKET_ORDERS_TOKEN',
-            'YA_MARKET_ORDERS_PREDOPLATA_YANDEX',
-            'YA_MARKET_ORDERS_PREDOPLATA_SHOP_PREPAID',
-            'YA_MARKET_ORDERS_POSTOPLATA_CASH_ON_DELIVERY',
-            'YA_MARKET_ORDERS_POSTOPLATA_CARD_ON_DELIVERY',
-            'YA_MARKET_ORDERS_APIURL',
-            'YA_MARKET_ORDERS_SET_CHANGEC',
-            'YA_MARKET_ORDERS_NC',
-            'YA_MARKET_ORDERS_LOGIN',
-            'YA_MARKET_ORDERS_ID',
-            'YA_MARKET_ORDERS_PW',
-            'YA_MARKET_ORDERS_YATOKEN',
-        ));
+
         $vars_market        = Configuration::getMultiple(array(
             'YA_MARKET_SET_ALLCURRENCY',
             'YA_MARKET_NAME',
@@ -795,9 +402,6 @@ class YandexModule extends PaymentModule
         $forms       = new YandexMoneyModule\FormHelper();
         $forms->cats = $cats;
 
-        $vars_market_orders['YA_MARKET_ORDERS_FD'] = 'JSON';
-        $vars_market_orders['YA_MARKET_ORDERS_TA'] = 'URL';
-
         $vars_org['YA_ORG_TEXT_INSIDE']    = $this->l('shopID и Секретное слово можно посмотреть в ')."<a href='https://money.yandex.ru/joinups' target='_blank'>".$this->l('личном кабинете')."</a>".$this->l('после подключения Яндекс.Кассы.');
         $vars_p2p['YA_WALLET_TEXT_INSIDE'] = $this->l('ID и секретное слово вы получите после').'<a href="https://sp-money.yandex.ru/myservices/new.xml" target="_blank">'.$this->l(' регистрации приложения').'</a> '.$this->l('на сайте Яндекс.Денег');
         $vars_p2p['YA_WALLET_LOGGING_ON']  = Configuration::get('YA_WALLET_LOGGING_ON');
@@ -812,7 +416,6 @@ class YandexModule extends PaymentModule
             'update_status'        => $this->update_status,
             'metrika_status'       => $this->metrics_status,
             'market_status'        => $this->market_status,
-            'market_orders_status' => $this->market_orders_status,
             'billing_status'       => $this->billing_status,
             'p2p_status'           => $this->p2p_status,
             'org_status'           => $this->org_status,
@@ -823,8 +426,6 @@ class YandexModule extends PaymentModule
             'emptyShopId'          => empty($shopId),
             'money_metrika'        => $this->renderForm('metrika', $vars_metrika, $forms->getFormYandexMetrics()),
             'money_market'         => $this->renderForm('market', $vars_market, $forms->getFormYamoneyMarket()),
-            'money_marketp'        => $this->renderForm('market_orders', $vars_market_orders,
-                $forms->getMarketOrdersForm()),
             'billing_form'         => $this->renderForm(
                 'billing_form',
                 $vars_billing,
@@ -1017,8 +618,10 @@ class YandexModule extends PaymentModule
 
             return null;
         }
-
-        $model = $this->getPaymentModel();
+        $cart                  = $params['cart'];
+        $model                 = $this->getPaymentModel();
+        $totalAmount           = $cart->getOrderTotal();
+        $isInstallmentsEnabled = $totalAmount > \YandexMoneyModule\Models\KassaModel::MIN_INSTALLMENTS_AMOUNT;
         if ($model === null) {
             // если отключен приём платежей - ничего не делаем
             $this->log('debug', 'Payment module disabled');
@@ -1026,10 +629,12 @@ class YandexModule extends PaymentModule
             return null;
         }
         $this->context->smarty->assign(array(
-            'model'     => $model,
-            'shop_name' => Configuration::get('PS_SHOP_NAME'),
-            'image_dir' => $this->getPathUri().'/views/img/',
-            'action'    => $this->context->link->getModuleLink(
+            'model'                 => $model,
+            'shop_name'             => Configuration::get('PS_SHOP_NAME'),
+            'image_dir'             => $this->getPathUri().'/views/img/',
+            'amount'                => $totalAmount,
+            'isInstallmentsEnabled' => $isInstallmentsEnabled,
+            'action'                => $this->context->link->getModuleLink(
                 $this->name,
                 $model->getPaymentActionController(),
                 array(),
@@ -1050,13 +655,10 @@ class YandexModule extends PaymentModule
                 $methods  = $model->getEnabledPaymentMethods();
                 $payments = Configuration::getMultiple(array_values($model->getPaymentMethods()));
                 $key      = 'YA_KASSA_PAYMENT_INSTALLMENTS';
-                /** @var \Cart $cart */
-                $cart  = $params['cart'];
-                $total = $cart->getOrderTotal();
                 if (isset($payments[$key]) && $payments[$key] == '1') {
                     $monthlyInstallment = \YandexMoneyModule\InstallmentsApi::creditPreSchedule(
                         $model->getShopId(),
-                        $total
+                        $totalAmount
                     );
                     if (!isset($monthlyInstallment['amount'])) {
                         $errorMessage = \YandexMoneyModule\InstallmentsApi::getLastError() ?: 'Unknown error. Could not get installment amount';
@@ -1067,7 +669,7 @@ class YandexModule extends PaymentModule
                         $this->log('info', 'Label: '.$installmentLabel);
                         foreach ($methods as $key => $method) {
                             if ($method['value'] == \YandexCheckout\Model\PaymentMethodType::INSTALLMENTS) {
-                                if ($total > \YandexMoneyModule\Models\KassaModel::MIN_INSTALLMENTS_AMOUNT) {
+                                if ($isInstallmentsEnabled) {
                                     $methods[$key]['name'] = $installmentLabel;
                                 } else {
                                     unset($methods[$key]);
@@ -1182,7 +784,7 @@ class YandexModule extends PaymentModule
                                     $errorMessage = \YandexMoneyModule\InstallmentsApi::getLastError() ?: 'Unknown error. Could not get installment amount';
                                     $this->log('error', $errorMessage);
                                 } else {
-                                    $installmentLabel = sprintf($this->l('Installments (%s ₽ per month)'),
+                                    $installmentLabel      = sprintf($this->l('Installments (%s ₽ per month)'),
                                         $monthlyInstallment['amount']);
                                     $methods[$key]['name'] = $installmentLabel;
                                 }
@@ -1468,22 +1070,12 @@ class YandexModule extends PaymentModule
             'redirect');
         $httpsBasePath                                    = str_replace('http://', 'https://',
             _PS_BASE_URL_.__PS_BASE_URI__);
-        $api_market_orders                                = $httpsBasePath.'yandexmodule/marketorders';
         $redir                                            = $httpsBasePath.'modules/yandexmodule/callback.php';
         $market_list                                      = str_replace('http://', 'https://',
             $this->context->link->getModuleLink($this->name, 'generate'));
         $helper->fields_value['YA_MARKET_YML']            = $market_list;
         $helper->fields_value['YA_WALLET_REDIRECT']       = $p2p_redirect;
-        $helper->fields_value['YA_MARKET_ORDERS_APISHOP'] = $api_market_orders;
-        $helper->fields_value['YA_MARKET_REDIRECT']       = $helper->fields_value['YA_METRICS_REDIRECT'] = $redir;
-        if ($mod == 'market_orders') {
-            $carriers = Carrier::getCarriers(Context::getContext()->language->id, true, false, false, null, 5);
-            foreach ($carriers as $a) {
-                $array = unserialize(Configuration::get('YA_MARKET_ORDERS_CARRIER_SERIALIZE'));
-                $helper->fields_value['YA_MARKET_ORDERS_DELIVERY_'.$a['id_carrier']]
-                       = isset($array[$a['id_carrier']]) ? $array[$a['id_carrier']] : 'POST';
-            }
-        }
+        $helper->fields_value['YA_METRICS_REDIRECT'] = $redir;
 
         return $helper->generateForm(array($form));
     }
@@ -1601,19 +1193,6 @@ class YandexModule extends PaymentModule
         }
 
         return $this->billingModel;
-    }
-
-    /**
-     * @return YandexMoneyModule\Models\OrderModel
-     */
-    public function getOrderModel()
-    {
-        if ($this->orderModel === null) {
-            $this->orderModel = new YandexMoneyModule\Models\OrderModel($this);
-            $this->orderModel->initConfiguration();
-        }
-
-        return $this->orderModel;
     }
 
     /**

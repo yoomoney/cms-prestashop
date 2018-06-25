@@ -24,7 +24,6 @@
         <li><a href="#billing">{l s='Yandex.Billing' mod='yandexmodule'}</a></li>
         <li><a href="#metrika">{l s='Yandex.Metrics' mod='yandexmodule'}</a></li>
         <li><a href="#market">{l s='Yandex.Market' mod='yandexmodule'}</a></li>
-        <li><a href="#marketp">{l s='Orders on market' mod='yandexmodule'}</a></li>
     </ul>
     <div id="money">
         <div class="errors">{$p2p_status|escape:'quotes':'UTF-8'}</div>
@@ -49,10 +48,6 @@
     <div id="market">
         <div class="errors">{$market_status|escape:'quotes':'UTF-8'}</div>
         {$money_market|escape:'quotes':'UTF-8'}
-    </div>
-    <div id="marketp">
-        <div class="errors">{$market_orders_status|escape:'quotes':'UTF-8'}</div>
-        {$money_marketp|escape:'quotes':'UTF-8'}
     </div>
 </div>
 {literal}
