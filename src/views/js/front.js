@@ -9,10 +9,11 @@
  * @package   Yandex Payment Solution
  */
 
-$(document).ready(function(){
-    if(typeof celi_wishlist != 'undefined' && celi_wishlist && typeof WishlistCart != 'undefined') {
+$(document).ready(function () {
+    if (typeof WishlistCart !== 'undefined') {
+        var prestaWishlistCart = WishlistCart;
         WishlistCart = function (id, action, id_product, id_product_attribute, quantity, id_wishlist) {
-            old_WishlistCart(id, action, id_product, id_product_attribute, quantity, id_wishlist);
+            prestaWishlistCart(id, action, id_product, id_product_attribute, quantity, id_wishlist);
             $.ajax({
                 type: 'POST',
                 url: baseDir + 'modules/yandexmodule/action.php?rand=' + new Date().getTime(),
@@ -25,12 +26,13 @@ $(document).ready(function(){
                     metrikaReach('metrikaWishlist', data.params);
                 }
             });
-        }
+        };
     }
-    if(typeof celi_cart != 'undefined' && celi_cart && typeof ajaxCart != 'undefined' && ajaxCart.add) {
-        var old_addCart = ajaxCart.add;
+
+    if (typeof ajaxCart !== 'undefined') {
+        var prestaAddCart = ajaxCart.add;
         ajaxCart.add = function (idProduct, idCombination, addedFromProductPage, callerElement, quantity, wishlist) {
-            old_addCart(idProduct, idCombination, addedFromProductPage, callerElement, quantity, wishlist);
+            prestaAddCart(idProduct, idCombination, addedFromProductPage, callerElement, quantity, wishlist);
             $.ajax({
                 type: 'POST',
                 url: baseDir + 'modules/yandexmodule/action.php?rand=' + new Date().getTime(),
@@ -40,10 +42,36 @@ $(document).ready(function(){
                 dataType : "json",
                 data: 'action=add_cart&id_product=' + idProduct + '&quantity=' + quantity + '&token=' + static_token + '&id_product_attribute=' + idCombination,
                 success: function(data) {
-                    metrikaReach('metrikaCart', data.params);
+                    window.dataLayer = window.dataLayer || [];
+                    dataLayer.push(data);
                 }
             });
-        }
+        };
+    }
+
+    if (typeof prestashop !== 'undefined') {
+        prestashop.on('updateCart', function (event) {
+            if (!event.reason
+                || !event.reason.linkAction
+                || event.reason.linkAction !== 'add-to-cart'
+            ) {
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: prestashop.urls.base_url + 'modules/yandexmodule/action.php?rand=' + new Date().getTime(),
+                headers: {"cache-control": "no-cache"},
+                async: true,
+                cache: false,
+                dataType: "json",
+                data: 'action=add_cart&id_product=' + event.reason.idProduct + '&quantity=1'
+                    + '&id_product_attribute=' + event.reason.idProductAttribute,
+                success: function (data) {
+                    window.dataLayer = window.dataLayer || [];
+                    dataLayer.push(data);
+                }
+            });
+        });
     }
 });
 

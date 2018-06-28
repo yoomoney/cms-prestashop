@@ -25,11 +25,16 @@ $state = base64_decode(Tools::getValue('state'));
 $response = $m->run();
 if ($error == '') {
     $state = explode('_', $module->getCipher()->decrypt($state));
-    $type = $state[2];
     $m->code = $code;
-    $m->getToken($type);
+    $m->getToken();
+    if ($m->editCounter()) {
+        $counter = $m->getCounter();
+        if (!empty($counter->counter->code)) {
+            Configuration::UpdateValue('YA_METRICS_CODE', $counter->counter->code, true);
+        }
+    }
     Tools::redirect(
-        _PS_BASE_URL_.__PS_BASE_URI__.$state[0].'/'.Context::getContext()->link->getAdminLink('AdminModules', false)
+        _PS_BASE_URL_.__PS_BASE_URI__.$state[0].'/?controller=AdminModules'
         .($m->errors ? '&error='.$module->getCipher()->encrypt($m->errors) : '')
         .'&configure=yandexmodule&tab_module=payments_gateways&module_name=yandexmodule&token='
         .Tools::getAdminToken('AdminModules'.(int)Tab::getIdFromClassName('AdminModules').(int)$state[1])

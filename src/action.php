@@ -43,4 +43,24 @@ if ($id_product_attribute) {
 $result['price'] = Tools::displayPrice($result['price']);
 $data['params'] = $result;
 $data['number'] = Configuration::get('YA_METRICS_NUMBER');
+
+if ($action === 'add_cart') {
+    $result = array(
+        'ecommerce' => array(
+            'add' => array(
+                'products' => array(
+                    array(
+                        "id"       => (string)$id_product,
+                        "name"     => $product->name,
+                        "variant"  => $name,
+                        "price"    => round(Product::getPriceStatic($id_product), 2),
+                        "quantity" => $quantity,
+                    ),
+                ),
+            ),
+        ),
+    );
+    exit(Tools::jsonEncode($result));
+}
+
 die(Tools::jsonEncode($data));

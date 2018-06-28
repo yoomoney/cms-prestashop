@@ -259,7 +259,7 @@ class FormHelper
     {
         $module = new yandexmodule();
         $dir = _PS_ADMIN_DIR_;
-        $dir = explode('/', $dir);
+        $dir = explode(DIRECTORY_SEPARATOR, $dir);
         $dir = base64_encode(
             $module->getCipher()->encrypt(
                 end($dir).'_'.Context::getContext()->cookie->id_employee.'_metrika'
@@ -317,17 +317,6 @@ class FormHelper
                         'label' => $this->l('An application-specific password'),
                     ),
                     array(
-                        'col' => 4,
-                        'class' => 't',
-                        'type' => 'text',
-                        'desc' => '<a href="https://oauth.yandex.ru/authorize?response_type=code&display=popup&state='.
-                            $dir.'&client_id='.Configuration::get('YA_METRICS_ID_APPLICATION').'">'
-                            .$this->l('To request a token for accessing the Yandex.The metric').'</a>',
-                        'name' => 'YA_METRICS_TOKEN',
-                        'label' => $this->l('The OAuth Token'),
-                        'disabled' => true
-                    ),
-                    array(
                         'type' => 'checkbox',
                         'label' => $this->l('Settings'),
                         'name' => 'YA_METRICS_SET',
@@ -344,47 +333,11 @@ class FormHelper
                                     'val' => 1
                                 ),
                                 array(
-                                    'id' => 'OUTLINK',
-                                    'name' => $this->l('External links, file downloads and report the "Share"button'),
-                                    'val' => 1
-                                ),
-                                array(
-                                    'id' => 'OTKAZI',
-                                    'name' => $this->l('Accurate bounce rate'),
-                                    'val' => 1
-                                ),
-                                array(
                                     'id' => 'HASH',
                                     'name' => $this->l('Hash tracking in the browser address bar'),
                                     'val' => 1
                                 ),
 
-                            ),
-                            'id' => 'id',
-                            'name' => 'name'
-                        ),
-                    ),
-                    array(
-                        'type' => 'checkbox',
-                        'label' => $this->l('To collect statistics on the following circuits:'),
-                        'name' => 'YA_METRICS_CELI',
-                        'values' => array(
-                            'query' => array(
-                                array(
-                                    'id' => 'CART',
-                                    'name' => $this->l('Basket(Visitor has clicked "add to cart")'),
-                                    'val' => 1
-                                ),
-                                array(
-                                    'id' => 'ORDER',
-                                    'name' => $this->l('Ordering(Visitor checkout)'),
-                                    'val' => 1
-                                ),
-                                array(
-                                    'id' => 'WISHLIST',
-                                    'name' => $this->l('Wishlist(Visitor added an item to wishlist)'),
-                                    'val' => 1
-                                )
                             ),
                             'id' => 'id',
                             'name' => 'name'
@@ -397,6 +350,7 @@ class FormHelper
                         'name' => 'YA_METRICS_REDIRECT',
                         'desc' => $this->l('Callback Url for OAuth applications'),
                         'label' => $this->l('The link for the application'),
+                        'disabled' => true
                     ),
                 ),
                 'submit' => array(
