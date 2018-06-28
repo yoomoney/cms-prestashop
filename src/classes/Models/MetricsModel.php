@@ -21,12 +21,7 @@ class MetricsModel extends AbstractModel
         $errors = '';
         Configuration::UpdateValue('YA_METRICS_SET_WEBVIZOR', Tools::getValue('YA_METRICS_SET_WEBVIZOR'));
         Configuration::UpdateValue('YA_METRICS_SET_CLICKMAP', Tools::getValue('YA_METRICS_SET_CLICKMAP'));
-        Configuration::UpdateValue('YA_METRICS_SET_OUTLINK', Tools::getValue('YA_METRICS_SET_OUTLINK'));
-        Configuration::UpdateValue('YA_METRICS_SET_OTKAZI', Tools::getValue('YA_METRICS_SET_OTKAZI'));
         Configuration::UpdateValue('YA_METRICS_SET_HASH', Tools::getValue('YA_METRICS_SET_HASH'));
-        Configuration::UpdateValue('YA_METRICS_CELI_CART', Tools::getValue('YA_METRICS_CELI_CART'));
-        Configuration::UpdateValue('YA_METRICS_CELI_ORDER', Tools::getValue('YA_METRICS_CELI_ORDER'));
-        Configuration::UpdateValue('YA_METRICS_CELI_WISHLIST', Tools::getValue('YA_METRICS_CELI_WISHLIST'));
         Configuration::UpdateValue('YA_METRICS_ACTIVE', Tools::getValue('YA_METRICS_ACTIVE'));
 
         if (Tools::getValue('YA_METRICS_ID_APPLICATION') == '') {
@@ -69,40 +64,75 @@ class MetricsModel extends AbstractModel
     {
     }
 
+    /**
+     * @return array
+     */
+    public function getOptionValues()
+    {
+        $optionKeys   = array(
+            'YA_METRICS_SET_WEBVIZOR',
+            'YA_METRICS_SET_CLICKMAP',
+            'YA_METRICS_SET_HASH',
+            'YA_METRICS_ACTIVE',
+            'YA_METRICS_NUMBER',
+            'YA_METRICS_ID_APPLICATION',
+            'YA_METRICS_PASSWORD_APPLICATION',
+            'YA_METRICS_TOKEN',
+            'YA_METRICS_CODE',
+        );
+        $optionValues = array();
+        foreach ($optionKeys as $optionKey) {
+            $optionValues[$optionKey] = Configuration::get($optionKey);
+        }
+
+        return $optionValues;
+    }
+
+    /**
+     * @param array $prevOptions
+     * @return bool
+     */
+    public function isNeedUpdateToken($prevOptions)
+    {
+        $tokenOptions = array('YA_METRICS_NUMBER', 'YA_METRICS_ID_APPLICATION', 'YA_METRICS_PASSWORD_APPLICATION');
+        foreach ($tokenOptions as $option) {
+            if (!Configuration::get($option)) {
+                return false;
+            }
+        }
+        foreach ($tokenOptions as $option) {
+            if (Configuration::get($option) !== $prevOptions[$option]) {
+                return true;
+            }
+        }
+
+        if (!Configuration::get('YA_METRICS_TOKEN')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $state
+     * @return void
+     */
+    public function redirectToOAuth($state)
+    {
+        Tools::redirect(
+            'https://oauth.yandex.ru/authorize?response_type=code&state='.$state
+            .'&client_id='
+            .Configuration::get('YA_METRICS_ID_APPLICATION')
+            .'&client_secret='.Configuration::get('YA_METRICS_PASSWORD_APPLICATION')
+        );
+    }
+
     public function sendData()
     {
         $m        = new \YandexMoneyModule\Metrics();
         $response = $m->run();
 
         $data = array(
-            'YA_METRICS_CART'     => array(
-                'name'       => 'YA_METRICS_CART',
-                'flag'       => 'basket',
-                'type'       => 'action',
-                'class'      => 1,
-                'depth'      => 0,
-                'conditions' => array(
-                    array(
-                        'url'  => 'metrikaCart',
-                        'type' => 'exact',
-                    ),
-                ),
-
-            ),
-            'YA_METRICS_ORDER'    => array(
-                'name'       => 'YA_METRICS_ORDER',
-                'flag'       => 'order',
-                'type'       => 'action',
-                'class'      => 1,
-                'depth'      => 0,
-                'conditions' => array(
-                    array(
-                        'url'  => 'metrikaOrder',
-                        'type' => 'exact',
-                    ),
-                ),
-
-            ),
             'YA_METRICS_WISHLIST' => array(
                 'name'       => 'YA_METRICS_WISHLIST',
                 'flag'       => '',
@@ -123,11 +153,11 @@ class MetricsModel extends AbstractModel
         $error = '';
         if (Configuration::get('YA_METRICS_TOKEN') != '') {
             if ($response) {
+                $otvet = $m->editCounter();
                 $counter = $m->getCounter();
                 if (!empty($counter->counter->code)) {
                     Configuration::UpdateValue('YA_METRICS_CODE', $counter->counter->code, true);
                 }
-                $otvet = $m->editCounter();
                 if (!is_null($otvet)) {
                     if ($otvet->counter->id != Configuration::get('YA_METRICS_NUMBER')) {
                         $error .= $this->module->displayError(
@@ -142,15 +172,10 @@ class MetricsModel extends AbstractModel
                             $goals[$goal->name] = $goal;
                         }
 
-                        $types = array('YA_METRICS_ORDER', 'YA_METRICS_WISHLIST', 'YA_METRICS_CART');
+                        $types = array('YA_METRICS_WISHLIST');
                         foreach ($types as $type) {
-                            $conf = explode('_', $type);
-                            $conf = $conf[0].'_'.$conf[1].'_CELI_'.$conf[2];
-                            if (Configuration::get($conf) == 0 && isset($goals[$type])) {
-                                $ret['delete_'.$type] = $m->deleteCounterGoal($goals[$type]->id);
-                            } elseif (Configuration::get($conf) == 1 && !isset($goals[$type])) {
-                                $params            = $data[$type];
-                                $ret['add_'.$type] = $m->addCounterGoal(array('goal' => $params));
+                            if (!isset($goals[$type])) {
+                                $ret['add_'.$type] = $m->addCounterGoal(array('goal' => $data[$type]));
                             }
                         }
                     }

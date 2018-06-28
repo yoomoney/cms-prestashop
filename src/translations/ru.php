@@ -107,16 +107,9 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_d62a2911aa129f8fa6062e703904360d'
 $_MODULE['<{yandexmodule}prestashop>formhelper_54943cacb42c23593f245b1fdcf02ad8'] = 'ID приложения OAuth';
 $_MODULE['<{yandexmodule}prestashop>formhelper_84825bf349b53c7499d1bb01c6983e5b'] = 'Пароль приложения OAuth';
 $_MODULE['<{yandexmodule}prestashop>formhelper_f23c151dd21e537fe7f18ce07ef267e4'] = 'Получить токен для доступа к Яндекс.Метрика';
-$_MODULE['<{yandexmodule}prestashop>formhelper_9aed518abf496c046cc83cd3058b0c3f'] = 'Токен OAuth';
 $_MODULE['<{yandexmodule}prestashop>formhelper_b78af897765e9126a96f5f6c3834e284'] = 'Вебвизор';
 $_MODULE['<{yandexmodule}prestashop>formhelper_4c78d281a74703bf0fa1e67eeb896c16'] = 'Карта кликов';
-$_MODULE['<{yandexmodule}prestashop>formhelper_549fe58265736f9bb8ba11f75e6fee76'] = 'Внешние ссылки, загрузки файлов и отчёт по кнопке \"Поделиться\"';
-$_MODULE['<{yandexmodule}prestashop>formhelper_9b04c23ed6068e5d56289de8befac445'] = 'Точный показатель отказов';
 $_MODULE['<{yandexmodule}prestashop>formhelper_127cd2dfda4be1020022bfb1b42ebc57'] = 'Отслеживание хеша в адресной строке браузера';
-$_MODULE['<{yandexmodule}prestashop>formhelper_a760f4bbdbe979b9dcec935544ddbc60'] = 'Собирать статистику по следующим целям:';
-$_MODULE['<{yandexmodule}prestashop>formhelper_94fd663a86297d326dfe2033d84cb69e'] = 'Корзина(Посетитель кликнул \"Добавить в корзину\")';
-$_MODULE['<{yandexmodule}prestashop>formhelper_c08c4a3cbba6669251179041a4cefa6b'] = 'Заказ(Посетитель оформил заказ)';
-$_MODULE['<{yandexmodule}prestashop>formhelper_08f4bada043db413443aa8cf4676c67a'] = 'Вишлист(Посетитель добавил товар в вишлист)';
 $_MODULE['<{yandexmodule}prestashop>formhelper_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Банковские карты';
 $_MODULE['<{yandexmodule}prestashop>formhelper_faef1666296f6eb16b2a4f390ea30d62'] = 'Яндекс.Деньги';
 $_MODULE['<{yandexmodule}prestashop>formhelper_ee55b43dc97b2011716c124c0d412642'] = 'Сбербанк Онлайн';

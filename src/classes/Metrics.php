@@ -24,7 +24,6 @@ class Metrics
     public $url = 'https://oauth.yandex.ru/';
     public $url_api = 'https://api-metrika.yandex.ru/management/v1/';
     public $client_id;
-    public $state;
     public $errors;
     public $number;
     public $client_secret;
@@ -43,7 +42,6 @@ class Metrics
         $this->client_id = Configuration::get('YA_METRICS_ID_APPLICATION');
         $this->number = Configuration::get('YA_METRICS_NUMBER');
         $this->client_secret = Configuration::get('YA_METRICS_PASSWORD_APPLICATION');
-        $this->state = 'Test_1';
         $this->token = Configuration::get('YA_METRICS_TOKEN') ? Configuration::get('YA_METRICS_TOKEN') : '';
         $this->module = Module::getInstanceByName('yandexmodule');
     }
@@ -65,39 +63,23 @@ class Metrics
         }
     }
     
-    public function getToken($type = 'def')
+    public function getToken()
     {
         $params = array(
             'grant_type' => 'authorization_code',
-            'client_id' => ($type == 'market_orders') ? Configuration::get('YA_MARKET_ORDERS_ID') : $this->client_id,
-            'client_secret' =>
-                ($type == 'market_orders') ? Configuration::get('YA_MARKET_ORDERS_PW') : $this->client_secret,
+            'client_id' => $this->client_id,
+            'client_secret' => $this->client_secret,
             'code' => $this->code
         );
         $response = $this->post($this->url.'token', array(), $params, 'POST');
         $data = Tools::jsonDecode($response->body);
         if ($response->status_code == 200) {
             $this->token = $data->access_token;
-            if ($type == 'metrika') {
-                Configuration::updateValue('YA_METRICS_TOKEN', $this->token);
-            } elseif ($type == 'market_orders') {
-                Configuration::updateValue('YA_MARKET_ORDERS_YATOKEN', $this->token);
-            }
+            Configuration::updateValue('YA_METRICS_TOKEN', $this->token);
         } else {
             $this->errors = 'error #'.$response->status_code
                 .' error description: '.$data->error_description.' '.$data->error;
         }
-    }
-    
-    public function getCode()
-    {
-        $params = array(
-            'response_type' => 'code',
-            'client_id' => $this->client_id,
-            'state' => $this->state
-        );
-        $params = http_build_query($params);
-        Tools::redirect($this->url.'authorize?'.$params);
     }
     
     // Все счётчики
@@ -149,20 +131,28 @@ class Metrics
             'counter' => array(
                 'goals_remove' => 0,
                 'code_options' => array(
-                    'clickmap' => Configuration::get('YA_METRICS_SET_CLICKMAP') ? 1 : 0,
-                    'external_links' => Configuration::get('YA_METRICS_SET_OUTLINK') ? 1 : 0,
-                    'visor' => Configuration::get('YA_METRICS_SET_WEBVIZOR') ? 1 : 0,
-                    'denial' => Configuration::get('YA_METRICS_SET_OTKAZI') ? 1 : 0,
+                    'clickmap'   => Configuration::get('YA_METRICS_SET_CLICKMAP') ? 1 : 0,
+                    'visor'      => Configuration::get('YA_METRICS_SET_WEBVIZOR') ? 1 : 0,
                     'track_hash' => Configuration::get('YA_METRICS_SET_HASH') ? 1 : 0,
+                    'ecommerce'  => 1,
+                    'informer'   => array(
+                        'enabled' => 0,
+                    ),
                 )
             )
         );
 
-        if (count($params)) {
-            return $this->sendResponse('counter/'.$this->number, array(), $params, 'PUT');
-        }
+        return $this->sendResponse('counter/'.$this->number, array(), $params, 'PUT');
     }
-    
+
+    /**
+     * @param $to
+     * @param $headers
+     * @param $params
+     * @param $type
+     * @param int $pretty
+     * @return null
+     */
     public function sendResponse($to, $headers, $params, $type, $pretty = 1)
     {
         $response = $this->post(
@@ -177,6 +167,7 @@ class Metrics
             return $data;
         } else {
             $this->module->log('info', 'Failed to send request: response is ' . $response->body);
+            return null;
         }
     }
     

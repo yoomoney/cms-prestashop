@@ -93,7 +93,7 @@ class YandexModule extends PaymentModule
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.0.6';
+        $this->version         = '1.0.7';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -166,6 +166,7 @@ class YandexModule extends PaymentModule
             'displayOrderConfirmation',
             'displayAdminOrder',
             'actionOrderStatusUpdate',
+            'displayFooterProduct',
         );
         if (version_compare(_PS_VERSION_, '1.7.0') > 0) {
             $hooks[] = 'paymentOptions';
@@ -205,37 +206,7 @@ class YandexModule extends PaymentModule
 
     public function hookDisplayFooter($params)
     {
-        $data = '';
-        if (!Configuration::get('YA_METRICS_ACTIVE')) {
-            $data .= 'var celi_order = false;';
-            $data .= 'var celi_cart = false;';
-            $data .= 'var celi_wishlist = false;';
-
-            return '<p style="display:none;"><script type="text/javascript">'.$data.'</script></p>';
-        }
-
-        if (Configuration::get('YA_METRICS_CELI_ORDER')) {
-            $data .= 'var celi_order = true;';
-        } else {
-            $data .= 'var celi_order = false;';
-        }
-
-        if (Configuration::get('YA_METRICS_CELI_CART')) {
-            $data .= 'var celi_cart = true;';
-        } else {
-            $data .= 'var celi_cart = false;';
-        }
-
-        if (Configuration::get('YA_METRICS_CELI_WISHLIST')) {
-            $data .= 'var celi_wishlist = true;';
-        } else {
-            $data .= 'var celi_wishlist = false;';
-        }
-
-        if (Configuration::get('YA_METRICS_CODE') != '') {
-            return '<p style="display:none;"><script type="text/javascript">'.$data
-                   .'</script>'.Configuration::get('YA_METRICS_CODE').'</p>';
-        }
+        return Configuration::get('YA_METRICS_CODE');
     }
 
     public function selfPostProcess()
@@ -253,8 +224,19 @@ class YandexModule extends PaymentModule
         }
 
         if (Tools::isSubmit('submitmetrikaModule')) {
+            $prevOptions = $this->getMetricsModel()->getOptionValues();
             $this->metrics_status = $this->getMetricsModel()->validateOptions();
             $this->metrika_valid  = $this->getMetricsModel()->isValid();
+            if ($this->getMetricsModel()->isNeedUpdateToken($prevOptions)) {
+                $dir = _PS_ADMIN_DIR_;
+                $dir = explode(DIRECTORY_SEPARATOR, $dir);
+                $dir = base64_encode(
+                    $this->getCipher()->encrypt(
+                        end($dir).'_'.Context::getContext()->cookie->id_employee.'_metrika'
+                    )
+                );
+                $this->getMetricsModel()->redirectToOAuth($dir);
+            }
             if ($this->metrika_valid && Configuration::get('YA_METRICS_ACTIVE')) {
                 $this->getMetricsModel()->sendData();
             } elseif ($this->metrika_valid && !Configuration::get('YA_METRICS_ACTIVE')) {
@@ -356,15 +338,11 @@ class YandexModule extends PaymentModule
             'YA_METRICS_ID_APPLICATION',
             'YA_METRICS_SET_WEBVIZOR',
             'YA_METRICS_SET_CLICKMAP',
-            'YA_METRICS_SET_OUTLINK',
             'YA_METRICS_SET_OTKAZI',
             'YA_METRICS_SET_HASH',
             'YA_METRICS_ACTIVE',
             'YA_METRICS_TOKEN',
             'YA_METRICS_NUMBER',
-            'YA_METRICS_CELI_CART',
-            'YA_METRICS_CELI_ORDER',
-            'YA_METRICS_CELI_WISHLIST',
         ));
         $vars_billing       = array(
             'billing' => $this->getBillingModel(),
@@ -727,6 +705,33 @@ class YandexModule extends PaymentModule
         );
     }
 
+    public function hookDisplayFooterProduct($params) {
+        $product = (object)$params['product'];
+        $price = round(Product::getPriceStatic($product->id), 2);
+        $html = '
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", ecommerceDetailProducts);
+    function ecommerceDetailProducts() {
+        window.dataLayer = window.dataLayer || [];
+        dataLayer.push({
+            ecommerce: {
+                detail: {
+                    products: [
+                        {
+                            id: "'.$product->id.'",
+                            name : "'.$product->name.'",
+                            price: '.$price.',
+                            category: "'.$params['category']->name.'"
+                        }
+                    ]
+                }
+            }
+        });
+    }
+</script>';
+        return $html;
+    }
+
     public function hookDisplayPayment($params)
     {
         if (!$this->active) {
@@ -997,45 +1002,50 @@ class YandexModule extends PaymentModule
             return false;
         }
 
-        $ret = array();
-
         if (version_compare(_PS_VERSION_, '1.7.0') < 0) {
-            $ret['order_price'] = $params['total_to_pay'].' '.$params['currency'];
-            $ret['order_id']    = $params['objOrder']->id;
-            $ret['currency']    = $params['currencyObj']->iso_code;
-            $ret['payment']     = $params['objOrder']->payment;
-            $products           = array();
+            $orderId      = (string)$params['objOrder']->id;
+            $currencyCode = $params['currencyObj']->iso_code;
+            $products     = array();
             foreach ($params['objOrder']->getCartProducts() as $k => $product) {
-                $products[$k]['id']       = $product['product_id'];
+                $products[$k]['id']       = (string)$product['product_id'];
                 $products[$k]['name']     = $product['product_name'];
-                $products[$k]['quantity'] = $product['product_quantity'];
-                $products[$k]['price']    = $product['product_price'];
+                $products[$k]['quantity'] = (int)$product['product_quantity'];
+                $products[$k]['price']    = round(Product::getPriceStatic($product['product_id']), 2);
             }
         } else {
             /** @var Order $order */
-            $order              = $params['order'];
-            $currency           = new Currency($order->id_currency);
-            $ret['order_price'] = $order->total_paid.' '.$currency->iso_code;
-            $ret['order_id']    = $order->id;
-            $ret['currency']    = $currency->iso_code;
-            $ret['payment']     = $order->payment;
-            $products           = array();
+            $order        = $params['order'];
+            $orderId      = (string)$order->id;
+            $currency     = new Currency($order->id_currency);
+            $currencyCode = $currency->iso_code;
+            $products     = array();
             /** @var Cart $cart */
-            $cart = $params['cart'];
-            foreach ($cart->getProducts() as $k => $product) {
-                $products[$k]['id']       = $product['product_id'];
-                $products[$k]['name']     = $product['product_name'];
-                $products[$k]['quantity'] = $product['product_quantity'];
-                $products[$k]['price']    = $product['product_price'];
+            $cart = Cart::getCartByOrderId($orderId);
+            foreach ($cart->getProducts(true) as $k => $product) {
+                $products[$k]['id']       = $product['id_product'];
+                $products[$k]['name']     = $product['name'];
+                $products[$k]['quantity'] = $product['quantity'];
+                $products[$k]['price']    = round(Product::getPriceStatic((int)$product['id_product']), 2);
             }
         }
 
-        $ret['goods'] = $products;
-        $data         = '<script>
-                $(window).load(function() {
-                    if(celi_order)
-                        metrikaReach(\'metrikaOrder\', '.Tools::jsonEncode($ret).');
-                });
+        $result = array(
+            "ecommerce" => array(
+                "currencyCode" => $currencyCode,
+                "purchase"     => array(
+                    "actionField" => array(
+                        "id" => $orderId,
+                    ),
+                    "products"    => $products,
+                ),
+            ),
+        );
+        $data   = '<script>
+                window.dataLayer = window.dataLayer || [];
+                document.addEventListener("DOMContentLoaded", ecommercePurchase);
+                function ecommercePurchase() {
+                    dataLayer.push('.Tools::jsonEncode($result).');
+                }
                 </script>
         ';
 
