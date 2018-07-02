@@ -204,6 +204,7 @@ class CurlClient implements ApiClientInterface
 
     /**
      * @return array
+     * @throws ApiConnectionException
      */
     public function sendRequest()
     {

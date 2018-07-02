@@ -24,30 +24,24 @@
  * THE SOFTWARE.
  */
 
-namespace YandexCheckout\Model;
+define('YANDEX_CHECKOUT_SDK_ROOT_PATH', dirname(__FILE__));
+define('YANDEX_CHECKOUT_PSR_LOG_PATH', dirname(__FILE__).'/../vendor/psr/log/Psr/Log');
 
-use YandexCheckout\Common\AbstractEnum;
-
-/**
- * CurrencyCode - Код валюты, ISO-4217 3-alpha currency symbol
- */
-class CurrencyCode extends AbstractEnum
+function yandexCheckoutLoadClass($className)
 {
-    const RUB = 'RUB';
-    const USD = 'USD';
-    const EUR = 'EUR';
-    const BYN = 'BYN';
-    const CNY = 'CNY';
-    const KZT = 'KZT';
-    const UAH = 'UAH';
-
-    protected static $validValues = array(
-        self::RUB => true,
-        self::USD => true,
-        self::EUR => true,
-        self::BYN => true,
-        self::CNY => true,
-        self::KZT => true,
-        self::UAH => true,
-    );
+    if (strncmp('YandexCheckout', $className, 14) === 0) {
+        $path   = YANDEX_CHECKOUT_SDK_ROOT_PATH;
+        $length = 14;
+    } elseif (strncmp('Psr\Log', $className, 7) === 0) {
+        $path   = YANDEX_CHECKOUT_PSR_LOG_PATH;
+        $length = 7;
+    } else {
+        return;
+    }
+    $path .= str_replace('\\', '/', substr($className, $length)) . '.php';
+    if (file_exists($path)) {
+        require $path;
+    }
 }
+
+spl_autoload_register('yandexCheckoutLoadClass');

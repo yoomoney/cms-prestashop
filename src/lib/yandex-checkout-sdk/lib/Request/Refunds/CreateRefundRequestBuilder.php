@@ -141,6 +141,7 @@ class CreateRefundRequestBuilder extends AbstractRequestBuilder
     /**
      * Устанавливает чек для проведения возврата
      * @param ReceiptInterface|array $value Инстанс чека и массив с его описанием
+     * @return CreateRefundRequestBuilder
      */
     public function setReceipt($value)
     {
@@ -151,6 +152,7 @@ class CreateRefundRequestBuilder extends AbstractRequestBuilder
         } else {
             throw new InvalidPropertyValueTypeException('Invalid receipt value type', 0, 'receipt', $value);
         }
+        return $this;
     }
 
     /**
