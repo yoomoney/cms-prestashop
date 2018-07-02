@@ -136,6 +136,7 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
     /**
      * Устанавливает получателя платежа из объекта или ассоциативного массива
      * @param RecipientInterface|array $value Получатель платежа
+     * @return CreatePaymentRequestBuilder
      * @throws InvalidPropertyValueTypeException Выбрасывается если передан аргумент не валидного типа
      */
     public function setRecipient($value)
@@ -148,6 +149,7 @@ class CreatePaymentRequestBuilder extends AbstractRequestBuilder
         } else {
             throw new InvalidPropertyValueTypeException('Invalid recipient value', 0, 'recipient', $value);
         }
+        return $this;
     }
 
     /**

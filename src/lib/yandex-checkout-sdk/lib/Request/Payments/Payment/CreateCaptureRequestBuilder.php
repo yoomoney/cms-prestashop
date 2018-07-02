@@ -120,6 +120,7 @@ class CreateCaptureRequestBuilder extends AbstractRequestBuilder
      * Устанавливает чек
      * @param ReceiptInterface|array $value Инстанс чека или ассоциативный массив с данными чека
      * @since 1.0.2
+     * @return CreateCaptureRequestBuilder
      */
     public function setReceipt($value)
     {
@@ -130,6 +131,7 @@ class CreateCaptureRequestBuilder extends AbstractRequestBuilder
         } else {
             throw new InvalidPropertyValueTypeException('Invalid receipt value type', 0, 'receipt', $value);
         }
+        return $this;
     }
 
     /**
