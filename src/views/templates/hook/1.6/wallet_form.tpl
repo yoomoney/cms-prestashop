@@ -12,7 +12,7 @@
 <div class="row">
     <div class="col-xs-12 col-md-6">
         <p class="payment_module">
-            <a href="{$link->getModuleLink('yandexmodule', 'redirect', ['type' => 'wallet'])|escape:'quotes':'UTF-8'}" title="{l s='Yandex.Money' mod='yandexmodule'}" class="yandex_money_yandex_money yandex_money_payment">
+            <a href="{$link->getModuleLink('yandexmodule', 'redirectwallet', ['type' => 'wallet'])|escape:'quotes':'UTF-8'}" title="{l s='Yandex.Money' mod='yandexmodule'}" class="yandex_money_yandex_money yandex_money_payment">
                 {l s='Yandex.Money' mod='yandexmodule'}
             </a>
         </p>
@@ -21,7 +21,7 @@
 <div class="row">
     <div class="col-xs-12 col-md-6">
         <p class="payment_module">
-            <a href="{$link->getModuleLink('yandexmodule', 'redirect', ['type' => 'card'])|escape:'quotes':'UTF-8'}" title="{l s='Bank cards' mod='yandexmodule'}" class="yandex_money_bank_card yandex_money_payment">
+            <a href="{$link->getModuleLink('yandexmodule', 'redirectwallet', ['type' => 'card'])|escape:'quotes':'UTF-8'}" title="{l s='Bank cards' mod='yandexmodule'}" class="yandex_money_bank_card yandex_money_payment">
                 {l s='Bank cards' mod='yandexmodule'}
             </a>
         </p>

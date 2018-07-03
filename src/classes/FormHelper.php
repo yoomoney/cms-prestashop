@@ -698,6 +698,7 @@ class FormHelper
 
     public function getWalletForm(Models\WalletModel $model)
     {
+        $state = new OrderState();
         return array(
             'form' => array(
                 'input' => array(
@@ -728,8 +729,8 @@ class FormHelper
                         'col' => 6,
                         'class' => 't',
                         'desc' => $this->l('Скопируйте эту ссылку в поле Redirect URL на').
-                            '<a href="https://sp-money.yandex.ru/myservices/new.xml" target="_blank"> '.
-                            $this->l('странице регистрации приложения'). ' </a>',
+                            '<a href="https://money.yandex.ru/myservices/online.xml" target="_blank"> '.
+                            $this->l('странице настройки уведомлений'). ' </a>',
                         'type' => 'text',
                         'name' => 'YA_WALLET_REDIRECT',
                         'label' => $this->l('RedirectURL'),
@@ -744,29 +745,14 @@ class FormHelper
                         'value' => $model->getAccountId(),
                     ),
                     array(
-                        'col' => 6,
-                        'class' => 't',
-                        'type' => 'text',
-                        'desc' => $this->l(''),
-                        'name' => 'YA_WALLET_APPLICATION_ID',
-                        'label' => $this->l('Id приложения'),
-                        'value' => $model->getApplicationId(),
-                    ),
-                    array(
                         'type' => 'textarea',
                         'label' => $this->l('Codeword'),
                         'name' => 'YA_WALLET_PASSWORD',
                         'rows' => 5,
                         'cols' => 30,
-                        'desc' => $this->l(''),
+                        'desc' => $this->l('Секретное слово нужно скопировать').'<a href="https://money.yandex.ru/myservices/online.xml" target="_blank">'. $this->l(' со страницы настройки уведомлений на сайте Яндекс.Денег').'</a>',
                         'class' => 't',
                         'value' => $model->getPassword(),
-                    ),
-                    array(
-                        'col' => 9,
-                        'class' => 't',
-                        'type' => 'free',
-                        'name' => 'YA_WALLET_TEXT_INSIDE',
                     ),
                     array(
                         'col' => 4,
@@ -778,10 +764,24 @@ class FormHelper
                         'value' => $model->getMinimumAmount()
                     ),
                     array(
+                        'col' => 4,
+                        'class' => 't',
+                        'type' => 'select',
+                        'desc' => '',
+                        'name' => 'YA_WALLET_END_STATUS',
+                        'label' => $this->l('Order status'),
+                        'options' => array(
+                            'query' => $state->getOrderStates(1),
+                            'id' => 'id_order_state',
+                            'name' => 'name'
+                        ),
+                        'default' => Configuration::get('PS_OS_PAYMENT'),
+                        'value' => $model->getOrderStatus(),
+                    ),
+                    array(
                         'type' => 'checkbox',
                         'label' => $this->l('Debug log'),
-                        'desc' => $this->l('Настройку нужно будет поменять, ".
-                            "только если попросят специалисты Яндекс.Денег'),
+                        'desc' => $this->l('Настройку нужно будет поменять, только если попросят специалисты Яндекс.Денег'),
                         'name' => 'YA_WALLET_LOGGING',
                         'values' => array(
                             'query' => array(
