@@ -28,26 +28,26 @@
     <div id="money">
         <div class="errors">{$p2p_status|escape:'quotes':'UTF-8'}</div>
         <p>{l s='Для работы с модулем нужно' mod='yandexmodule'} <a href='https://money.yandex.ru/new' target='_blank'>{l s='открыть кошелек' mod='yandexmodule'}</a> {l s='на Яндексе и ' mod='yandexmodule'}<a href='https://sp-money.yandex.ru/myservices/new.xml' target='_blank'>{l s='зарегистрировать приложение ' mod='yandexmodule'}</a>{l s=' на сайте Яндекс.Денег ' mod='yandexmodule'}</p>
-        {$money_p2p|escape:'quotes':'UTF-8'}
+        {$money_p2p}
     </div>
     <div id="billing">
         <div class="errors">{$billing_status|escape:'quotes':'UTF-8'}</div>
         <p>{l s='This is a payment form for your site. It allows for accepting payments to your company account from cards and Yandex.Money e-wallets without a contract. To set it up, you need to provide the Yandex.Billing identifier: we will send it via email after you' mod='yandexmodule'} <a href="https://money.yandex.ru/fastpay/">{l s='create a form in construction kit' mod='yandexmodule'}</a></p>
-        {$billing_form|escape:'quotes':'UTF-8'}
+        {$billing_form}
     </div>
     <div id="moneyorg">
         <div class="errors">{$org_status|escape:'quotes':'UTF-8'}</div>
         <p>{l s='Для работы с модулем нужно подключить магазин к' mod='yandexmodule'} <a target="_blank" href="https://kassa.yandex.ru/">{l s='Яндекс.Кассе' mod='yandexmodule'}</a>.</p>
-        {$money_org|escape:'quotes':'UTF-8'}
+        {$money_org}
     </div>
     <div id="metrika">
         <div class="errors">{$metrika_status|escape:'quotes':'UTF-8'}</div>
-        {$money_metrika|escape:'quotes':'UTF-8'}
+        {$money_metrika}
         <div id="iframe_container"></div>
     </div>
     <div id="market">
         <div class="errors">{$market_status|escape:'quotes':'UTF-8'}</div>
-        {$money_market|escape:'quotes':'UTF-8'}
+        {$money_market}
     </div>
 </div>
 {literal}
