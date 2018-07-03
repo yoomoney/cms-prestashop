@@ -16,12 +16,12 @@
         <legend>{$label|escape:'htmlall':'UTF-8'}</legend>
         <div class="form-check">
             <label for="yandex_money_wallet" class="form-check-label">
-                <input type="radio" class="form-check-input" name="payment_method" id="yandex_money_wallet" value="yandex_money_wallet" />
+                <input type="radio" class="form-check-input" name="type" id="yandex_money_wallet" value="wallet" />
                 <img src="{$image_dir|escape:'htmlall':'UTF-8'}yandex_money.png" />
                 {l s='Yandex.Money' mod='yandexmodule'}
             </label><br />
             <label for="yandex_money_card" class="form-check-label">
-                <input type="radio" class="form-check-input" name="payment_method" id="yandex_money_card" value="yandex_money_card" />
+                <input type="radio" class="form-check-input" name="type" id="yandex_money_card" value="card" />
                 <img src="{$image_dir|escape:'htmlall':'UTF-8'}bank_card.png" />
                 {l s='Bank cards' mod='yandexmodule'}
             </label>

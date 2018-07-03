@@ -27,7 +27,7 @@
     </ul>
     <div id="money">
         <div class="errors">{$p2p_status|escape:'quotes':'UTF-8'}</div>
-        <p>{l s='Для работы с модулем нужно' mod='yandexmodule'} <a href='https://money.yandex.ru/new' target='_blank'>{l s='открыть кошелек' mod='yandexmodule'}</a> {l s='на Яндексе и ' mod='yandexmodule'}<a href='https://sp-money.yandex.ru/myservices/new.xml' target='_blank'>{l s='зарегистрировать приложение ' mod='yandexmodule'}</a>{l s=' на сайте Яндекс.Денег ' mod='yandexmodule'}</p>
+        <p>{l s='Для работы с модулем нужно' mod='yandexmodule'} <a href='https://money.yandex.ru/new' target='_blank'>{l s='открыть кошелек' mod='yandexmodule'}</a> {l s='на Яндексе.' mod='yandexmodule'}</p>
         {$money_p2p|escape:'quotes':'UTF-8'}
     </div>
     <div id="billing">
