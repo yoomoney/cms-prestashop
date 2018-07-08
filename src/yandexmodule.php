@@ -93,7 +93,7 @@ class YandexModule extends PaymentModule
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.0.8';
+        $this->version         = '1.0.9';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -381,7 +381,6 @@ class YandexModule extends PaymentModule
         $forms->cats = $cats;
 
         $vars_org['YA_ORG_TEXT_INSIDE']    = $this->l('shopID и Секретное слово можно посмотреть в ')."<a href='https://money.yandex.ru/joinups' target='_blank'>".$this->l('личном кабинете')."</a>".$this->l('после подключения Яндекс.Кассы.');
-        $vars_p2p['YA_WALLET_TEXT_INSIDE'] = $this->l('ID и секретное слово вы получите после').'<a href="https://sp-money.yandex.ru/myservices/new.xml" target="_blank">'.$this->l(' регистрации приложения').'</a> '.$this->l('на сайте Яндекс.Денег');
         $vars_p2p['YA_WALLET_LOGGING_ON']  = Configuration::get('YA_WALLET_LOGGING_ON');
         $this->context->smarty->assign(array(
             'ya_version'           => $this->version,
@@ -1077,7 +1076,7 @@ class YandexModule extends PaymentModule
         }
         $helper->fields_value                             = $vars;
         $p2p_redirect                                     = $this->context->link->getModuleLink($this->name,
-            'redirect');
+            'callbackwallet');
         $httpsBasePath                                    = str_replace('http://', 'https://',
             _PS_BASE_URL_.__PS_BASE_URI__);
         $redir                                            = $httpsBasePath.'modules/yandexmodule/callback.php';

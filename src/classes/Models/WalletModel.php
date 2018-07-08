@@ -13,9 +13,9 @@ use Tools;
 class WalletModel extends AbstractPaymentModel
 {
     private $accountId;
-    private $applicationId;
     private $password;
     private $minAmount;
+    private $orderStatus;
 
     public function initConfiguration()
     {
@@ -24,6 +24,7 @@ class WalletModel extends AbstractPaymentModel
         $this->applicationId = Configuration::get('YA_WALLET_APPLICATION_ID');
         $this->password = Configuration::get('YA_WALLET_PASSWORD');
         $this->minAmount = Configuration::get('YA_WALLET_MIN_AMOUNT');
+        $this->orderStatus = Configuration::get('YA_WALLET_END_STATUS');
         $this->paymentActionController = 'redirectwallet';
     }
 
@@ -47,6 +48,14 @@ class WalletModel extends AbstractPaymentModel
         return $this->minAmount;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getOrderStatus()
+    {
+        return $this->orderStatus;
+    }
+
     public function validateOptions()
     {
         $errors = '';
@@ -66,13 +75,6 @@ class WalletModel extends AbstractPaymentModel
             Configuration::UpdateValue('YA_WALLET_ACCOUNT_ID', $this->accountId);
         }
 
-        if (trim(Tools::getValue('YA_WALLET_APPLICATION_ID')) == '') {
-            $errors .= $this->module->displayError($this->module->l('Application not specified!'));
-        } else {
-            $this->applicationId = trim(Tools::getValue('YA_WALLET_APPLICATION_ID'));
-            Configuration::UpdateValue('YA_WALLET_APPLICATION_ID', $this->applicationId);
-        }
-
         if (trim(Tools::getValue('YA_WALLET_PASSWORD')) == '') {
             $errors .= $this->module->displayError($this->module->l('Password not specified!'));
         } else {
@@ -82,7 +84,10 @@ class WalletModel extends AbstractPaymentModel
         Configuration::UpdateValue('YA_WALLET_LOGGING_ON', Tools::getValue('YA_WALLET_LOGGING_ON'));
 
         $this->minAmount = (float)Tools::getValue('YA_WALLET_MIN_AMOUNT');
-        Configuration::UpdateValue('YA_KASSA_SEND_RECEIPT', $this->minAmount);
+        Configuration::UpdateValue('YA_WALLET_MIN_AMOUNT', $this->minAmount);
+
+        $this->orderStatus = Tools::getValue('YA_WALLET_END_STATUS');
+        Configuration::UpdateValue('YA_WALLET_END_STATUS', $this->orderStatus);
 
         if ($errors == '') {
             $errors = $this->module->displayConfirmation($this->module->l('Settings saved successfully!'));
