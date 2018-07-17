@@ -386,6 +386,13 @@ class FormHelper
             );
         }
 
+        $statusList = OrderState::getOrderStates(Context::getContext()->language->id);
+        $statusOptions = array(
+            'query' => $statusList,
+            'id' => 'id_order_state',
+            'name' => 'name',
+        );
+
         $form =  array(
             'form' => array(
                 'input' => array(
@@ -511,25 +518,6 @@ class FormHelper
                         'label' => $this->l('Transaction data'),
                         'value' => $model->getPaymentDescription(),
                     ),
-                    array(
-                        'type' => 'radio',
-                        'label' => $this->l('Send receipt to Yandex.Kassa (54 federal law)'),
-                        'name' => 'YA_KASSA_SEND_RECEIPT',
-                        'desc' => $this->l(''),
-                        'value' => ($model->getSendReceipt() ? 1 : 0),
-                        'values' => array(
-                            array(
-                                'id' => 'kassa_send_receipt_enable',
-                                'label' => $this->l('Enable'),
-                                'value' => 1,
-                            ),
-                            array(
-                                'id' => 'kassa_send_receipt_disable',
-                                'label' => $this->l('Disable'),
-                                'value' => 0,
-                            ),
-                        ),
-                    ),
                 ),
                 'submit' => array(
                     'title' => $this->l('Save'),
@@ -578,6 +566,79 @@ class FormHelper
         );
 
         $form['form']['input'][] = array(
+            'type'   => 'checkbox',
+            'label'  => $this->l('Включить отложенную оплату'),
+            'name'   => 'YA_KASSA_ENABLE_HOLD_MODE',
+            'values' => array(
+                'query' => array(
+                    array(
+                        'id'   => 'ON',
+                        'name' => $this->l('Если опция включена, платежи с карт проходят в 2 этапа: у клиента сумма замораживается, и вам вручную нужно подтвердить её списание – через панель администратора.'),
+                    ),
+                ),
+                'id'    => 'id',
+                'name'  => 'name',
+            ),
+        );
+
+        $form['form']['input'][] = array(
+            'type' => 'checkbox',
+            'label' => $this->l('What status should be assigned to an order if it is:'),
+            'name'   => 'YA_KASSA_HOLD_MODE_STATUSES_LABEL',
+            'class'  => 'text-inside enable-hold-mode hidden',
+            'values' => array(
+                'query' => array(
+                    array(
+                        'id'   => 'ON',
+                        'name' => $this->l(''),
+                    ),
+                ),
+                'id'    => 'id',
+                'name'  => 'name',
+            ),
+        );
+
+        $form['form']['input'][] = array(
+            'type' => 'select',
+            'label' => $this->l('waiting for capture'),
+            'name' => 'YA_KASSA_ON_HOLD_STATUS_ID',
+            'class'  => 'text-inside enable-hold-mode',
+            'value' => $model->getOnHoldStatusId(),
+            'options' => $statusOptions,
+            'desc' => $this->l('the order status will be changed to this one after the funds are credited, until the store\'s operator either captures or cancels the payment'),
+        );
+
+        $form['form']['input'][] = array(
+            'type' => 'select',
+            'label' => $this->l('canceled'),
+            'name' => 'YA_KASSA_CANCEL_STATUS_ID',
+            'class'  => 'text-inside enable-hold-mode',
+            'value' => $model->getCancelStatusId(),
+            'options' => $statusOptions,
+            'desc' => $this->l('the order status will be changed to this one after the payment is canceled'),
+        );
+
+        $form['form']['input'][] = array(
+            'type'   => 'radio',
+            'label'  => $this->l('Send receipt to Yandex.Kassa (54 federal law)'),
+            'name'   => 'YA_KASSA_SEND_RECEIPT',
+            'desc'   => $this->l(''),
+            'value'  => ($model->getSendReceipt() ? 1 : 0),
+            'values' => array(
+                array(
+                    'id'    => 'kassa_send_receipt_enable',
+                    'label' => $this->l('Enable'),
+                    'value' => 1,
+                ),
+                array(
+                    'id'    => 'kassa_send_receipt_disable',
+                    'label' => $this->l('Disable'),
+                    'value' => 0,
+                ),
+            ),
+        );
+
+        $form['form']['input'][] = array(
             'type'  => 'html',
             'label' => $this->l('VAT'),
             'html_content' => '',
@@ -623,13 +684,6 @@ class FormHelper
             );
         }
 
-        $statusList = OrderState::getOrderStates(Context::getContext()->language->id);
-        $statusOptions = array(
-            'query' => $statusList,
-            'id' => 'id_order_state',
-            'name' => 'name',
-        );
-
         $form['form']['input'][] = array(
             'col' => 6,
             'class' => 't',
@@ -643,13 +697,6 @@ class FormHelper
             'disabled' => true
         );
 
-        /*$form['form']['input'][] = array(
-            'type' => 'select',
-            'label' => $this->l('Статус заказа после создания'),
-            'name' => 'YA_KASSA_CREATE_STATUS_ID',
-            'value' => $model->getCreateStatusId(),
-            'options' => $statusOptions,
-        );*/
         $form['form']['input'][] = array(
             'type' => 'select',
             'label' => $this->l('Order status after the payment'),
@@ -657,14 +704,6 @@ class FormHelper
             'value' => $model->getSuccessStatusId(),
             'options' => $statusOptions,
         );
-        /*$form['form']['input'][] = array(
-            'type' => 'select',
-            'label' => $this->l('Статус заказа после неудачного платежа'),
-            'name' => 'YA_KASSA_FAILURE_STATUS_ID',
-            'value' => $model->getFailureStatusId(),
-            'options' => $statusOptions,
-        );*/
-
 
         $form['form']['input'][] = array(
             'col' => 4,

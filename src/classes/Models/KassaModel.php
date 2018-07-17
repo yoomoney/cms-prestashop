@@ -22,6 +22,7 @@ use YandexCheckout\Client;
 use YandexCheckout\Common\Exceptions\NotFoundException;
 use YandexCheckout\Model\ConfirmationType;
 use YandexCheckout\Model\Payment;
+use YandexCheckout\Model\PaymentInterface;
 use YandexCheckout\Model\PaymentMethodType;
 use YandexCheckout\Model\RefundInterface;
 use YandexCheckout\Model\RefundStatus;
@@ -29,9 +30,10 @@ use YandexCheckout\Request\Payments\CreatePaymentRequest;
 use YandexCheckout\Request\Payments\CreatePaymentRequestBuilder;
 use YandexCheckout\Request\Payments\CreatePaymentResponse;
 use YandexCheckout\Request\Payments\Payment\CreateCaptureRequest;
+use YandexCheckout\Request\Payments\Payment\CreateCaptureRequestBuilder;
 use YandexCheckout\Request\Payments\Payment\CreateCaptureRequestSerializer;
-use YandexCheckout\Request\Payments\Payment\CreateCaptureResponse;
 use YandexCheckout\Request\Refunds\CreateRefundRequest;
+use YandexModule;
 
 class KassaModel extends AbstractPaymentModel
 {
@@ -54,7 +56,9 @@ class KassaModel extends AbstractPaymentModel
     private $debugLog;
     private $createStatusId;
     private $successStatusId;
-    private $failureStatusId;
+    private $enableHoldMode;
+    private $onHoldStatusId;
+    private $cancelStatusId;
     private $apiClient;
 
     public function initConfiguration()
@@ -71,14 +75,14 @@ class KassaModel extends AbstractPaymentModel
         $this->debugLog               = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
         $this->createStatusId         = Configuration::get('PS_OS_PREPARATION');
         $this->successStatusId        = (int)Configuration::get('YA_KASSA_SUCCESS_STATUS_ID');
-        $this->failureStatusId        = Configuration::get('PS_OS_ERROR');
+        $this->enableHoldMode         = Configuration::get('YA_KASSA_ENABLE_HOLD_MODE_ON') === 'on';
+        $this->onHoldStatusId         = (int)Configuration::get('YA_KASSA_ON_HOLD_STATUS_ID');
+        $this->cancelStatusId         = (int)Configuration::get('YA_KASSA_CANCEL_STATUS_ID');
         $this->paymentDescription     = Configuration::get('YA_KASSA_PAYMENT_DESCRIPTION');
 
         if (!$this->paymentDescription) {
             $this->paymentDescription = $this->module->l('Payment for order No. %cart_id%');
         }
-        //$this->createStatusId = (int)Configuration::get('YA_KASSA_CREATE_STATUS_ID');
-        //$this->failureStatusId = (int)Configuration::get('YA_KASSA_FAILURE_STATUS_ID');
 
         $this->paymentActionController = 'paymentkassa';
     }
@@ -251,11 +255,27 @@ class KassaModel extends AbstractPaymentModel
     }
 
     /**
+     * @return bool
+     */
+    public function getEnableHoldMode()
+    {
+        return $this->enableHoldMode;
+    }
+
+    /**
      * @return int
      */
-    public function getFailureStatusId()
+    public function getOnHoldStatusId()
     {
-        return $this->failureStatusId;
+        return $this->onHoldStatusId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCancelStatusId()
+    {
+        return $this->cancelStatusId;
     }
 
     public function validateOptions()
@@ -303,14 +323,21 @@ class KassaModel extends AbstractPaymentModel
         Configuration::UpdateValue('YA_KASSA_PAYMENT_MODE', Tools::getValue('YA_KASSA_PAYMENT_MODE'));
         $this->epl = Tools::getValue('YA_KASSA_PAYMENT_MODE') == 'kassa';
 
-        //$this->createStatusId = (int)Tools::getValue('YA_KASSA_CREATE_STATUS_ID');
-        //Configuration::UpdateValue('YA_KASSA_CREATE_STATUS_ID', $this->createStatusId);
-
         $this->successStatusId = (int)Tools::getValue('YA_KASSA_SUCCESS_STATUS_ID');
         Configuration::UpdateValue('YA_KASSA_SUCCESS_STATUS_ID', $this->successStatusId);
 
-        //$this->failureStatusId = (int)Tools::getValue('YA_KASSA_FAILURE_STATUS_ID');
-        //Configuration::UpdateValue('YA_KASSA_FAILURE_STATUS_ID', $this->failureStatusId);
+        $this->enableHoldMode = Tools::getValue('YA_KASSA_ENABLE_HOLD_MODE_ON') === 'on';
+        Configuration::UpdateValue('YA_KASSA_ENABLE_HOLD_MODE_ON', Tools::getValue('YA_KASSA_ENABLE_HOLD_MODE_ON'));
+        if ($this->enableHoldMode) {
+            $module = new yandexmodule();
+            $module->installTabIfNeeded();
+        }
+
+        $this->onHoldStatusId = (int)Tools::getValue('YA_KASSA_ON_HOLD_STATUS_ID');
+        Configuration::UpdateValue('YA_KASSA_ON_HOLD_STATUS_ID', $this->onHoldStatusId);
+
+        $this->cancelStatusId = (int)Tools::getValue('YA_KASSA_CANCEL_STATUS_ID');
+        Configuration::UpdateValue('YA_KASSA_CANCEL_STATUS_ID', $this->cancelStatusId);
 
         foreach ($this->getTaxesArray() as $taxRow) {
             Configuration::UpdateValue($taxRow, Tools::getValue($taxRow));
@@ -429,7 +456,7 @@ class KassaModel extends AbstractPaymentModel
             $description = $this->generateDescription($cart);
             $builder->setAmount($totalAmount)
                     ->setCurrency('RUB')
-                    ->setCapture(true)
+                    ->setCapture($this->getCaptureValue($paymentMethod))
                     ->setDescription($description)
                     ->setClientIp($_SERVER['REMOTE_ADDR'])
                     ->setMetadata(array(
@@ -458,7 +485,7 @@ class KassaModel extends AbstractPaymentModel
             }
             $builder->setConfirmation($confirmation);
             if ($this->getSendReceipt()) {
-                $this->addReceiptItems($context, $cart, $builder);
+                $this->addReceiptItems($context->customer, $cart, $builder);
             }
             $request = $builder->build();
             if ($this->getSendReceipt()) {
@@ -489,13 +516,17 @@ class KassaModel extends AbstractPaymentModel
         return $payment;
     }
 
+    /**
+     * @param $orderId
+     * @return null|PaymentInterface
+     */
     public function findOrderPayment($orderId)
     {
         $paymentInfo = $this->findPaymentInfoByOrderId($orderId);
         if (empty($paymentInfo)) {
             $this->module->log('warning', 'Order#'.$orderId.' payment not found in database');
 
-            return false;
+            return null;
         }
 
         try {
@@ -652,7 +683,7 @@ class KassaModel extends AbstractPaymentModel
     /**
      * @param Payment $payment
      *
-     * @return CreateCaptureResponse|null
+     * @return PaymentInterface|null
      */
     public function capturePayment($payment)
     {
@@ -676,39 +707,53 @@ class KassaModel extends AbstractPaymentModel
         return $response;
     }
 
+    /**
+     * @param Payment $payment
+     *
+     * @return PaymentInterface|null
+     */
+    public function cancelPayment($payment)
+    {
+        $response = null;
+        try {
+            $response = $this->getApiClient()->cancelPayment($payment->getId());
+        } catch (\Exception $e) {
+            $this->module->log('error', 'Cancel payment error: '.$e->getMessage());
+            $response = $payment;
+        }
+
+        return $response;
+    }
+
     public function updateOrderPaymentId($orderId, $payment)
     {
         $orderPaymentId = $this->findLocalOrderPaymentId($orderId);
         $this->updateOrderTransactionId($orderPaymentId, $payment->getId());
     }
 
-    private function addReceiptItems(Context $context, Cart $cart, CreatePaymentRequestBuilder $builder)
+    /**
+     * @param Customer $customer
+     * @param Cart $cart
+     * @param CreateCaptureRequestBuilder|CreatePaymentRequestBuilder $builder
+     */
+    public function addReceiptItems($customer, $cart, $builder)
     {
-        $builder->setTaxSystemCode($this->getDefaultTaxRate());
-        $builder->setReceiptEmail($context->customer->email);
+        $builder->setReceiptEmail($customer->email);
 
         $products = $cart->getProducts(true);
         $taxValue = $this->getTaxesArray(true);
-        $carrier  = new Carrier($cart->id_carrier, $context->language->id);
+        $carrier  = new Carrier($cart->id_carrier);
 
         foreach ($products as $product) {
             $taxIndex = 'YA_NALOG_STAVKA_'.Product::getIdTaxRulesGroupByIdProduct($product['id_product']);
-            if (isset($taxValue[$taxIndex])) {
-                $taxId = $taxValue[$taxIndex];
-                $builder->addReceiptItem($product['name'], $product['price_wt'], $product['cart_quantity'], $taxId);
-            } else {
-                $builder->addReceiptItem($product['name'], $product['price_wt'], $product['cart_quantity']);
-            }
+            $taxId    = isset($taxValue[$taxIndex]) ? $taxValue[$taxIndex] : $this->getDefaultTaxRate();
+            $builder->addReceiptItem($product['name'], $product['price_wt'], $product['cart_quantity'], $taxId);
         }
 
         if ($carrier->id && $cart->getPackageShippingCost()) {
-            $taxIndex = 'YA_NALOG_STAVKA_'.Carrier::getIdTaxRulesGroupByIdCarrier($carrier->id, $context);
-            if (isset($taxValue[$taxIndex])) {
-                $taxId = $taxValue[$taxIndex];
-                $builder->addReceiptShipping($carrier->name, $cart->getPackageShippingCost(), $taxId);
-            } else {
-                $builder->addReceiptShipping($carrier->name, $cart->getPackageShippingCost());
-            }
+            $taxIndex = 'YA_NALOG_STAVKA_'.Carrier::getIdTaxRulesGroupByIdCarrier($carrier->id);
+            $taxId    = isset($taxValue[$taxIndex]) ? $taxValue[$taxIndex] : $this->getDefaultTaxRate();
+            $builder->addReceiptShipping($carrier->name, $cart->getPackageShippingCost(), $taxId);
         }
     }
 
@@ -795,7 +840,7 @@ class KassaModel extends AbstractPaymentModel
     /**
      * @return Client
      */
-    private function getApiClient()
+    public function getApiClient()
     {
         if ($this->apiClient === null) {
             $this->apiClient = new Client();
@@ -844,5 +889,18 @@ class KassaModel extends AbstractPaymentModel
         $description = (string)mb_substr($description, 0, Payment::MAX_LENGTH_DESCRIPTION);
 
         return $description;
+    }
+
+    /**
+     * @param string $paymentMethod
+     * @return bool
+     */
+    private function getCaptureValue($paymentMethod)
+    {
+        if (!$this->getEnableHoldMode()) {
+            return true;
+        }
+
+        return !in_array($paymentMethod, array('', PaymentMethodType::BANK_CARD));
     }
 }

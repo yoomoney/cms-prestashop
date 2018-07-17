@@ -25,118 +25,6 @@ class Installer
     }
 
     /**
-     *
-     */
-    public function addOrderStatuses()
-    {
-        $status = array(
-            'DELIVERY' => array(
-                'name' => $this->module->l('YA Ждёт отправки'),
-                'color' => '#8A2BE2',
-                'id' => 900,
-                'paid' => true,
-                'shipped' => false,
-                'logable' => true,
-                'delivery' => true
-            ),
-            'CANCELLED' => array(
-                'name' => $this->module->l('YA Отменен'),
-                'color' => '#b70038',
-                'id' => 901,
-                'paid' => false,
-                'shipped' => false,
-                'logable' => true,
-                'delivery' => false
-            ),
-            'PICKUP' => array(
-                'name' => $this->module->l('YA В пункте самовывоза'),
-                'color' => '#cd98ff',
-                'id' => 902,
-                'paid' => true,
-                'shipped' => true,
-                'logable' => true,
-                'delivery' => true
-            ),
-            'PROCESSING' => array(
-                'name' => $this->module->l('YA В процессе подготовки'),
-                'color' => '#FF8C00',
-                'id' => 903,
-                'paid' => true,
-                'shipped' => false,
-                'logable' => false,
-                'delivery' => true
-            ),
-            'DELIVERED' => array(
-                'name' => $this->module->l('YA Доставлен'),
-                'color' => '#108510',
-                'id' => 904,
-                'paid' => true,
-                'shipped' => true,
-                'logable' => true,
-                'delivery' => true
-            ),
-            'UNPAID' => array(
-                'name' => $this->module->l('YA Не оплачен'),
-                'color' => '#ff1c30',
-                'id' => 905,
-                'paid' => false,
-                'shipped' => false,
-                'logable' => false,
-                'delivery' => false
-            ),
-            'RESERVATION_EXPIRED' => array(
-                'name' => $this->module->l('YA Резерв отменён'),
-                'color' => '#ff2110',
-                'id' => 906,
-                'paid' => false,
-                'shipped' => false,
-                'logable' => false,
-                'delivery' => false
-            ),
-            'RESERVATION' => array(
-                'name' => $this->module->l('YA Резерв'),
-                'color' => '#0f00d3',
-                'id' => 907,
-                'paid' => false,
-                'shipped' => false,
-                'logable' => false,
-                'delivery' => false
-            ),
-        );
-        $existsStatuses = \OrderState::getOrderStates(1);
-        foreach ($status as $s) {
-            if (array_key_exists($s['id'], $existsStatuses)) {
-                continue;
-            }
-            $os = new \OrderState((int)$s['id']);
-            $os->id = $s['id'];
-            $os->force_id = true;
-            $os->name = $this->module->multiLangField($s['name']);
-            $os->color = $s['color'];
-            $os->module_name = $this->module->name;
-            $os->paid = $s['paid'];
-            $os->logable = $s['logable'];
-            $os->shipped = $s['shipped'];
-            $os->delivery = $s['delivery'];
-            $os->add();
-            $this->module->log('debug', 'Order state "' . $s['name'] . '" added');
-        }
-    }
-
-    /**
-     * Delete Yandex.Market order statuses when module uninstalled
-     * @param int[] $statuses Yandex.Market order statuses
-     */
-    public function removeOrderStatuses($statuses)
-    {
-        foreach ($statuses as $statusId) {
-            $os = new \OrderState((int)$statusId);
-            $os->id = $statusId;
-            $os->delete();
-        }
-    }
-
-    /**
      * Добавляет в базу данных магазина таблицы модуля
      */
     public function addDatabaseTables()
@@ -241,4 +129,34 @@ class Installer
             $customer->delete();
         }
     }
+
+    public function installTab()
+    {
+        $tab = new \Tab();
+        $tab->active = 1;
+        $tab->class_name = \YandexModule::ADMIN_CONTROLLER;
+        $tab->name = array();
+        foreach (\Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = \YandexModule::ADMIN_CONTROLLER;
+        }
+        $tab->id_parent = -1;
+        $tab->module = $this->module->name;
+
+        return $tab->add();
+    }
+
+    public function uninstallTab() {
+        $id_tab = (int)\Tab::getIdFromClassName(\YandexModule::ADMIN_CONTROLLER);
+        if ($id_tab) {
+            $tab = new \Tab($id_tab);
+            return $tab->delete();
+        } else {
+            return false;
+        }
+    }
+
+    public function issetTab() {
+        return \Tab::getIdFromClassName(\YandexModule::ADMIN_CONTROLLER) !== false;
+    }
+
 }

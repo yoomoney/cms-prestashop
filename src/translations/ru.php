@@ -136,6 +136,11 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_b278285aeff5cffad70c9838b3566f5d'
 $_MODULE['<{yandexmodule}prestashop>formhelper_396dea841276c65130749b6d1c2e8517'] = 'Скачать файл журнала событий';
 $_MODULE['<{yandexmodule}prestashop>formhelper_49109d9247c33b657b15e735d818a82c'] = 'НДС';
 $_MODULE['<{yandexmodule}prestashop>formhelper_156b1c57d7c0e2a3f9b8b85642a47982'] = 'Ставка по умолчанию';
+$_MODULE['<{yandexmodule}prestashop>formhelper_4e3c7101fa3d9e76a9f9cda5df6e0493'] = 'Какой статус присваивать заказу, если он:';
+$_MODULE['<{yandexmodule}prestashop>formhelper_ffea110fd47942cef1c5c687a25f9161'] = 'ожидает подтверждения';
+$_MODULE['<{yandexmodule}prestashop>formhelper_7ce590a2ba8bf3a2b19b8c312cc96458'] = 'заказ переходит в этот статус при поступлении и остается в нем пока оператор магазина не подтвердит или не отменит платеж';
+$_MODULE['<{yandexmodule}prestashop>formhelper_d5c39a1d9aced393f835f334a1fb9206'] = 'отменён';
+$_MODULE['<{yandexmodule}prestashop>formhelper_79cab9afc965a279edd596941b2eebb2'] = 'заказ переходит в этот статус после отмены платежа';
 $_MODULE['<{yandexmodule}prestashop>formhelper_785d4b16fc800589e811ec37e3b0acc5'] = 'Ставка по умолчанию будет в чеке, если в карточке товара не указана другая ставка.';
 $_MODULE['<{yandexmodule}prestashop>formhelper_74833aaeee132a62a8b3156053a979c7'] = 'Сопоставьте ставки';
 $_MODULE['<{yandexmodule}prestashop>formhelper_8ff12753b591fed06fc68e83d608e398'] = 'Ставка в вашем магазине';
