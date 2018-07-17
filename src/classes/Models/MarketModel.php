@@ -355,14 +355,14 @@ class MarketModel extends AbstractModel
             } else {
                 $data['downloadable'] = 'false';
             }
-            if (Configuration::get('YA_MARKET_DESC_TYPE')) {
-                $data['description'] = $product['description_short'];
-            } else {
-                $data['description'] = $product['description'];
-            }
             $data['param'] = $params;
         } else {
             $data['name'] = $product['name'];
+        }
+        if (Configuration::get('YA_MARKET_DESC_TYPE')) {
+            $data['description'] = $product['description_short'];
+        } else {
+            $data['description'] = $product['description'];
         }
 
         $data['vendor'] = $product['manufacturer_name'];

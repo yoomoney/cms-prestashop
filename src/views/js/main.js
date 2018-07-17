@@ -61,6 +61,17 @@ function bindModeTrigger(root) {
             jQuery(paymentMethodWrapper).show();
         }
     }
+
+    const holdModeSettings = jQuery('.enable-hold-mode').parents('.form-group');
+    function toggleEnableHoldMode() {
+        if (jQuery('#YA_KASSA_ENABLE_HOLD_MODE_ON').is(':checked')) {
+            holdModeSettings.slideDown();
+        } else {
+            holdModeSettings.slideUp();
+        }
+    }
+    jQuery('#YA_KASSA_ENABLE_HOLD_MODE_ON').on('change', toggleEnableHoldMode);
+    toggleEnableHoldMode();
 }
 
 function bindReceiptTrigger(root) {

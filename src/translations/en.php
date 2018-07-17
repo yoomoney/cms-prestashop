@@ -143,6 +143,11 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_d8b508bc2590a113c23a7a46eb2fc597'
 $_MODULE['<{yandexmodule}prestashop>formhelper_c39557a4f151a29bc6feae447183d6f0'] = 'Applicable rate 18/118';
 $_MODULE['<{yandexmodule}prestashop>formhelper_49109d9247c33b657b15e735d818a82c'] = 'VAT';
 $_MODULE['<{yandexmodule}prestashop>formhelper_156b1c57d7c0e2a3f9b8b85642a47982'] = 'Default rate';
+$_MODULE['<{yandexmodule}prestashop>formhelper_4e3c7101fa3d9e76a9f9cda5df6e0493'] = 'What status should be assigned to an order if it is:';
+$_MODULE['<{yandexmodule}prestashop>formhelper_ffea110fd47942cef1c5c687a25f9161'] = 'waiting for capture';
+$_MODULE['<{yandexmodule}prestashop>formhelper_7ce590a2ba8bf3a2b19b8c312cc96458'] = 'the order status will be changed to this one after the funds are credited, until the store\'s operator either captures or cancels the payment';
+$_MODULE['<{yandexmodule}prestashop>formhelper_d5c39a1d9aced393f835f334a1fb9206'] = 'canceled';
+$_MODULE['<{yandexmodule}prestashop>formhelper_79cab9afc965a279edd596941b2eebb2'] = 'the order status will be changed to this one after the payment is canceled';
 $_MODULE['<{yandexmodule}prestashop>formhelper_785d4b16fc800589e811ec37e3b0acc5'] = 'The default rate applies if another rate is not set on the product\'s page.';
 $_MODULE['<{yandexmodule}prestashop>formhelper_74833aaeee132a62a8b3156053a979c7'] = 'Compare rates';
 $_MODULE['<{yandexmodule}prestashop>formhelper_8ff12753b591fed06fc68e83d608e398'] = 'Rate at your store';

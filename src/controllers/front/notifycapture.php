@@ -51,9 +51,9 @@ class YandexModuleNotifyCaptureModuleFrontController extends ModuleFrontControll
         }
         try {
             if ($json['event'] == NotificationEventType::PAYMENT_WAITING_FOR_CAPTURE) {
-                $object = new NotificationWaitingForCapture($json);
+                $notification = new NotificationWaitingForCapture($json);
                 $this->module->log('info', 'Notification waiting for capture init.');
-                $result = $this->module->capturePayment($object->getObject());
+                $result = $this->module->captureOrHoldPayment($notification->getObject()->getId());
             } else {
                 $webhookObject = new NotificationSucceeded($json);
                 $this->module->log('info', 'Notification succeeded init.');

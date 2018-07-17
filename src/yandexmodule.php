@@ -12,6 +12,8 @@
  */
 class YandexModule extends PaymentModule
 {
+    const ADMIN_CONTROLLER = 'AdminYandexModule';
+
     private $p2p_status = '';
     private $org_status = '';
     private $market_status = '';
@@ -50,16 +52,6 @@ class YandexModule extends PaymentModule
      */
     private $cipher;
 
-    public $status = array(
-        'DELIVERY'            => 1900,
-        'CANCELLED'           => 1901,
-        'PICKUP'              => 1902,
-        'PROCESSING'          => 1903,
-        'DELIVERED'           => 1904,
-        'UNPAID'              => 1905,
-        'RESERVATION_EXPIRED' => 1906,
-        'RESERVATION'         => 1907,
-    );
 
     private static $moduleRoutes = array(
         'generate_price'     => array(
@@ -93,7 +85,7 @@ class YandexModule extends PaymentModule
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.0.9';
+        $this->version         = '1.0.10';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -184,9 +176,17 @@ class YandexModule extends PaymentModule
         $installer = new \YandexMoneyModule\Installer($this);
         $installer->addDatabaseTables();
         $installer->addServiceCustomer();
-        $installer->addOrderStatuses();
+        $installer->installTab();
 
         return true;
+    }
+
+    public function installTabIfNeeded()
+    {
+        $installer = new \YandexMoneyModule\Installer($this);
+        if (!$installer->issetTab()) {
+            $installer->installTab();
+        }
     }
 
     /**
@@ -197,9 +197,9 @@ class YandexModule extends PaymentModule
     public function uninstall()
     {
         $installer = new \YandexMoneyModule\Installer($this);
-        $installer->removeOrderStatuses($this->status);
         $installer->removeDatabaseTables();
         $installer->removeServiceCustomer();
+        $installer->uninstallTab();
 
         return parent::uninstall();
     }
@@ -321,6 +321,7 @@ class YandexModule extends PaymentModule
                     'YA_KASSA_PAY_LOGO_ON',
                     'YA_KASSA_INSTALLMENTS_BUTTON_ON',
                     'YA_KASSA_LOGGING_ON',
+                    'YA_KASSA_ENABLE_HOLD_MODE_ON',
                 ),
                 $kassa->getTaxesArray(),
                 array_values($kassa->getPaymentMethods())
@@ -867,62 +868,8 @@ class YandexModule extends PaymentModule
         /** @var Order $order Инстанс заказа, который оплачивал пользователь */
         $order   = $params[$key];
         $kassa   = $this->getKassaModel();
-        $success = false;
-        if ($order->getCurrentState() == $kassa->getCreateStatusId()) {
-            // обрабатываем только платежи, которые только что созданы
-            $this->log('debug', 'Payment return: '.$order->id);
-            // получаем связанный с обрабатываемым заказом платёж
-            $payment = $kassa->findOrderPayment($order->id, $order->getOrdersTotalPaid());
-            if ($payment !== null) {
-                $success = true;
-                // обновляем статус платежа в локальной базе данных
-                $kassa->updatePaymentStatus($payment);
-                // проверяем состояние платежа
-
-                if ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::WAITING_FOR_CAPTURE) {
-                    // если платёж уже ожидает подтверждения - подтверждаем
-                    $this->log('debug', 'Confirm payment for order#'.$order->id);
-                    $response = $kassa->capturePayment($payment);
-                    if ($response === null) {
-                        $success = false;
-                        $this->smarty->assign('message', $this->l('Не удалось провести платёж'));
-                    } else {
-                        $orderStatusId = $kassa->getSuccessStatusId();
-                    }
-                } elseif ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::CANCELED) {
-                    // если платёж был отменён, сообщаем об этом
-                    $this->log('debug', 'Order#'.$order->id.' is cancelled');
-                    $success = false;
-                    $this->smarty->assign('message', $this->l('Payment was canceled'));
-                } elseif ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
-                    $orderStatusId = $kassa->getSuccessStatusId();
-                }
-                if (isset($orderStatusId)) {
-                    // если установлен статус, меняем на него статус заказа
-                    $history           = new OrderHistory();
-                    $history->id_order = $order->id;
-                    $history->changeIdOrderState($orderStatusId, $order->id);
-                    $history->addWithemail(true);
-                    // обновляем номер транзакции, привязанной к заказу
-                    $this->getKassaModel()->updateOrderPaymentId($order->id, $payment);
-                }
-            } else {
-                $message = 'Payment for order#'.$order->id.' not exists';
-                $this->log('warning', $message);
-                $this->smarty->assign('message', $message);
-            }
-        } else {
-            // получаем связанный с обрабатываемым заказом платёж
-            $payment = $kassa->findOrderPayment($order->id, $order->getOrdersTotalPaid());
-            if ($payment !== null && $payment->getPaid()) {
-                $success = true;
-            } else {
-                $message = 'Order#'.$order->id.' payment state is '.$order->getCurrentState()
-                           .' != '.$kassa->getCreateStatusId();
-                $this->log('info', $message);
-                $this->smarty->assign('message', $message);
-            }
-        }
+        $payment = $kassa->findOrderPayment($order->id);
+        $success = $payment !== null && $payment->getPaid();
         if ($success) {
             $this->smarty->assign(array(
                 'shop_name'   => $this->context->shop->name,
@@ -944,55 +891,52 @@ class YandexModule extends PaymentModule
     }
 
     /**
-     * @param PaymentInterface $payment
-     *
+     * @param string $paymentId
      * @return bool
      */
-    public function capturePayment($payment)
+    public function captureOrHoldPayment($paymentId)
     {
         $kassa   = $this->getKassaModel();
-        $payment = $kassa->getPayment($payment->getId());
+        $payment = $kassa->getPayment($paymentId);
         if ($payment === null) {
             $this->log('error', 'Failed to fetch payment object in notification');
 
             return false;
         }
         if ($payment->getStatus() !== \YandexCheckout\Model\PaymentStatus::WAITING_FOR_CAPTURE) {
-            return $payment->getStatus() === \YandexCheckout\Model\PaymentStatus::SUCCEEDED;
+            $this->log('error', 'Wrong status for capture: '.$payment->getStatus());
+
+            return false;
         }
         $kassa->updatePaymentStatus($payment);
         $orderId = $kassa->getOrderIdByPayment($payment);
-        $success = false;
-        if ($orderId > 0) {
-            if ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
-                // change order status to "success" if payment already succeeded
-                $orderStatusId = $kassa->getSuccessStatusId();
-                $success       = true;
-            } elseif ($payment->getStatus() === \YandexCheckout\Model\PaymentStatus::WAITING_FOR_CAPTURE) {
-                // если платёж ожидает подтверждения - подтверждаем
-                $this->log('debug', 'Capture payment for order#'.$orderId);
-                $response = $kassa->capturePayment($payment);
-                if ($response === null || $response->getStatus() !== \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
-                    // failure order if payment not captured
-                    $this->log('error', 'Failed to capture payment '.$payment->getId());
-                    $orderStatusId = $kassa->getFailureStatusId();
-                } else {
-                    $orderStatusId = $kassa->getSuccessStatusId();
-                    $success       = true;
-                }
-            }
-            if (isset($orderStatusId)) {
-                // если установлен статус, меняем на него статус заказа
-                $history           = new OrderHistory();
-                $history->id_order = $orderId;
-                $history->changeIdOrderState($orderStatusId, $orderId);
-                $history->addWithemail(true);
-                // обновляем номер транзакции, привязанной к заказу
-                $this->getKassaModel()->updateOrderPaymentId($orderId, $payment);
-            }
+
+        if ($kassa->getEnableHoldMode()
+            && $payment->getPaymentMethod()->getType() === \YandexCheckout\Model\PaymentMethodType::BANK_CARD
+        ) {
+            $this->log('debug', 'Hold payment for order #'.$orderId);
+            $history           = new OrderHistory();
+            $history->id_order = $orderId;
+            $history->changeIdOrderState($kassa->getOnHoldStatusId(), $orderId);
+            $history->addWithemail(true);
+            $this->getKassaModel()->updateOrderPaymentId($orderId, $payment);
+
+            return true;
         }
 
-        return $success;
+        $this->log('debug', 'Capture payment for order #'.$orderId);
+        $response = $kassa->capturePayment($payment);
+        if ($response !== null && $response->getStatus() === \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
+            $history           = new OrderHistory();
+            $history->id_order = $orderId;
+            $history->changeIdOrderState($kassa->getSuccessStatusId(), $orderId);
+            $history->addWithemail(true);
+            $this->getKassaModel()->updateOrderPaymentId($orderId, $payment);
+            return true;
+        }
+
+        $this->log('error', 'Failed to capture payment '.$payment->getId());
+        return false;
     }
 
     public function hookDisplayOrderConfirmation($params)
@@ -1245,4 +1189,116 @@ class YandexModule extends PaymentModule
             return null;
         }
     }
+
+    /**
+     * @param array $params
+     * @return string
+     */
+    public function hookDisplayAdminOrder($params)
+    {
+        if (empty($params['id_order'])) {
+            return '';
+        }
+        $orderId = $params['id_order'];
+        $order   = new Order($orderId);
+
+        if ((int)$order->getCurrentState() !== $this->getKassaModel()->getOnHoldStatusId()) {
+            return '';
+        }
+
+        $payment = $this->getKassaModel()->findOrderPayment($orderId);
+        if (!$payment || $payment->getStatus() !== \YandexCheckout\Model\PaymentStatus::WAITING_FOR_CAPTURE) {
+            return '';
+        }
+        $title        = $this->l('Отложенная оплата');
+        $text = sprintf('Поступил новый платёж. Он ожидает подтверждения до %1$s, после чего автоматически отменится',
+            $payment->getExpiresAt()->format('d.m.Y H:i'));
+        $capture      = $this->l('Подтвердить');
+        $cancel       = $this->l('Отменить');
+        $token        = Tools::getAdminTokenLite(self::ADMIN_CONTROLLER);
+        $controller   = self::ADMIN_CONTROLLER;
+        $successCapture = $this->l('Вы подтвердили платёж в Яндекс.Кассе.');
+        $errorCapture = $this->l('Платёж не подтвердился. Попробуйте ещё раз.');
+        $successCancel = $this->l('Вы отменили платёж в Яндекс.Кассе. Деньги вернутся клиенту.');
+        $errorCancel  = $this->l('Платёж не отменился. Попробуйте ещё раз.');
+
+        $html = <<<HTML
+<div class="panel">
+    <div class="panel-heading">
+        <i class="icon-shopping-cart"></i>
+        $title
+    </div>
+    <div>
+        $text
+    </div>
+    <div>
+        <button type="button" class="btn btn-default" id="ya_kassa_capture_payment">
+            <i class="icon-check"></i> 
+            $capture
+        </button>
+        <button type="button" class="btn btn-default" id="ya_kassa_cancel_payment">
+            <i class="icon-remove"></i> 
+            $cancel
+        </button>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+    function ya_kassa_disable_payment_action_buttons() {
+        $('#ya_kassa_capture_payment').addClass('disabled');           
+        $('#ya_kassa_cancel_payment').addClass('disabled');           
+    }
+    $('#ya_kassa_capture_payment').on('click', function() {
+        ya_kassa_disable_payment_action_buttons();
+        $.ajax({
+            type: "POST",
+            url: "ajax-tab.php",
+            data : {
+					ajax: "1",
+					order_id: "$orderId",
+					token: "$token",
+					controller: "$controller",
+					action: "capturePayment",
+				},
+            dataType: "json",
+            complete: function(data) {
+                if (data && data.responseJSON && data.responseJSON.result && data.responseJSON.result === 'success') {
+                    alert('$successCapture');
+                } else {
+                    alert('$errorCapture');
+                }
+                location.reload();                    
+            }
+        });
+    });
+    $('#ya_kassa_cancel_payment').on('click', function() {
+        ya_kassa_disable_payment_action_buttons();
+        $.ajax({
+            type: "POST",
+            url: "ajax-tab.php",
+            data : {
+					ajax: "1",
+					order_id: "$orderId",
+					token: "$token",
+					controller: "$controller",
+					action: "cancelPayment",
+				},
+            dataType: "json",
+            complete: function(data) {
+                if (data && data.responseJSON && data.responseJSON.result && data.responseJSON.result === 'success') {
+                    alert('$successCancel');
+                } else {
+                    alert('$errorCancel');
+                }
+                location.reload();
+            }
+        });
+    });
+});
+</script>
+HTML;
+
+        return $html;
+    }
+
 }

@@ -1,7 +1,12 @@
 <?php
 
 define('YANDEX_MONEY_SDK_ROOT_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'yandex-checkout-sdk' . DIRECTORY_SEPARATOR . 'lib');
-define('YANDEX_MONEY_PSR_LOG_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'yandex-checkout-sdk' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'psr-log');
+define('YANDEX_MONEY_PSR_LOG_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'yandex-checkout-sdk'
+    .DIRECTORY_SEPARATOR.'vendor'
+    .DIRECTORY_SEPARATOR.'psr'
+    .DIRECTORY_SEPARATOR.'log'
+    .DIRECTORY_SEPARATOR.'Psr'
+    .DIRECTORY_SEPARATOR.'Log');
 define('YANDEX_MONEY_MODULE_CLASS_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'classes');
 
 function yandexMoneyLoadClass($className)
