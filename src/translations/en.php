@@ -181,7 +181,7 @@ $_MODULE['<{yandexmodule}prestashop>installer_f22db8fbe35db4c69f618e3172bcc89c']
 $_MODULE['<{yandexmodule}prestashop>partner_144b6cf23fc15ad3149f4de4148db710'] = 'Street';
 $_MODULE['<{yandexmodule}prestashop>partner_b36e0ab3847e00a79740d2acf69d5f84'] = 'Pickup';
 $_MODULE['<{yandexmodule}prestashop>partner_05ad70c4bf46fe11fea132a8a467d66c'] = 'Metro';
-$_MODULE['<{yandexmodule}prestashop>partner_1316f20ef1ea5d3387283b0536b57fc9'] = 'Корпус/Строение:';
+$_MODULE['<{yandexmodule}prestashop>partner_1316f20ef1ea5d3387283b0536b57fc9'] = 'Building:';
 $_MODULE['<{yandexmodule}prestashop>partner_c8aef3e87fbfce666271a989203e31b3'] = 'Floor';
 $_MODULE['<{yandexmodule}prestashop>partner_05fa553e6c36a5b2e449ab95075c4467'] = 'House number';
 $_MODULE['<{yandexmodule}prestashop>billingmodel_feac4e0fd871a458032a22b5aa390bda'] = 'Billing ID not specified';
@@ -280,7 +280,7 @@ $_MODULE['<{yandexmodule}prestashop>error_0d311489dbb7ed0a8b3485d8242879ae'] = '
 $_MODULE['<{yandexmodule}prestashop>error_c7a7107be0d14d8eaaf80b725702b4d5'] = 'Во время заказа произошли следующие ошибки:';
 $_MODULE['<{yandexmodule}prestashop>error_237ef39a49e1e23a4a50c0489ef8119a'] = 'Number of errors';
 $_MODULE['<{yandexmodule}prestashop>error_13b938ac5fd57a203358eec65de2c876'] = 'Другие методы оплаты';
-$_MODULE['<{yandexmodule}prestashop>payment_fail_93774d9c2cd957adb0e68408aa6c03c8'] = 'Ошибка платежа! Свяжитесь с поддержкой укажите эти данные:';
+$_MODULE['<{yandexmodule}prestashop>payment_fail_93774d9c2cd957adb0e68408aa6c03c8'] = 'Payment error! Contact the Support Service and provide them with this data:';
 $_MODULE['<{yandexmodule}prestashop>waitingpayment_9cda17742e8bf8b8ba56e932ad292326'] = 'Ожидание платежа';
 $_MODULE['<{yandexmodule}prestashop>waitingpayment_5d6738d201772643b83125b328ba31d0'] = 'Ваш платёж ещё не подтверждён, статус заказа вы можете узнать в личном кабинете.';
 $_MODULE['<{yandexmodule}prestashop>waitingpayment_587296de66bc7e020c73e6a7b2e7d259'] = 'Если вы не получили уведомление об оплате, напишите нам номер корзины:';
@@ -299,7 +299,7 @@ $_MODULE['<{yandexmodule}prestashop>wallet_error_6fed3e7157b91f3bbadd4731d0a7a9d
 $_MODULE['<{yandexmodule}prestashop>wallet_error_02f2dafcd12ee40aa14f9c677b276bae'] = 'Ваша корзина пуста.';
 $_MODULE['<{yandexmodule}prestashop>wallet_error_645da7106e9fcf2fe4976825f4838d57'] = 'Вы выбрали оплату через Яндекс деньги.';
 $_MODULE['<{yandexmodule}prestashop>wallet_error_c7a7107be0d14d8eaaf80b725702b4d5'] = 'Во время заказа произошли следующие ошибки:';
-$_MODULE['<{yandexmodule}prestashop>wallet_error_237ef39a49e1e23a4a50c0489ef8119a'] = 'Количество ошибок';
+$_MODULE['<{yandexmodule}prestashop>wallet_error_237ef39a49e1e23a4a50c0489ef8119a'] = 'Number of errors';
 $_MODULE['<{yandexmodule}prestashop>wallet_error_13b938ac5fd57a203358eec65de2c876'] = 'Другие методы оплаты';
 $_MODULE['<{yandexmodule}prestashop>admin_269885d356c07f0556eb22ed63df8a16'] = 'Your module version is outdated. You can ';
 $_MODULE['<{yandexmodule}prestashop>admin_31f568f9bee2a5076e5401b762196d79'] = 'download and install ';

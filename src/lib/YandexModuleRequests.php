@@ -9,7 +9,7 @@
 * @license   https://money.yandex.ru/doc.xml?id=527052
 */
 
-class requests
+class YandexModuleRequests
 {
     public $logFile;
     

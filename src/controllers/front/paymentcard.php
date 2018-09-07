@@ -53,7 +53,7 @@ class YandexModulePaymentCardModuleFrontController extends ModuleFrontController
             if ($res->status == 'success') {
                 //TODO Отправить повторный
                 ///*
-                $external_payment = new ExternalPayment($instance_id);
+                $external_payment = new YandexModuleExternalPayment($instance_id);
                 do {
                     $process_options = array(
                         "request_id" => $requestId,

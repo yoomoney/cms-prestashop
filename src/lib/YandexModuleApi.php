@@ -9,10 +9,10 @@
 * @license   https://money.yandex.ru/doc.xml?id=527052
 */
 
-require_once __DIR__ . "/base.php";
-require_once __DIR__ . "/requests.php";
+require_once __DIR__ . "/YandexModuleBaseApi.php";
+require_once __DIR__ . "/YandexModuleRequests.php";
 
-class YandexApi extends BaseAPI
+class YandexModuleApi extends YandexModuleBaseApi
 {
     public function __construct($access_token)
     {
@@ -83,7 +83,7 @@ class YandexApi extends BaseAPI
     public static function getAccessToken($client_id, $code, $redirect_uri, $client_secret=null)
     {
         $full_url = self::SP_MONEY_URL . "/oauth/token";
-        $result = \Requests::post($full_url, array(), array(
+        $result = \YandexModuleRequests::post($full_url, array(), array(
             "code" => $code,
             "client_id" => $client_id,
             "grant_type" => "authorization_code",
