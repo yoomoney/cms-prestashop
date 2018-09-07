@@ -9,9 +9,9 @@
 * @license   https://money.yandex.ru/doc.xml?id=527052
 */
 
-require_once __DIR__ . "/base.php";
+require_once __DIR__ . "/YandexModuleBaseApi.php";
 
-class ExternalPayment extends BaseAPI
+class YandexModuleExternalPayment extends YandexModuleBaseApi
 {
     public function __construct($instance_id)
     {

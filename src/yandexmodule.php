@@ -80,12 +80,12 @@ class YandexModule extends PaymentModule
 
         include_once(dirname(__FILE__).'/lib/autoload.php');
 
-        include_once(dirname(__FILE__).'/lib/YandexApi.php');
-        include_once(dirname(__FILE__).'/lib/external_payment.php');
+        include_once(dirname(__FILE__).'/lib/YandexModuleApi.php');
+        include_once(dirname(__FILE__).'/lib/YandexModuleExternalPayment.php');
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.0.10';
+        $this->version         = '1.0.11';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -110,12 +110,8 @@ class YandexModule extends PaymentModule
     public function getCipher()
     {
         if ($this->cipher === null) {
-            if (version_compare(_PS_VERSION_, '1.7.0') > 0) {
-                if (!Configuration::get('PS_CIPHER_ALGORITHM') || !defined('_RIJNDAEL_KEY_')) {
-                    $this->cipher = new PhpEncryptionLegacyEngine(_COOKIE_KEY_, _COOKIE_IV_);
-                } else {
-                    $this->cipher = new PhpEncryptionLegacyEngine(_RIJNDAEL_KEY_, _RIJNDAEL_IV_);
-                }
+            if (version_compare(_PS_VERSION_, '1.7.0') >= 0) {
+                $this->cipher = new PhpEncryption(_NEW_COOKIE_KEY_);
             } else {
                 if (!Configuration::get('PS_CIPHER_ALGORITHM') || !defined('_RIJNDAEL_KEY_')) {
                     $this->cipher = new Blowfish(_COOKIE_KEY_, _COOKIE_IV_);
@@ -381,7 +377,7 @@ class YandexModule extends PaymentModule
         $forms       = new YandexMoneyModule\FormHelper();
         $forms->cats = $cats;
 
-        $vars_org['YA_ORG_TEXT_INSIDE']    = $this->l('shopID и Секретное слово можно посмотреть в ')."<a href='https://money.yandex.ru/joinups' target='_blank'>".$this->l('личном кабинете')."</a>".$this->l('после подключения Яндекс.Кассы.');
+        $vars_org['YA_ORG_TEXT_INSIDE']    = $this->l('You can find your shopID and codeword in your')."<a href='https://money.yandex.ru/joinups' target='_blank'>".$this->l('Merchant Profile')."</a>".$this->l('after signing up for Yandex.Checkout.');
         $vars_p2p['YA_WALLET_LOGGING_ON']  = Configuration::get('YA_WALLET_LOGGING_ON');
         $this->context->smarty->assign(array(
             'ya_version'           => $this->version,

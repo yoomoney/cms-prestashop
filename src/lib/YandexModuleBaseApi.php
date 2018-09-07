@@ -9,9 +9,7 @@
 * @license   https://money.yandex.ru/doc.xml?id=527052
 */
 
-require_once __DIR__ . "/exceptions.php";
-
-class baseApi
+class YandexModuleBaseApi
 {
     const MONEY_URL = "https://money.yandex.ru";
     const SP_MONEY_URL = "https://sp-money.yandex.ru";
@@ -26,7 +24,7 @@ class baseApi
         } else {
             $headers = array();
         }
-        $result = \Requests::post($full_url, $headers, $options);
+        $result = \YandexModuleRequests::post($full_url, $headers, $options);
         return self::processResult($result);
     }
     

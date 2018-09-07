@@ -257,14 +257,6 @@ class FormHelper
 
     public function getFormYandexMetrics()
     {
-        $module = new yandexmodule();
-        $dir = _PS_ADMIN_DIR_;
-        $dir = explode(DIRECTORY_SEPARATOR, $dir);
-        $dir = base64_encode(
-            $module->getCipher()->encrypt(
-                end($dir).'_'.Context::getContext()->cookie->id_employee.'_metrika'
-            )
-        );
         return array(
             'form' => array(
                 'legend' => array(
@@ -436,10 +428,10 @@ class FormHelper
                         'class' => 't',
                         'type' => 'text',
                         'required' => true,
-                        'desc' => $this->l('Выпустите и активируйте секретный ключ в ')
+                        'desc' => $this->l('Issue and activate your secret key in your ')
                             . '<a href="https://kassa.yandex.ru/my" target="_blank">'
-                            . $this->l('личном кабинете Яндекс.Кассы').'</a>. '
-                            . $this->l('Потом скопируйте его сюда.')
+                            . $this->l('Yandex.Checkout Merchant Profile').'</a>. '
+                            . $this->l('Then copy it here.')
                         ,
                         'name' => 'YA_KASSA_PASSWORD',
                         'label' => $this->l('Secret key'),
@@ -767,9 +759,9 @@ class FormHelper
                     array(
                         'col' => 6,
                         'class' => 't',
-                        'desc' => $this->l('Скопируйте эту ссылку в поле Redirect URL на').
-                            '<a href="https://money.yandex.ru/myservices/online.xml" target="_blank"> '.
-                            $this->l('странице настройки уведомлений'). ' </a>',
+                        'desc' => $this->l('Copy this link to the Redirect URL field at').
+                            '<a href="https://sp-money.yandex.ru/myservices/online.xml" target="_blank"> '.
+                            $this->l('the notification page'). ' </a>',
                         'type' => 'text',
                         'name' => 'YA_WALLET_REDIRECT',
                         'label' => $this->l('RedirectURL'),

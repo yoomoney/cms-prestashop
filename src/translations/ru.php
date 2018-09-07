@@ -3,6 +3,7 @@
 global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{yandexmodule}prestashop>actions_c3dca352ec9e5dd8c6f100c25e7c691a'] = 'Не верный токен!';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_faef1666296f6eb16b2a4f390ea30d62'] = 'Яндекс.Деньги';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_a79541c6ecb3e0c3e633ae1dcc71ce2b'] = 'Модуль Y.CMS 2.0 для Prestashop';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_493140388ba4ddfeda8e007f8dc4729f'] = 'Вы действительно хотите удалить модуль?';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_309244368ba557406a7fb9b0f43fa96a'] = 'Не установлена валюта!';
@@ -25,6 +26,13 @@ $_MODULE['<{yandexmodule}prestashop>yandexmodule_87e3a24016419087509c5c2dceae8e1
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_4ffc34f91eaef85424d3e46efd315475'] = 'Комментарий к возврату не должен быть пустым и его длина не должна превышать 250 символов';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_3d91d1bd9c5ffe3618d82fb4db29652f'] = 'Сумма возврата не должна превышать сумму платежа';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_16300af76572242cc925c8c157cba6f1'] = 'Не удалось создать возврат';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Банковские карты';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_ee55b43dc97b2011716c124c0d412642'] = 'Сбербанк Онлайн';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_f7337702a47bd4cd79b8c8f2f0ec52ed'] = 'QIWI Wallet';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_773c3ed6cfb7b75272be7b516a877ba0'] = 'Webmoney';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_ad0866dbe28c9ee3c0db20b66a3d2ebd'] = 'Наличные через терминалы';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_a63593a811927ba64204f7171601ff6e'] = 'Баланс мобильного';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_621995df232472963068d5acc085332b'] = 'Альфа-Клик';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_4b3e7faab54578d96b7e965a1910832c'] = 'Платёж полностью возвращён';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_7f3a357d8c73ce62d856e445d46efce8'] = 'Яндекс.Касса (банковские карты, электронные деньги и другое)';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_20a5b4f336715bb1116a4d9a51d4d4b3'] = 'Has declined a request authorization application';
@@ -84,6 +92,7 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_4fd1758d04732167c1a7fb1afea54795'
 $_MODULE['<{yandexmodule}prestashop>formhelper_859b1c8b07648fb0da176705011a9c65'] = 'Доступны если > 0, остальные на заказ';
 $_MODULE['<{yandexmodule}prestashop>formhelper_a22c832f19ea129ea2eb843baa3f6aaf'] = 'Если = 0, не выгружать';
 $_MODULE['<{yandexmodule}prestashop>formhelper_115f053e252a21e0b3c22517492c090d'] = 'Все на заказ';
+$_MODULE['<{yandexmodule}prestashop>formhelper_f4f70727dc34561dfde1a3c529b6205c'] = 'Настройки';
 $_MODULE['<{yandexmodule}prestashop>formhelper_48c119b861ee794e7d2afae68ced7d4c'] = 'Экспортировать только товары которые есть в наличии';
 $_MODULE['<{yandexmodule}prestashop>formhelper_744cdb3e3a64eb137450db1bd616f42b'] = 'Исключить неактивные категории';
 $_MODULE['<{yandexmodule}prestashop>formhelper_38784d17b562869c6afef76ab860e4ef'] = 'Использовать поле доставки в домашнем регионе';
@@ -97,6 +106,7 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_a4bc6e6dfa5171a81d57d86862a8736c'
 $_MODULE['<{yandexmodule}prestashop>formhelper_d753dad76fe8cfb4db34476260856b7e'] = 'Ссылка на динамический файл прайс-листа';
 $_MODULE['<{yandexmodule}prestashop>formhelper_8dda30c3894340bb36205c1f18388d35'] = 'Файл yml';
 $_MODULE['<{yandexmodule}prestashop>formhelper_d1f5b29d0210c60f649e08d6f5981c08'] = 'Редирект ссылка для приложения.';
+$_MODULE['<{yandexmodule}prestashop>formhelper_c9cc8cce247e49bae79f15173ce97354'] = 'Сохранить';
 $_MODULE['<{yandexmodule}prestashop>formhelper_ded6908df92ae68443d46c76ee8d1604'] = 'Генерировать вручную';
 $_MODULE['<{yandexmodule}prestashop>formhelper_2e0ca90b9482df753ebcc780e8ea3ca0'] = 'Настройки модуля Яндекс.Метрика';
 $_MODULE['<{yandexmodule}prestashop>formhelper_276a9047b655cacff9e72c21d936f008'] = 'Активность';
@@ -105,11 +115,14 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_b9f5c797ebbf55adccdd8539a65a0241'
 $_MODULE['<{yandexmodule}prestashop>formhelper_f4ec98e66d46bb9095c7ac9d763b7a92'] = 'Номер Вашего счётчика';
 $_MODULE['<{yandexmodule}prestashop>formhelper_d62a2911aa129f8fa6062e703904360d'] = 'Номер счётчика';
 $_MODULE['<{yandexmodule}prestashop>formhelper_54943cacb42c23593f245b1fdcf02ad8'] = 'ID приложения OAuth';
+$_MODULE['<{yandexmodule}prestashop>formhelper_e500e94f457ddd88824c88fda548bed2'] = 'ID приложения OAuth';
 $_MODULE['<{yandexmodule}prestashop>formhelper_84825bf349b53c7499d1bb01c6983e5b'] = 'Пароль приложения OAuth';
-$_MODULE['<{yandexmodule}prestashop>formhelper_f23c151dd21e537fe7f18ce07ef267e4'] = 'Получить токен для доступа к Яндекс.Метрика';
+$_MODULE['<{yandexmodule}prestashop>formhelper_6e6917ac6f152e6d77c13e73403648be'] = 'Пароль приложения OAuth';
 $_MODULE['<{yandexmodule}prestashop>formhelper_b78af897765e9126a96f5f6c3834e284'] = 'Вебвизор';
 $_MODULE['<{yandexmodule}prestashop>formhelper_4c78d281a74703bf0fa1e67eeb896c16'] = 'Карта кликов';
 $_MODULE['<{yandexmodule}prestashop>formhelper_127cd2dfda4be1020022bfb1b42ebc57'] = 'Отслеживание хеша в адресной строке браузера';
+$_MODULE['<{yandexmodule}prestashop>formhelper_1ed532baa0ffffd271ff9aeb9157340b'] = 'Callback Url для приложения OAuth';
+$_MODULE['<{yandexmodule}prestashop>formhelper_faa439510c820a929e13abfdc301af84'] = 'Ссылка для приложения OAuth';
 $_MODULE['<{yandexmodule}prestashop>formhelper_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Банковские карты';
 $_MODULE['<{yandexmodule}prestashop>formhelper_faef1666296f6eb16b2a4f390ea30d62'] = 'Яндекс.Деньги';
 $_MODULE['<{yandexmodule}prestashop>formhelper_ee55b43dc97b2011716c124c0d412642'] = 'Сбербанк Онлайн';
@@ -122,10 +135,8 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_ba5376b5ba3216a7a51eabb18265d921'
 $_MODULE['<{yandexmodule}prestashop>formhelper_93cba07454f06a4a960172bbd6e2a435'] = 'Да';
 $_MODULE['<{yandexmodule}prestashop>formhelper_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Нет';
 $_MODULE['<{yandexmodule}prestashop>formhelper_77ae253367b37a7ffeed106cfba63d37'] = 'shopId';
-$_MODULE['<{yandexmodule}prestashop>formhelper_a09a7a6e949aab436f7b4bcd16ea8379'] = 'Секретный ключ';
-$_MODULE['<{yandexmodule}prestashop>formhelper_f3db77dca0afe2ca395d4c641230ddd6'] = 'Выбор способа оплаты';
-$_MODULE['<{yandexmodule}prestashop>formhelper_683531b1938c0a3144bd2ec2c3b018ca'] = 'На стороне Кассы';
-$_MODULE['<{yandexmodule}prestashop>formhelper_34fc70d33c11c98da9f853f815099b38'] = 'На стороне магазина';
+$_MODULE['<{yandexmodule}prestashop>formhelper_3a411dd3ffa238bb924aa35ed35209c0'] = 'Выпустите и активируйте секретный ключ в';
+$_MODULE['<{yandexmodule}prestashop>formhelper_f988ad4d489f259bf1c1960ed81282b2'] = 'личном кабинете Яндекс.Кассы';
 $_MODULE['<{yandexmodule}prestashop>formhelper_65b42007117fefeb9d122c9d582c2e7e'] = 'Назвать кнопку оплаты «Заплатить через Яндекс»';
 $_MODULE['<{yandexmodule}prestashop>formhelper_08dd74d5ebac2acb6dbf78593ae75a4e'] = 'Добавить кнопку «Заплатить по частям»';
 $_MODULE['<{yandexmodule}prestashop>formhelper_0f6ec6c603cd5935515aecd633d0fde7'] = 'Это описание транзакции, которое пользователь увидит при оплате, а вы — в личном кабинете Яндекс.Кассы. Например, «Оплата заказа №72». Чтобы в описание подставлялся номер заказа (как в примере), поставьте на его месте %cart_id% (Оплата заказа %cart_id%). Ограничение для описания — 128 символов.';
@@ -141,6 +152,7 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_ffea110fd47942cef1c5c687a25f9161'
 $_MODULE['<{yandexmodule}prestashop>formhelper_7ce590a2ba8bf3a2b19b8c312cc96458'] = 'заказ переходит в этот статус при поступлении и остается в нем пока оператор магазина не подтвердит или не отменит платеж';
 $_MODULE['<{yandexmodule}prestashop>formhelper_d5c39a1d9aced393f835f334a1fb9206'] = 'отменён';
 $_MODULE['<{yandexmodule}prestashop>formhelper_79cab9afc965a279edd596941b2eebb2'] = 'заказ переходит в этот статус после отмены платежа';
+$_MODULE['<{yandexmodule}prestashop>formhelper_27dda3cb0fb2c7da8fd7751641582a5f'] = 'Отправлять в Яндекс.Кассу данные для чеков (54-ФЗ)';
 $_MODULE['<{yandexmodule}prestashop>formhelper_785d4b16fc800589e811ec37e3b0acc5'] = 'Ставка по умолчанию будет в чеке, если в карточке товара не указана другая ставка.';
 $_MODULE['<{yandexmodule}prestashop>formhelper_74833aaeee132a62a8b3156053a979c7'] = 'Сопоставьте ставки';
 $_MODULE['<{yandexmodule}prestashop>formhelper_8ff12753b591fed06fc68e83d608e398'] = 'Ставка в вашем магазине';
@@ -156,6 +168,7 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_2fdb05c9d5cf1ff667dac68b85b1dd94'
 $_MODULE['<{yandexmodule}prestashop>formhelper_eeec704c302586061ded062a1a5d6002'] = 'Id приложения';
 $_MODULE['<{yandexmodule}prestashop>formhelper_d9dc52e27dd22f5bfc1511eca2abedc4'] = 'Секретное слово';
 $_MODULE['<{yandexmodule}prestashop>formhelper_b16854ceee6fb9499c2ad3aac40d539e'] = 'Минимальная сумма заказа';
+$_MODULE['<{yandexmodule}prestashop>formhelper_57297718fdb439175177cf6b196172d1'] = 'Статус заказа';
 $_MODULE['<{yandexmodule}prestashop>formhelper_d6c59ded008314cda6d834de13a31a95'] = 'Яндекс.Платежка';
 $_MODULE['<{yandexmodule}prestashop>formhelper_83fb605a74088442ffdddb703f931ef9'] = 'Включить прием платежей через Платежку';
 $_MODULE['<{yandexmodule}prestashop>formhelper_d9c1b321240272ef302aeb3fd4658e2a'] = 'ID формы';
@@ -307,9 +320,5 @@ $_MODULE['<{yandexmodule}prestashop>kassa_epl_form_78d450c37ae59bb9c73017b43bc0c
 $_MODULE['<{yandexmodule}prestashop>kassa_epl_form_77f072c589a4ade0fd37ba687f37a7e1'] = 'Оплата с помощью Яндекс.Платёжки';
 $_MODULE['<{yandexmodule}prestashop>kassa_epl_form_9e91dca5be8717bad5e8d4e534fc43c2'] = 'Оплата с помощью Яндекс.Кассы';
 $_MODULE['<{yandexmodule}prestashop>kassa_form_faef1666296f6eb16b2a4f390ea30d62'] = 'Яндекс.Деньги (банковские карты, кошелек и другое)';
-$_MODULE['<{yandexmodule}prestashop>kassa_form_63a3ef4d984c4648743529cd0fedde4e'] = 'Телефон, который привязан к Qiwi Wallet';
-$_MODULE['<{yandexmodule}prestashop>kassa_form_a64b9392d904405f8a7ec4a37c70c1ca'] = 'Оплатить заказ';
-$_MODULE['<{yandexmodule}prestashop>kassa_form_9e3f795038088ee81c22ced0b6f491f0'] = 'Укажите логин, и мы выставим счет в Альфа-Клике. После этого останется подтвердить платеж на сайте интернет-банка.';
-$_MODULE['<{yandexmodule}prestashop>wallet_form_46322fb08a499ed1397e0a5e1f147aaf'] = 'Оплата через Яндекс кошелёк';
-$_MODULE['<{yandexmodule}prestashop>wallet_form_9ff5095ba7dc98485e16d743b2e1cbfd'] = 'Оплата банковской картой';
-$_MODULE['<{yandexmodule}prestashop>billing_form_76728ea0393b4f11a0f8660096bb8498'] = 'ФИО плательщика';
+$_MODULE['<{yandexmodule}prestashop>wallet_form_faef1666296f6eb16b2a4f390ea30d62'] = 'Банковские карты — Visa, Mastercard и Maestro, «Мир»';
+$_MODULE['<{yandexmodule}prestashop>wallet_form_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Яндекс.Деньги';

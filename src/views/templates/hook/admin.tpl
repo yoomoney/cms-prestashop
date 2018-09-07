@@ -15,9 +15,9 @@
         {$update_status|escape:'htmlall':'UTF-8'}</div>
 {/if}
 <div id="tabs" class="yan_tabs">
-    <p>{l s='Работая с модулем, вы автоматически соглашаетесь с' mod='yandexmodule'}
-        <a href="https://money.yandex.ru/doc.xml?id=527052" target="_blank">{l s='условиями его использования' mod='yandexmodule'}</a>.</p>
-    <p>{l s='Версия модуля' mod='yandexmodule'} <span id='ya_version'>{$ya_version|escape:'htmlall':'UTF-8'}</span></p>
+    <p>{l s='By using this module, you automatically agree with' mod='yandexmodule'}
+        <a href="https://money.yandex.ru/doc.xml?id=527052" target="_blank">{l s='its terms and conditions of use' mod='yandexmodule'}</a>.</p>
+    <p>{l s='Module version' mod='yandexmodule'} <span id='ya_version'>{$ya_version|escape:'htmlall':'UTF-8'}</span></p>
     <ul>
         <li><a href="#moneyorg">{l s='Yandex.Kassa' mod='yandexmodule'}</a></li>
         <li><a href="#money">{l s='Yandex.Money' mod='yandexmodule'}</a></li>
@@ -27,7 +27,7 @@
     </ul>
     <div id="money">
         <div class="errors">{$p2p_status|escape:'quotes':'UTF-8'}</div>
-        <p>{l s='Для работы с модулем нужно' mod='yandexmodule'} <a href='https://money.yandex.ru/new' target='_blank'>{l s='открыть кошелек' mod='yandexmodule'}</a> {l s='на Яндексе.' mod='yandexmodule'}</p>
+        <p>{l s='To operate this module, you need to' mod='yandexmodule'} <a href='https://money.yandex.ru/new' target='_blank'>{l s='create a Yandex.Money wallet' mod='yandexmodule'}</a></p>
         {$money_p2p|escape:'quotes':'UTF-8'}
     </div>
     <div id="billing">
@@ -37,7 +37,7 @@
     </div>
     <div id="moneyorg">
         <div class="errors">{$org_status|escape:'quotes':'UTF-8'}</div>
-        <p>{l s='Для работы с модулем нужно подключить магазин к' mod='yandexmodule'} <a target="_blank" href="https://kassa.yandex.ru/">{l s='Яндекс.Кассе' mod='yandexmodule'}</a>.</p>
+        <p>{l s='To operate this module, you need to connect your store' mod='yandexmodule'} <a target="_blank" href="https://kassa.yandex.ru/">{l s='to Yandex.Checkout' mod='yandexmodule'}</a>.</p>
         {$money_org|escape:'quotes':'UTF-8'}
     </div>
     <div id="metrika">

@@ -100,7 +100,7 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
             $cart->id,
             $kassa->getCreateStatusId(),
             $total,
-            $this->module->l('Оплата через Яндекс.Кассу')
+            $this->module->l('Payment via Yandex.Checkout')
             .$paymentMethodInfoName,
             null,
             null,

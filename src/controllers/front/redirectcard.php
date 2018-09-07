@@ -53,7 +53,7 @@ class YandexModuleRedirectCardModuleFrontController extends ModuleFrontControlle
             Tools::redirect('index.php?controller=order&step=3');
         } elseif (!empty($code) && $cnf) {
             $comment = $message = $this->module->l('Total:').$total_to_pay.$this->module->l(' rub');
-            $response = ExternalPayment::getInstanceId(Configuration::get('YA_WALLET_APPLICATION_ID'));
+            $response = YandexModuleExternalPayment::getInstanceId(Configuration::get('YA_WALLET_APPLICATION_ID'));
             if ($response->status == "success") {
                 if ($this->log_on) {
                     $this->module->log(
@@ -62,7 +62,7 @@ class YandexModuleRedirectCardModuleFrontController extends ModuleFrontControlle
                     );
                 }
                 $instance_id = $response->instance_id;
-                $external_payment = new ExternalPayment($instance_id);
+                $external_payment = new YandexModuleExternalPayment($instance_id);
                 $payment_options = array(
                     "pattern_id" => "p2p",
                     "to" => Configuration::get('YA_WALLET_ACCOUNT_ID'),
