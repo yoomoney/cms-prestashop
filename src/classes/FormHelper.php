@@ -12,20 +12,21 @@
 
 namespace YandexMoneyModule;
 
+use Category;
 use Carrier;
 use Configuration;
 use Context;
+use Currency;
 use Module;
 use OrderState;
 use Tax;
 use Tools;
 use YandexCheckout\Model\PaymentMethodType;
 use yandexmodule;
+use YandexMoneyModule\Models\Market\YandexMarketSettings;
 
 class FormHelper
 {
-    public $cats;
-
     private $module;
 
     public function l($s)
@@ -36,209 +37,147 @@ class FormHelper
         return $this->module->l($s, 'FormHelper');
     }
 
-    public function getFormYamoneyMarket()
+    public function getFormYamoneyMarket($settings)
     {
+        $market = new YandexMarketSettings($settings);
+
+        $inputs = array();
+
+        $inputs[] = array(
+            'col' => 6,
+            'type' => 'text',
+            'name' => 'YA_MARKET_SHOP_NAME',
+            'label' => $this->l('Короткое название магазина'),
+            'placeholder' => '123',
+        );
+
+        $inputs[] = array(
+            'col' => 6,
+            'type' => 'text',
+            'name' => 'YA_MARKET_FULL_SHOP_NAME',
+            'label' => $this->l('Полное наименование организации'),
+        );
+
+        $inputs[] = array(
+            'type' => 'html',
+            'name'         => '',
+            'label' => $this->l('Валюта'),
+            'html_content' => $market->getCurrency()->htmlCurrencyList(
+                Currency::getCurrencies(),
+                Currency::getDefaultCurrency()->iso_code
+            ),
+        );
+
+        $inputs[] = array(
+            'type'         => 'html',
+            'name'         => '',
+            'label'        => $this->l('Выгружаем категории'),
+            'html_content' => $market->getCategoryTree()->htmlCategoryList(Category::getCategories()),
+        );
+
+        $inputs[] = array(
+            'type'         => 'html',
+            'name'         => '',
+            'label'        => $this->l('Курьерская доставка для домашнего региона'),
+            'html_content' => $market->getDelivery()->htmlDeliveryList(Currency::getDefaultCurrency()->iso_code),
+        );
+
+        $inputs[] = array(
+            'type'         => 'html',
+            'name'         => '',
+            'label'        => '',
+            'html_content' => '<div class="yandex-money-market-sub-header">'.$this->l('Настройка предложений').'</div>',
+        );
+
+        $inputs[] = array(
+            'type'         => 'html',
+            'name'         => '',
+            'label'        => $this->l('Формат предложений'),
+            'html_content' => $market->getOfferType()->html(),
+        );
+
+        $inputs[] = array(
+            'type'         => 'html',
+            'name'         => '',
+            'label'        => $this->l('Статус товара и способы получения'),
+            'html_content' => $market->getAvailable()->htmlAvailableList(),
+        );
+
+        $taxes = Tax::getTaxes(Context::getContext()->language->id, true);
+        $inputs[] = array(
+            'type'         => 'html',
+            'name'         => '',
+            'label'        => $this->l('Налоговые ставки'),
+            'html_content' => $market->getVat()->htmlVatList($taxes),
+        );
+
+        $inputs[] = array(
+            'type'   => 'checkbox',
+            'label'  => $this->l('Выгрузка комбинаций товара'),
+            'name'   => 'YA_MARKET_COMBINATION',
+            'values' => array(
+                'query' => array(
+                    array(
+                        'id'   => 'EXPORT_ALL',
+                        'name' => $this->l('Выгружать комбинации товара'),
+                        'val'  => 1
+                    ),
+                ),
+                'id'    => 'id',
+                'name'  => 'name'
+            ),
+        );
+
+        $inputs[] = array(
+            'type'   => 'checkbox',
+            'label'  => $this->l('Опции предложений'),
+            'name'   => 'YA_MARKET_OFFER_OPTIONS',
+            'values' => array(
+                'query' => array(
+                    array(
+                        'id'   => 'EXPORT_PARAMS',
+                        'name' => $this->l('Выгружать все атрибуты товаров'),
+                        'val'  => 1
+                    ),
+                    array(
+                        'id'   => 'EXPORT_DIMENSION',
+                        'val'  => 1,
+                        'name' => $this->l('Выгружать размеры товаров')
+                    ),
+                ),
+                'id'    => 'id',
+                'name'  => 'name'
+            ),
+        );
+
+        $inputs[] = array(
+            'type'         => 'html',
+            'name'         => '',
+            'label'        => $this->l('Дополнительные условия'),
+            'html_content' => $market->getAdditionalCondition()->htmlAdditionalConditionList(Category::getCategories()),
+        );
+
+        $inputs[] = array(
+            'type'         => 'html',
+            'name'         => '',
+            'label'        => '',
+            'html_content' => '<div class="yandex-money-market-sub-header">'.$this->l('Параметры для Яндекс.Маркета').'</div>',
+        );
+
+        $inputs[] = array(
+            'type'         => 'html',
+            'name'         => '',
+            'label'        => $this->l('Ссылка для выгрузки товаров на Маркет'),
+            'html_content' => $market->getExportLink()->html(),
+        );
+
         return array(
             'form' => array(
                 'legend' => array(
                     'title' => $this->l('The module settings Yandex.Market'),
                     'icon' => 'icon-cogs',
                 ),
-                'input' => array(
-                    array(
-                        'type' => 'radio',
-                        'label' => $this->l('Simplified yml:'),
-                        'name' => 'YA_MARKET_SHORT',
-                        'required' => false,
-                        'class' => 't',
-                        'is_bool' => true,
-                        'values' => array(
-                            array(
-                                'id' => 'active_on',
-                                'value' => 1,
-                                'label' => $this->l('Included')
-                            ),
-                            array(
-                                'id' => 'active_off',
-                                'value' => 0,
-                                'label' => $this->l('Off')
-                            )
-                        ),
-                    ),
-                    array(
-                        'type' => 'categories',
-                        'label' => $this->l('Categories'),
-                        'desc' => $this->l('Select the categories to export. If you need a subcategory, select them.'),
-                        'name' => 'YA_MARKET_CATEGORIES',
-                        'tree' => array(
-                            'use_search' => false,
-                            'id' => 'categoryBox',
-                            'use_checkbox' => true,
-                            'selected_categories' => $this->cats,
-                        ),
-                    ),
-                    array(
-                        'type' => 'radio',
-                        'label' => $this->l('To unload:'),
-                        'name' => 'YA_MARKET_CATALL',
-                        'required' => false,
-                        'class' => 't',
-                        'is_bool' => true,
-                        'values' => array(
-                            array(
-                                'id' => 'active_on',
-                                'value' => 1,
-                                'label' => $this->l('All categories')
-                            ),
-                            array(
-                                'id' => 'active_off',
-                                'value' => 0,
-                                'label' => $this->l('Only selected')
-                            )
-                        ),
-                    ),
-                    array(
-                        'col' => 4,
-                        'class' => 't',
-                        'type' => 'text',
-                        'desc' => $this->l('The name of your company for Yandex.Market'),
-                        'name' => 'YA_MARKET_NAME',
-                        'label' => $this->l('The name of the store'),
-                    ),
-                    array(
-                        'col' => 4,
-                        'class' => 't',
-                        'type' => 'text',
-                        'desc' => $this->l('The shipping cost to your home location'),
-                        'name' => 'YA_MARKET_DELIVERY',
-                        'label' => $this->l('The shipping cost to your home location'),
-                    ),
-                    array(
-                        'type' => 'radio',
-                        'label' => $this->l('Type paged descriptions'),
-                        'name' => 'YA_MARKET_DESC_TYPE',
-                        'class' => 't',
-                        'values' => array(
-                            array(
-                                'id' => 'NORMAL',
-                                'value' => 0,
-                                'label' => $this->l('Full')
-                            ),
-                            array(
-                                'id' => 'SHORT',
-                                'value' => 1,
-                                'label' => $this->l('Short')
-                            )
-                        ),
-                    ),
-                    array(
-                        'type' => 'radio',
-                        'label' => $this->l('Availability'),
-                        'desc' => $this->l('Availability'),
-                        'name' => 'YA_MARKET_DOSTUPNOST',
-                        'is_bool' => false,
-                        'values' => array(
-                            array(
-                                'id' => 'd_0',
-                                'value' => 0,
-                                'label' => $this->l('All available')
-                            ),
-                            array(
-                                'id' => 'd_1',
-                                'value' => 1,
-                                'label' => $this->l('If available > 0, the rest to order')
-                            ),
-                            array(
-                                'id' => 'd_2',
-                                'value' => 2,
-                                'label' => $this->l('If = 0, do not unload')
-                            ),
-                            array(
-                                'id' => 'd_3',
-                                'value' => 3,
-                                'label' => $this->l('All made to order')
-                            )
-                        )
-                    ),
-                    array(
-                        'type' => 'checkbox',
-                        'label' => $this->l('Settings'),
-                        'name' => 'YA_MARKET_SET',
-                        'values' => array(
-                            'query' => array(
-                                array(
-                                    'id' => 'AVAILABLE',
-                                    'name' => $this->l('To export only the goods which are in stock'),
-                                    'val' => 1
-                                ),
-                                array(
-                                    'id' => 'NACTIVECAT',
-                                    'name' => $this->l('To exclude inactive categories'),
-                                    'val' => 1
-                                ),
-                                /*array(
-                                    'id' => 'HOMECARRIER',
-                                    'name' => $this->l('To use the delivery at your home location'),
-                                    'val' => 1
-                                ),*/
-                                array(
-                                    'id' => 'COMBINATIONS',
-                                    'name' => $this->l('Export of product combinations'),
-                                    'val' => 1
-                                ),
-                                array(
-                                    'id' => 'DIMENSIONS',
-                                    'val' => 1,
-                                    'name' => $this->l('Display dimensions of product (dimensions)')
-                                ),
-                                array(
-                                    'id' => 'ALLCURRENCY',
-                                    'val' => 1,
-                                    'name' =>
-                                        $this->l('Unload all currencies? (If not, will be uploaded only by default)')
-                                ),
-                                array(
-                                    'id' => 'GZIP',
-                                    'val' => 1,
-                                    'name' => $this->l('Gzip compression')
-                                ),
-                                array(
-                                    'id' => 'ROZNICA',
-                                    'val' => 1,
-                                    'name' => $this->l('the opportunity to buy in a retail store.')
-                                ),
-                                array(
-                                    'id' => 'DOST',
-                                    'val' => 1,
-                                    'name' => $this->l(' the possibility of delivery of the product.')
-                                ),
-                                array(
-                                    'id' => 'SAMOVIVOZ',
-                                    'val' => 1,
-                                    'name' => $this->l('the ability to reserve and pick up yourself.')
-                                ),
-
-                            ),
-                            'id' => 'id',
-                            'name' => 'name'
-                        ),
-                    ),
-                    array(
-                        'col' => 6,
-                        'class' => 't',
-                        'type' => 'text',
-                        'desc' => $this->l('Link to the dynamic file price list'),
-                        'name' => 'YA_MARKET_YML',
-                        'label' => $this->l('The yml file'),
-                    ),
-//                    array(
-//                        'col' => 6,
-//                        'class' => 't',
-//                        'type' => 'text',
-//                        'name' => 'YA_MARKET_REDIRECT',
-//                        'label' => $this->l('The redirect link for the application.'),
-//                    ),
-                ),
+                'input' => $inputs,
                 'submit' => array(
                     'title' => $this->l('Save'),
                 ),

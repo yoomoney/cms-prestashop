@@ -82,10 +82,11 @@ class YandexModule extends PaymentModule
 
         include_once(dirname(__FILE__).'/lib/YandexModuleApi.php');
         include_once(dirname(__FILE__).'/lib/YandexModuleExternalPayment.php');
+        include_once(dirname(__FILE__).'/lib/helpers.php');
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.0.11';
+        $this->version         = '1.1.0';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -303,9 +304,11 @@ class YandexModule extends PaymentModule
 
     public function getContent()
     {
-        $this->context->controller->addJS(__PS_BASE_URI__.'modules/'.$this->name.'/views/js/main.js');
-        $this->context->controller->addJS(__PS_BASE_URI__.'modules/'.$this->name.'/views/js/jquery.total-storage.js');
+        $this->context->controller->addJS($this->_path.'views/js/main.js');
+        $this->context->controller->addJS($this->_path.'views/js/jquery.total-storage.js');
         $this->context->controller->addCSS($this->_path.'views/css/admin.css');
+        $this->context->controller->addCSS($this->_path.'views/css/market.css');
+        $this->context->controller->addJS($this->_path.'views/js/market.js');
         $this->selfPostProcess();
         $this->context->controller->addJqueryUI('ui.tabs');
 
@@ -345,37 +348,51 @@ class YandexModule extends PaymentModule
             'billing' => $this->getBillingModel(),
         );
 
-        $vars_market        = Configuration::getMultiple(array(
-            'YA_MARKET_SET_ALLCURRENCY',
-            'YA_MARKET_NAME',
-            'YA_MARKET_SET_AVAILABLE',
-            'YA_MARKET_SET_NACTIVECAT',
-            //'YA_MARKET_SET_HOMECARRIER',
-            'YA_MARKET_SET_COMBINATIONS',
-            'YA_MARKET_CATALL',
-            'YA_MARKET_SET_DIMENSIONS',
-            'YA_MARKET_SET_SAMOVIVOZ',
-            'YA_MARKET_SET_DOST',
-            'YA_MARKET_SET_ROZNICA',
-            'YA_MARKET_DELIVERY',
-            'YA_MARKET_MK',
-            'YA_MARKET_SHORT',
-            'YA_MARKET_HKP',
-            'YA_MARKET_DOSTUPNOST',
-            'YA_MARKET_SET_GZIP',
-            'YA_MARKET_DESC_TYPE',
+        $settings = Configuration::getMultiple(array(
+            'YA_MARKET_SHOP_NAME',
+            'YA_MARKET_FULL_SHOP_NAME',
+            'YA_MARKET_CURRENCY_ENABLED',
+            'YA_MARKET_CURRENCY_RATE',
+            'YA_MARKET_CURRENCY_PLUS',
+            'YA_MARKET_CATEGORY_ALL_ENABLED',
+            'YA_MARKET_CATEGORY_LIST',
+            'YA_MARKET_DELIVERY_ENABLED',
+            'YA_MARKET_DELIVERY_COST',
+            'YA_MARKET_DELIVERY_DAYS_FROM',
+            'YA_MARKET_DELIVERY_DAYS_TO',
+            'YA_MARKET_DELIVERY_ORDER_BEFORE',
+            'YA_MARKET_OFFER_TYPE_SIMPLE',
+            'YA_MARKET_OFFER_TYPE_NAME_TEMPLATE',
+            'YA_MARKET_AVAILABLE_ENABLED',
+            'YA_MARKET_AVAILABLE_AVAILABLE',
+            'YA_MARKET_AVAILABLE_DELIVERY',
+            'YA_MARKET_AVAILABLE_PICKUP',
+            'YA_MARKET_AVAILABLE_STORE',
+            'YA_MARKET_VAT_ENABLED',
+            'YA_MARKET_VAT_LIST',
+            'YA_MARKET_COMBINATION_EXPORT_ALL',
+            'YA_MARKET_OFFER_OPTIONS_EXPORT_PARAMS',
+            'YA_MARKET_OFFER_OPTIONS_EXPORT_DIMENSION',
+            'YA_MARKET_ADDITIONAL_CONDITION_ENABLED',
+            'YA_MARKET_ADDITIONAL_CONDITION_NAME',
+            'YA_MARKET_ADDITIONAL_CONDITION_TAG',
+            'YA_MARKET_ADDITIONAL_CONDITION_TYPE_VALUE',
+            'YA_MARKET_ADDITIONAL_CONDITION_STATIC_VALUE',
+            'YA_MARKET_ADDITIONAL_CONDITION_DATA_VALUE',
+            'YA_MARKET_ADDITIONAL_CONDITION_FOR_ALL_CAT',
+            'YA_MARKET_ADDITIONAL_CONDITION_JOIN',
+            'YA_MARKET_ADDITIONAL_CONDITION_CATEGORIES',
         ));
-
-        $cats = array();
-        if ($c = Configuration::get('YA_MARKET_CATEGORIES')) {
-            $uc = unserialize($c);
-            if (is_array($uc)) {
-                $cats = $uc;
-            }
+        if (!$settings['YA_MARKET_SHOP_NAME']) {
+            $settings['YA_MARKET_SHOP_NAME'] = Configuration::get('PS_SHOP_NAME');
         }
+        if (!$settings['YA_MARKET_OFFER_TYPE_NAME_TEMPLATE']) {
+            $settings['YA_MARKET_OFFER_TYPE_NAME_TEMPLATE'] = '%name% %manufacturer_name%';
+        }
+        $settings['YA_MARKET_EXPORT_LINK_URL'] = str_replace('http://', 'https://',
+            $this->context->link->getModuleLink($this->name, 'generate'));
 
-        $forms       = new YandexMoneyModule\FormHelper();
-        $forms->cats = $cats;
+        $forms = new YandexMoneyModule\FormHelper();
 
         $vars_org['YA_ORG_TEXT_INSIDE']    = $this->l('You can find your shopID and codeword in your')."<a href='https://money.yandex.ru/joinups' target='_blank'>".$this->l('Merchant Profile')."</a>".$this->l('after signing up for Yandex.Checkout.');
         $vars_p2p['YA_WALLET_LOGGING_ON']  = Configuration::get('YA_WALLET_LOGGING_ON');
@@ -399,7 +416,10 @@ class YandexModule extends PaymentModule
             'kassa'                => $kassa,
             'emptyShopId'          => empty($shopId),
             'money_metrika'        => $this->renderForm('metrika', $vars_metrika, $forms->getFormYandexMetrics()),
-            'money_market'         => $this->renderForm('market', $vars_market, $forms->getFormYamoneyMarket()),
+            'money_market'         => $this->renderForm(
+                'market',
+                $settings, $forms->getFormYamoneyMarket($settings)
+            ),
             'billing_form'         => $this->renderForm(
                 'billing_form',
                 $vars_billing,
@@ -1020,9 +1040,6 @@ class YandexModule extends PaymentModule
         $httpsBasePath                                    = str_replace('http://', 'https://',
             _PS_BASE_URL_.__PS_BASE_URI__);
         $redir                                            = $httpsBasePath.'modules/yandexmodule/callback.php';
-        $market_list                                      = str_replace('http://', 'https://',
-            $this->context->link->getModuleLink($this->name, 'generate'));
-        $helper->fields_value['YA_MARKET_YML']            = $market_list;
         $helper->fields_value['YA_WALLET_REDIRECT']       = $p2p_redirect;
         $helper->fields_value['YA_METRICS_REDIRECT'] = $redir;
 
