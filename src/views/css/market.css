@@ -1,0 +1,141 @@
+/**
+* Module is prohibited to sales! Violation of this condition leads to the deprivation of the license!
+*
+* @category  Front Office Features
+* @package   Yandex Payment Solution
+* @author    Yandex.Money <cms@yamoney.ru>
+* @copyright © 2015 NBCO Yandex.Money LLC
+* @license   https://money.yandex.ru/doc.xml?id=527052
+*/
+
+div#market label {
+    font-weight: normal;
+}
+
+.yandex-money-market-sub-header {
+    font-size: 120%;
+    font-style: italic;
+    margin: 10px 0 0;
+}
+
+.yandex-money-market-js-editable form {
+    display: inline-block;
+}
+
+.yandex-money-market-js-editable-edit {
+    display: none;
+}
+
+.yandex-money-market-js-editable .yandex-money-market-edit-on-button {
+    position: relative;
+    cursor: pointer;
+    display: none;
+    font: normal normal normal 14px/1 FontAwesome;
+}
+
+.yandex-money-market-copy-url {
+    cursor: pointer;
+    font: normal normal normal 14px/1 FontAwesome;
+}
+
+.yandex-money-market-js-editable:hover .yandex-money-market-edit-on-button {
+    display: inline-block;
+}
+
+.yandex-money-market-js-editable .edit_finish {
+    cursor: pointer;
+}
+
+.yandex-money-market-currency-disabled {
+    color: silver;
+}
+
+div#market .yandex-money-market-delivery-days-from,
+div#market .yandex-money-market-delivery-days-to {
+    width: 100px;
+    min-width: 100px;
+}
+
+.yandex-money-market-first-letter-uppercase:first-letter {
+    text-transform: uppercase;
+}
+
+.yandex-money-market-category-tree-branch {
+    display: block;
+}
+
+.yandex-money-market-category-tree-block ul {
+    list-style: none;
+    padding-left: 20px;
+}
+
+.yandex-money-market-hidden-element {
+    display: none;
+}
+
+.yandex-money-market-category-tree-trunk, .yandex-money-market-category-tree-trunk ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 20px;
+}
+
+.yandex-money-market-category-tree-trunk input {
+    vertical-align: baseline;
+    margin-right: 4px;
+    line-height: normal;
+}
+
+.yandex-money-market-category-tree-panel-heading-controls {
+    line-height: 2.2em;
+    font-size: 1.1em;
+    color: #00aff0;
+}
+
+.yandex-money-market-category-tree-actions {
+    display: inline-block;
+}
+
+.yandex-money-market-category-tree-panel-heading-controls {
+    display: none;
+    float: right;
+    padding: 5px;
+}
+
+.yandex-money-market-category-tree-actions .twitter-typeahead {
+    padding: 0 0 0 4px;
+}
+
+.yandex-money-market-category-tree-block:hover .yandex-money-market-category-tree-panel-heading-controls {
+    display: inline;
+}
+
+.yandex-money-market-delivery-days-from,
+.yandex-money-market-delivery-days-to {
+    display: inline-block !important;
+}
+
+.yandex-money-market-available-options-list::after {
+    content: ',';
+}
+
+.yandex-money-market-available-options-list.last::after {
+    content: '';
+}
+
+.yandex-money-market-additional-condition-more {
+    cursor: pointer;
+}
+
+.yandex-money-market-additional-condition-template {
+    display: none;
+}
+
+.yandex-money-market-copy-url {
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.yandex-money-market-export-link-url {
+    display: inline-block !important;
+    width: 80% !important;
+}

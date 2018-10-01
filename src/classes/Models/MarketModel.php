@@ -14,42 +14,64 @@ use Currency;
 use Image;
 use Product;
 use Tools;
-use YandexMoneyModule\Yml;
+use Link;
+use YandexMoneyModule\YandexMarket\Offer;
+use YandexMoneyModule\YandexMarket\ProductCategory;
+use YandexMoneyModule\YandexMarket\ShopInfo;
+use YandexMoneyModule\YandexMarket\YandexMarket;
 
 class MarketModel extends AbstractModel
 {
+    private $settings;
+    private $additionalConditionMap;
+
     public function validateOptions()
     {
         $errors = '';
-        Configuration::UpdateValue('YA_MARKET_SHORT', Tools::getValue('YA_MARKET_SHORT'));
-        Configuration::UpdateValue('YA_MARKET_SET_ALLCURRENCY', Tools::getValue('YA_MARKET_SET_ALLCURRENCY'));
-        Configuration::UpdateValue('YA_MARKET_DESC_TYPE', Tools::getValue('YA_MARKET_DESC_TYPE'));
-        Configuration::UpdateValue('YA_MARKET_DOSTUPNOST', Tools::getValue('YA_MARKET_DOSTUPNOST'));
-        Configuration::UpdateValue('YA_MARKET_SET_GZIP', Tools::getValue('YA_MARKET_SET_GZIP'));
-        Configuration::UpdateValue('YA_MARKET_SET_AVAILABLE', Tools::getValue('YA_MARKET_SET_AVAILABLE'));
-        Configuration::UpdateValue('YA_MARKET_SET_NACTIVECAT', Tools::getValue('YA_MARKET_SET_NACTIVECAT'));
-        //Configuration::UpdateValue('YA_MARKET_SET_HOMECARRIER', Tools::getValue('YA_MARKET_SET_HOMECARRIER'));
-        Configuration::UpdateValue('YA_MARKET_SET_COMBINATIONS', Tools::getValue('YA_MARKET_SET_COMBINATIONS'));
-        Configuration::UpdateValue('YA_MARKET_SET_DIMENSIONS', Tools::getValue('YA_MARKET_SET_DIMENSIONS'));
-        Configuration::UpdateValue('YA_MARKET_SET_SAMOVIVOZ', Tools::getValue('YA_MARKET_SET_SAMOVIVOZ'));
-        Configuration::UpdateValue('YA_MARKET_SET_DOST', Tools::getValue('YA_MARKET_SET_DOST'));
-        Configuration::UpdateValue('YA_MARKET_SET_ROZNICA', Tools::getValue('YA_MARKET_SET_ROZNICA'));
-        Configuration::UpdateValue('YA_MARKET_MK', Tools::getValue('YA_MARKET_MK'));
-        Configuration::UpdateValue('YA_MARKET_HKP', Tools::getValue('YA_MARKET_HKP'));
-        Configuration::UpdateValue('YA_MARKET_CATEGORIES', serialize(Tools::getValue('YA_MARKET_CATEGORIES')));
 
-        if (Tools::getValue('YA_MARKET_NAME') == '') {
-            $errors .= $this->module->displayError($this->module->l('The company name is not filled in!'));
-        } else {
-            Configuration::UpdateValue('YA_MARKET_NAME', Tools::getValue('YA_MARKET_NAME'));
+        $simpleParams = array(
+            'YA_MARKET_SHOP_NAME',
+            'YA_MARKET_FULL_SHOP_NAME',
+            'YA_MARKET_CATEGORY_ALL_ENABLED',
+            'YA_MARKET_OFFER_TYPE_SIMPLE',
+            'YA_MARKET_OFFER_TYPE_NAME_TEMPLATE',
+            'YA_MARKET_VAT_ENABLED',
+            'YA_MARKET_COMBINATION_EXPORT_ALL',
+            'YA_MARKET_OFFER_OPTIONS_EXPORT_PARAMS',
+            'YA_MARKET_OFFER_OPTIONS_EXPORT_DIMENSION',
+        );
+        foreach ($simpleParams as $param) {
+            Configuration::UpdateValue($param, Tools::getValue($param));
         }
 
-        if (Tools::getValue('YA_MARKET_DELIVERY') == '') {
-            $errors .= $this->module->displayError(
-                $this->module->l('The shipping cost to your home location is not filled in!')
-            );
-        } else {
-            Configuration::UpdateValue('YA_MARKET_DELIVERY', Tools::getValue('YA_MARKET_DELIVERY'));
+        $arrayParams = array(
+            'YA_MARKET_CURRENCY_ENABLED',
+            'YA_MARKET_CURRENCY_RATE',
+            'YA_MARKET_CURRENCY_PLUS',
+            'YA_MARKET_CATEGORY_LIST',
+            'YA_MARKET_DELIVERY_ENABLED',
+            'YA_MARKET_DELIVERY_COST',
+            'YA_MARKET_DELIVERY_DAYS_FROM',
+            'YA_MARKET_DELIVERY_DAYS_TO',
+            'YA_MARKET_DELIVERY_ORDER_BEFORE',
+            'YA_MARKET_AVAILABLE_ENABLED',
+            'YA_MARKET_AVAILABLE_AVAILABLE',
+            'YA_MARKET_AVAILABLE_DELIVERY',
+            'YA_MARKET_AVAILABLE_PICKUP',
+            'YA_MARKET_AVAILABLE_STORE',
+            'YA_MARKET_VAT_LIST',
+            'YA_MARKET_ADDITIONAL_CONDITION_ENABLED',
+            'YA_MARKET_ADDITIONAL_CONDITION_NAME',
+            'YA_MARKET_ADDITIONAL_CONDITION_TAG',
+            'YA_MARKET_ADDITIONAL_CONDITION_TYPE_VALUE',
+            'YA_MARKET_ADDITIONAL_CONDITION_STATIC_VALUE',
+            'YA_MARKET_ADDITIONAL_CONDITION_DATA_VALUE',
+            'YA_MARKET_ADDITIONAL_CONDITION_FOR_ALL_CAT',
+            'YA_MARKET_ADDITIONAL_CONDITION_JOIN',
+            'YA_MARKET_ADDITIONAL_CONDITION_CATEGORIES',
+        );
+        foreach ($arrayParams as $param) {
+            Configuration::UpdateValue($param, json_encode(Tools::getValue($param)));
         }
 
         if ($errors == '') {
@@ -61,326 +83,472 @@ class MarketModel extends AbstractModel
 
     public function initConfiguration()
     {
+        $this->settings = Configuration::getMultiple(array(
+            'YA_MARKET_SHOP_NAME',
+            'YA_MARKET_FULL_SHOP_NAME',
+            'YA_MARKET_CURRENCY_ENABLED',
+            'YA_MARKET_CURRENCY_RATE',
+            'YA_MARKET_CURRENCY_PLUS',
+            'YA_MARKET_CATEGORY_ALL_ENABLED',
+            'YA_MARKET_CATEGORY_LIST',
+            'YA_MARKET_DELIVERY_ENABLED',
+            'YA_MARKET_DELIVERY_COST',
+            'YA_MARKET_DELIVERY_DAYS_FROM',
+            'YA_MARKET_DELIVERY_DAYS_TO',
+            'YA_MARKET_DELIVERY_ORDER_BEFORE',
+            'YA_MARKET_OFFER_TYPE_SIMPLE',
+            'YA_MARKET_OFFER_TYPE_NAME_TEMPLATE',
+            'YA_MARKET_AVAILABLE_ENABLED',
+            'YA_MARKET_AVAILABLE_AVAILABLE',
+            'YA_MARKET_AVAILABLE_DELIVERY',
+            'YA_MARKET_AVAILABLE_PICKUP',
+            'YA_MARKET_AVAILABLE_STORE',
+            'YA_MARKET_VAT_ENABLED',
+            'YA_MARKET_VAT_LIST',
+            'YA_MARKET_COMBINATION_EXPORT_ALL',
+            'YA_MARKET_OFFER_OPTIONS_EXPORT_PARAMS',
+            'YA_MARKET_OFFER_OPTIONS_EXPORT_DIMENSION',
+            'YA_MARKET_ADDITIONAL_CONDITION_ENABLED',
+            'YA_MARKET_ADDITIONAL_CONDITION_NAME',
+            'YA_MARKET_ADDITIONAL_CONDITION_TAG',
+            'YA_MARKET_ADDITIONAL_CONDITION_TYPE_VALUE',
+            'YA_MARKET_ADDITIONAL_CONDITION_STATIC_VALUE',
+            'YA_MARKET_ADDITIONAL_CONDITION_DATA_VALUE',
+            'YA_MARKET_ADDITIONAL_CONDITION_FOR_ALL_CAT',
+            'YA_MARKET_ADDITIONAL_CONDITION_JOIN',
+            'YA_MARKET_ADDITIONAL_CONDITION_CATEGORIES',
+        ));
     }
 
+    /**
+     * @param bool $cron
+     * @throws \Exception
+     */
     public function generateXML($cron)
     {
-        $this->yamarket_availability = Configuration::get('YA_MARKET_DOSTUPNOST');
-        $this->gzip = Configuration::get('YA_MARKET_SET_GZIP');
+        $market        = new YandexMarket();
+        $market->setShop(
+            $this->getConfig('YA_MARKET_SHOP_NAME'),
+            $this->getConfig('YA_MARKET_FULL_SHOP_NAME'),
+            'http://' . Tools::getHttpHost(false, true) . __PS_BASE_URI__
+        );
+        $shop = $market->getShop();
 
-        /*-----------------------------------------------------------------------------*/
+        $shop->setPlatform('prestashop');
+        $shop->setVersion(_PS_VERSION_);
 
-        $yml = $this->initYml();
-        $this->loadYmlCategories($yml);
-        foreach ($yml->categories as $categoryInfo) {
-            $this->loadYmlProducts($yml, $categoryInfo['id']);
+        $this->exportDelivery($shop);
+        $this->exportCurrency($market);
+        $this->exportCategories($market);
+
+        foreach ($shop->getCategories() as $category) {
+            $this->exportOffers($market, $category->getId());
         }
 
-        $xml = $yml->getXml();
+        $xml = $market->getXml($this->getConfig('YA_MARKET_OFFER_TYPE_SIMPLE'));
+
         if ($cron) {
-            if ($fp = fopen(_PS_UPLOAD_DIR_.'yml.'.$this->context->shop->id.'.xml'.($this->gzip ? '.gz' : ''), 'w')) {
+            if ($fp = fopen(_PS_UPLOAD_DIR_.'yml.'.$this->context->shop->id.'.xml', 'w')) {
                 fwrite($fp, $xml);
                 fclose($fp);
                 $this->log('info', 'market_generate: Cron '.$this->module->l('Generate price'));
             }
         } else {
-            if ($this->gzip) {
-                header('Content-type:application/x-gzip');
-                header('Content-Disposition: attachment; filename=yml.'.$this->context->shop->id.'.xml.gz');
-                $this->log('info', 'market_generate: gzip view '.$this->module->l('Generate price'));
-            } else {
-                header('Content-type:application/xml; charset=windows-1251');
-            }
+            header('Content-type:application/xml; charset=utf-8');
             $this->module->log('info', 'market_generate: view '.$this->module->l('Generate price'));
             echo $xml;
-            exit;
+            exit();
         }
     }
 
     /**
-     * @return \YandexMoneyModule\Yml
+     * @param ShopInfo $shop
      */
-    private function initYml()
-    {
-        $yml = new \YandexMoneyModule\Yml();
-        $yml->yml('utf-8');
-        $yml->setShop(
-            Configuration::get('PS_SHOP_NAME'),
-            Configuration::get('YA_MARKET_NAME'),
-            'http://' . Tools::getHttpHost(false, true) . __PS_BASE_URI__
-        );
-        $defaultCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        if (Configuration::get('YA_MARKET_SET_ALLCURRENCY')) {
-            foreach (Currency::getCurrencies() as $currency) {
-                $yml->addCurrency(
-                    $currency['iso_code'],
-                    ((float)$defaultCurrency->conversion_rate / (float)$currency['conversion_rate'])
-                );
+    private function exportDelivery(ShopInfo $shop){
+        for ($index = 1; $index <= 5; $index++) {
+            $enabled = $this->getConfig('YA_MARKET_DELIVERY_ENABLED', $index);
+            if (!$enabled) {
+                continue;
             }
-        } else {
-            $yml->addCurrency($defaultCurrency->iso_code, (float)$defaultCurrency->conversion_rate);
+            $cost = $this->getConfig('YA_MARKET_DELIVERY_COST', $index);
+            if ($cost === '') {
+                continue;
+            }
+            $daysFrom = $this->getConfig('YA_MARKET_DELIVERY_DAYS_FROM', $index);
+            $daysTo   = $this->getConfig('YA_MARKET_DELIVERY_DAYS_TO', $index);
+            $days     = empty($daysTo) || $daysFrom === $daysTo ? $daysFrom : $daysFrom.'-'.$daysTo;
+            if ($days === '') {
+                continue;
+            }
+            $orderBefore = $this->getConfig('YA_MARKET_DELIVERY_ORDER_BEFORE', $index);
+            $shop->addDeliveryOption($cost, $days, $orderBefore);
         }
-        return $yml;
     }
 
-    private function loadYmlCategories(Yml $yml)
+    /**
+     * @param YandexMarket $market
+     */
+    private function exportCurrency(YandexMarket $market)
     {
-        $languageId = (int)Configuration::get('PS_LANG_DEFAULT');
-        $activeOnly = Configuration::get('YA_MARKET_SET_NACTIVECAT') ? true : false;
-        $allCategories = Configuration::get('YA_MARKET_CATALL');
+        $currencies = Currency::getCurrencies();
+        $defaultCurrency = Currency::getDefaultCurrency();
 
-        $categoryIdList = array();
-        if ($c = Configuration::get('YA_MARKET_CATEGORIES')) {
-            $uc = unserialize($c);
-            if (is_array($uc)) {
-                foreach ($uc as $categoryId) {
-                    $categoryIdList[$categoryId] = $categoryId;
+        foreach ($currencies as $currency) {
+            if (!in_array($currency['iso_code'], \YandexMoneyModule\YandexMarket\Currency::getAvailableCurrencies())) {
+                continue;
+            }
+            $enabled = $this->getConfig('YA_MARKET_CURRENCY_ENABLED', $currency['iso_code']);
+            if (!$enabled) {
+                continue;
+            }
+            if ($currency['iso_code'] === $defaultCurrency->iso_code) {
+                $rate = '1';
+                $plus = null;
+            } else {
+                $rate = $this->getConfig('YA_MARKET_CURRENCY_RATE', $currency['iso_code']);
+                if ($rate === '1') {
+                    continue;
+                }
+                $plus = (float)$this->getConfig('YA_MARKET_CURRENCY_PLUS', $currency['iso_code'], 0.0);
+                if ($rate === '__cms') {
+                    $rate = (float)$currency['conversion_rate'];
                 }
             }
+            $market->addCurrency($currency['iso_code'], $rate, $plus);
         }
+    }
+
+    /**
+     * @param YandexMarket $market
+     */
+    private function exportCategories(YandexMarket $market)
+    {
+        $languageId   = (int)Configuration::get('PS_LANG_DEFAULT');
+        $exportAll    = $this->getConfig('YA_MARKET_CATEGORY_ALL_ENABLED');
+        $categoryList = (array)$this->getConfig('YA_MARKET_CATEGORY_LIST');
 
         foreach (Category::getCategories($languageId, false, false) as $category) {
             if ($category['id_category'] == 1) {
                 continue;
             }
-            if ($activeOnly && !$category['active']) {
+            if ($exportAll || in_array($category['id_category'], $categoryList)) {
+                $market->addCategory($category['name'], $category['id_category'], $category['id_parent']);
+            }
+        }
+    }
+
+    /**
+     * @param YandexMarket $market
+     * @param $categoryId
+     * @throws \Exception
+     */
+    private function exportOffers(YandexMarket $market, $categoryId)
+    {
+        $isSimpleType = $this->getConfig('YA_MARKET_OFFER_TYPE_SIMPLE');
+        $nameTemplate = explode('%', $this->getConfig('YA_MARKET_OFFER_TYPE_NAME_TEMPLATE'));
+        $isExportParams = $this->getConfig('YA_MARKET_OFFER_OPTIONS_EXPORT_PARAMS');
+
+        $langId = (int)Configuration::get('PS_LANG_DEFAULT');
+        $category = new Category($categoryId);
+        $products = $category->getProducts($langId, 1, 10000);
+        if (empty($products)) {
+            return;
+        }
+        foreach ($products as $product) {
+            if ($product['id_category_default'] != $categoryId) {
                 continue;
             }
-            if ($allCategories || array_key_exists($category['id_category'], $categoryIdList)) {
-                $yml->addCategory($category['name'], $category['id_category'], $category['id_parent']);
+            $this->exportOffer($market, $product, $langId, $isSimpleType, $isExportParams, $nameTemplate);
+        }
+    }
+
+    /**
+     * @param YandexMarket $market
+     * @param $product
+     * @param $langId
+     * @param $isSimpleType
+     * @param $isExportParams
+     * @param $nameTemplate
+     * @throws \Exception
+     */
+    private function exportOffer($market, $product, $langId, $isSimpleType, $isExportParams, $nameTemplate)
+    {
+        $statusId  = $product['quantity'] > 0 ? 'non-zero-quantity' : 'zero-quantity';
+        $useStatus = $this->getConfig('YA_MARKET_AVAILABLE_ENABLED', $statusId);
+        $available = $this->getConfig('YA_MARKET_AVAILABLE_AVAILABLE', $statusId);
+        if ($useStatus && $available === 'none') {
+            return;
+        }
+
+        $offer = $market->createOffer($product['id_product'], $product['id_category_default']);
+        if (!$offer) {
+            return;
+        }
+
+        $offer
+            ->setUrl($product['link'])
+            ->setModel($product['name'])
+            ->setVendor($product['manufacturer_name'])
+            ->setDescription($product['description'] ?: $product['description_short'])
+            ->setPrice(Tools::ps_round($product['price'], 2));
+
+        $this->exportOfferAvailable($offer, $statusId, $useStatus, $available);
+        $this->exportOfferVat($offer, $product);
+        $this->exportOfferName($offer, $product, $isSimpleType, $nameTemplate);
+        $this->exportOfferParams($offer, $product, $isExportParams);
+        $this->exportOfferAdditionalCondition($offer, $product, $market->getShop()->getCategories());
+        $this->exportOfferDimensions($offer, $product);
+
+        if (!$this->makeOfferCombination($offer, $product, $market, $langId)) {
+            $this->exportOfferPictures($offer, $product, $langId);
+            $market->addOffer($offer);
+        }
+    }
+
+    /**
+     * @param Offer $offer
+     * @param $statusId
+     * @param $useStatus
+     * @param $available
+     */
+    private function exportOfferAvailable($offer, $statusId, $useStatus, $available)
+    {
+        if (!$useStatus) {
+            return;
+        }
+        $offer
+            ->setAvailable($available === 'true')
+            ->setDelivery((bool)$this->getConfig('YA_MARKET_AVAILABLE_DELIVERY', $statusId))
+            ->setPickup((bool)$this->getConfig('YA_MARKET_AVAILABLE_PICKUP', $statusId))
+            ->setStore((bool)$this->getConfig('YA_MARKET_AVAILABLE_STORE', $statusId));
+    }
+
+    /**
+     * @param Offer $offer
+     * @param $product
+     * @param $langId
+     */
+    private function exportOfferPictures($offer, $product, $langId)
+    {
+        $link = Context::getContext()->link->getImageLink($product['id_image'], $product['id_image']);
+        if ($link) {
+            $offer->addPicture(Context::getContext()->link->getImageLink($product['link_rewrite'],
+                $product['id_image']));
+        }
+
+        $images = Image::getImages($langId, $product['id_product']);
+        if (!$images) {
+            return;
+        }
+        foreach ($images as $image) {
+            $offer->addPicture(Context::getContext()->link
+                ->getImageLink($product['link_rewrite'], $image['id_image']));
+        }
+    }
+
+    /**
+     * @param Offer $offer
+     * @param $product
+     */
+    private function exportOfferVat($offer, $product)
+    {
+        if (!$this->getConfig('YA_MARKET_VAT_ENABLED')) {
+            return;
+        }
+        $vatRates = $this->getConfig('YA_MARKET_VAT_LIST', $product['id_tax_rules_group']);
+        if ($vatRates) {
+            $offer->setVat($vatRates);
+        }
+    }
+
+    /**
+     * @param Offer $offer
+     * @param $product
+     * @param $isSimpleType
+     * @param $nameTemplate
+     */
+    private function exportOfferName($offer, $product, $isSimpleType, $nameTemplate)
+    {
+        if (!$isSimpleType) {
+            return;
+        }
+        $name = '';
+        foreach ($nameTemplate as $namePart) {
+            $name .= isset($product[$namePart]) ? $product[$namePart] : $namePart;
+        }
+        $offer->setName($name);
+    }
+
+    /**
+     * @param Offer $offer
+     * @param $product
+     * @param $isExportParams
+     */
+    private function exportOfferParams($offer, $product, $isExportParams)
+    {
+        if (!$isExportParams) {
+            return;
+        }
+        $attributes = $product['features'];
+        foreach ($attributes as $attribute) {
+            $offer->addParameter($attribute['name'], $attribute['value']);
+        }
+    }
+
+    /**
+     * @param Offer $offer
+     * @param $product
+     * @param $categories
+     */
+    private function exportOfferAdditionalCondition(Offer $offer, $product, $categories)
+    {
+        $additionalConditionMap = $this->getAdditionalConditionCategoryMap($categories);
+        $allCategories = Product::getProductCategories($product['id_product']);
+        foreach ($allCategories as $category) {
+            if (!isset($additionalConditionMap[$category])) {
+                continue;
+            }
+            foreach ($additionalConditionMap[$category] as $conditionId) {
+                $tag       = $this->getConfig('YA_MARKET_ADDITIONAL_CONDITION_TAG', $conditionId);
+                $typeValue = $this->getConfig('YA_MARKET_ADDITIONAL_CONDITION_TYPE_VALUE', $conditionId);
+                if ($typeValue === 'static') {
+                    $value = $this->getConfig('YA_MARKET_ADDITIONAL_CONDITION_STATIC_VALUE', $conditionId);
+                } else {
+                    $dataValue = $this->getConfig('YA_MARKET_ADDITIONAL_CONDITION_DATA_VALUE', $conditionId);
+                    $value     = isset($product[$dataValue]) ? $product[$dataValue] : '';
+                }
+                $join = $this->getConfig('YA_MARKET_ADDITIONAL_CONDITION_JOIN', $conditionId);
+
+                if (!empty($tag) && $value !== '') {
+                    $offer->addCustomTag($tag, $value, $join);
+                }
             }
         }
     }
 
-    private function loadYmlProducts(Yml $yml, $categoryId)
+    /**
+     * @param ProductCategory[] $categories
+     * @return array
+     */
+    private function getAdditionalConditionCategoryMap($categories)
     {
-        $languageId = (int)Configuration::get('PS_LANG_DEFAULT');
-        $yamarket_set_combinations = Configuration::get('YA_MARKET_SET_COMBINATIONS');
-        $category = new Category($categoryId);
-        $products = $category->getProducts($languageId, 1, 10000);
-        if (!empty($products)) {
-            foreach ($products as $productInfo) {
-                if ($productInfo['id_category_default'] != $categoryId) {
-                    continue;
+        if (is_null($this->additionalConditionMap)) {
+            $allCategoryIds = array_map(function (ProductCategory $category) {
+                return $category->getId();
+            }, $categories);
+
+            $additionalConditionIds     = array();
+            $additionalConditionMap     = array();
+            $additionalConditionEnabled = (array)$this->getConfig('YA_MARKET_ADDITIONAL_CONDITION_ENABLED');
+            foreach ($additionalConditionEnabled as $id => $enabled) {
+                if ($enabled) {
+                    $additionalConditionIds[] = $id;
                 }
-
-                $data = array();
-                if ($yamarket_set_combinations && !Configuration::get('YA_MARKET_SHORT')) {
-                    $product = new Product($productInfo['id_product'], false, $languageId);
-                    $combinations = $product->getAttributeCombinations($languageId);
-                } else {
-                    $combinations = false;
-                }
-
-                if (is_array($combinations) && count($combinations) > 0) {
-                    $comb_array = array();
-                    foreach ($combinations as $combination) {
-                        $comb_array[$combination['id_product_attribute']]['id_product_attribute']
-                            = $combination['id_product_attribute'];
-                        $comb_array[$combination['id_product_attribute']]['price'] = Product::getPriceStatic(
-                            $productInfo['id_product'],
-                            true,
-                            $combination['id_product_attribute']
-                        );
-
-                        $comb_array[$combination['id_product_attribute']]['reference'] = $combination['reference'];
-                        $comb_array[$combination['id_product_attribute']]['ean13'] = $combination['ean13'];
-                        $comb_array[$combination['id_product_attribute']]['quantity'] = $combination['quantity'];
-                        $comb_array[$combination['id_product_attribute']]['minimal_quantity']
-                            = $combination['minimal_quantity'];
-                        $comb_array[$combination['id_product_attribute']]['weight'] = $combination['weight'];
-                        $comb_array[$combination['id_product_attribute']]['attributes'][$combination['group_name']]
-                            = $combination['attribute_name'];
-                        if (!isset($comb_array[$combination['id_product_attribute']]['comb_url'])) {
-                            $comb_array[$combination['id_product_attribute']]['comb_url'] = '';
-                        }
-                        $comb_array[$combination['id_product_attribute']]['comb_url'] .= '/'.
-                            Tools::str2url(
-                                $combination['id_attribute']."-".$combination['group_name']
-                            ).'-'.str_replace(
-                                Configuration::get('PS_ATTRIBUTE_ANCHOR_SEPARATOR'),
-                                '_',
-                                Tools::str2url(
-                                    str_replace(
-                                        array(',', '.'),
-                                        '-',
-                                        $combination['attribute_name']
-                                    )
-                                )
-                            );
-                    }
-
-                    foreach ($comb_array as $combination) {
-                        $data = $this->makeData($product, $combination);
-                        $available = $data['available'];
-                        unset($data['available']);
-                        if (!empty($data) && $data['price'] != 0) {
-                            $yml->addOffer($data['id'], $data, $available, $data['group_id']);
-                        }
-                    }
-                } else {
-                    $data = $this->makeData($productInfo);
-                    $available = $data['available'];
-                    unset($data['available']);
-                    if (!empty($data) && (int)$data['price'] != 0) {
-                        $yml->addOffer($data['id'], $data, $available);
-                    }
-                }
-                unset($data);
             }
+            if (!empty($additionalConditionIds)) {
+                foreach ($additionalConditionIds as $conditionId) {
+                    $additionalConditionCategoryIds
+                        = $this->getConfig('YA_MARKET_ADDITIONAL_CONDITION_FOR_ALL_CAT', $conditionId)
+                        ? $allCategoryIds
+                        : $this->getConfig('YA_MARKET_ADDITIONAL_CONDITION_CATEGORIES', $conditionId, array());
+                    foreach ($additionalConditionCategoryIds as $category) {
+                        $additionalConditionMap[$category][] = $conditionId;
+                    }
+                }
+            }
+            $this->additionalConditionMap = $additionalConditionMap;
+        }
+
+        return $this->additionalConditionMap;
+    }
+
+    /**
+     * @param Offer $offer
+     * @param $product
+     */
+    private function exportOfferDimensions($offer, $product)
+    {
+        if (!$this->getConfig('YA_MARKET_OFFER_OPTIONS_EXPORT_DIMENSION')) {
+            return;
+        }
+        if ($product['height'] > 0 && $product['depth'] > 0 && $product['width'] > 0) {
+            $offer->setDimensions(number_format($product['depth'], 3, '.', ''),
+                number_format($product['width'], 3, '.', ''),
+                number_format($product['height'], 3, '.', '')
+            );
         }
     }
 
-    private function makeData($product, $combination = false)
+    /**
+     * @param Offer $commonOffer
+     * @param $product
+     * @param YandexMarket $market
+     * @param $langId
+     * @return bool
+     */
+    private function makeOfferCombination($commonOffer, $product, $market, $langId)
     {
-        $params = array();
-        $data = array();
-        $images = array();
-        $id_lang = (int)Configuration::get('PS_LANG_DEFAULT');
-        if ($combination) {
-            $quantity = (int)$combination['quantity'];
-            $url = $product['link'].'#'.$combination['comb_url'];
-            $price =  Tools::ps_round($combination['price'], 2);
-            $reference = $combination['reference'];
-            $id_offer = $product['id_product'].'c'.$combination['id_product_attribute'];
-            $barcode = $combination['ean13'];
-            $images = Image::getImages($id_lang, $product['id_product'], $combination['id_product_attribute']);
+        if (!$this->getConfig('YA_MARKET_COMBINATION_EXPORT_ALL')) {
+            return false;
+        }
+
+        $productInstance = new Product($product['id_product'], false, $langId);
+        $combinations = $productInstance->getAttributeCombinations($langId);
+
+        $exports = array();
+        foreach ($combinations as $combination) {
+            $attrId = $combination['id_product_attribute'];
+
+            $exports[$attrId]['id_product_attribute'] = $attrId;
+
+            $exports[$attrId]['price'] = Product::getPriceStatic($product['id_product'], true, $attrId);
+
+            $exports[$attrId]['attributes'][$combination['group_name']] = $combination['attribute_name'];
+
+            if (!isset($exports[$attrId]['url'])) {
+                $exports[$attrId]['url'] = '';
+            }
+            $exports[$attrId]['url'] .= '/'
+                .Tools::str2url($combination['id_attribute'].'-'.$combination['group_name']).'-'
+                .str_replace(Configuration::get('PS_ATTRIBUTE_ANCHOR_SEPARATOR'), '_',
+                    Tools::str2url(str_replace(array(',', '.'), '-', $combination['attribute_name'])));
+        }
+
+        foreach ($exports as $combination) {
+            $offer = clone $commonOffer;
+            $offer->setId($product['id_product'].'c'.$combination['id_product_attribute']);
+            $offer->setGroupId($product['id_product']);
+            $offer->setPrice(Tools::ps_round($combination['price'], 2));
+            $offer->setUrl($offer->getUrl().'#'.$combination['url']);
+            foreach ($combination['attributes'] as $name => $value) {
+                $offer->addParameter($name, $value);
+            }
+
+            $images = Image::getImages($langId, $product['id_product'], $combination['id_product_attribute']);
             if (empty($images)) {
-                $images = Image::getImages($id_lang, $product['id_product']);
+                $images = Image::getImages($langId, $product['id_product']);
             }
-
-            if ((int)$combination['weight'] > 0) {
-                $data['weight'] = $combination['weight'];
-                $data['weight'] = number_format($data['weight'], 2);
-            } else {
-                $data['weight'] = $product['weight'];
-                $data['weight'] = number_format($data['weight'], 2);
-            }
-
-            if ($combination['minimal_quantity'] > 1) {
-                $data['sales_notes'] = $this->module->l('Minimum order').' '.$combination['minimal_quantity'].' '.
-                    $this->module->l('of the product (s)');
-            }
-            $data['group_id'] = $product['id_product'];
-        } else {
-            $quantity = (int)$product['quantity'];
-            $url = $product['link'];
-            $price =  Tools::ps_round($product['price'], 2);
-            $reference = $product['reference'];
-            $id_offer = $product['id_product'];
-            $barcode = $product['ean13'];
-            $images = Image::getImages($id_lang, $product['id_product']);
-            if ((int)$product['weight'] > 0) {
-                $data['weight'] = $product['weight'];
-                $data['weight'] = number_format($data['weight'], 2);
-            }
-
-            if ($product['minimal_quantity'] > 1) {
-                $data['sales_notes'] = $this->module->l('Minimum order').' '.$product['minimal_quantity'].' '.
-                    $this->module->l('of the product (s)');
-            }
-        }
-
-        if (Configuration::get('YA_MARKET_SET_AVAILABLE')) {
-            if ($quantity < 1) {
-                return;
-            }
-        }
-
-        $available = 'false';
-        if ($this->yamarket_availability == 0) {
-            $available = 'true';
-        } elseif ($this->yamarket_availability == 1) {
-            if ($quantity > 0) {
-                $available = 'true';
-            }
-        } elseif ($this->yamarket_availability == 2) {
-            $available = 'true';
-            if ($quantity == 0) {
-                return;
-            }
-        }
-
-
-        if ($product['features']) {
-            foreach ($product['features'] as $feature) {
-                $params[$feature['name']] = $feature['value'];
-            }
-        }
-        if ($combination) {
-            $params = array_merge($params, $combination['attributes']);
-        }
-
-        $defaultCurrency = new Currency(Configuration::get('PS_CURRENCY_DEFAULT'));
-        $data['available'] = $available;
-        $data['url'] = str_replace('https://', 'http://', $url);
-        $data['id'] = $id_offer;
-        $data['currencyId'] = $defaultCurrency->iso_code;
-        $data['price'] = $price;
-        $data['categoryId'] = $product['id_category_default'];
-
-        /*-------------------------------------------------------------------*/
-        preg_match_all('/([а-яё]+)/iu', $data['url'], $urlarr, PREG_SET_ORDER);
-        if (!empty($urlarr)) {
-            foreach ($urlarr as $ua) {
-                $data['url'] = str_replace($ua[0], rawurlencode($ua[0]), $data['url']);
-            }
-        }
-        /*-------------------------------------------------------------------*/
-        foreach ($images as $i) {
-            $uri = Context::getContext()->link->getImageLink($product['link_rewrite'], $i['id_image']);
-            preg_match_all('/([а-яё]+)/iu', $uri, $marr, PREG_SET_ORDER);
-            if (!empty($marr)) {
-                foreach ($marr as $m) {
-                    $uri = str_replace($m[0], rawurlencode($m[0]), $uri);
+            if (!empty($images)) {
+                foreach ($images as $image) {
+                    $url = Context::getContext()->link->getImageLink($product['link_rewrite'], $image['id_image']);
+                    $offer->addPicture($url);
                 }
             }
 
-            $data['picture'][] = $uri;
+            $market->addOffer($offer);
         }
 
-        if (!Configuration::get('YA_MARKET_SHORT')) {
-            $data['model'] = $product['name'];
-            if (Configuration::get('YA_MARKET_SET_DIMENSIONS')
-                && $product['height'] > 0
-                && $product['depth'] > 0
-                && $product['width']
-            ) {
-                $data['dimensions'] = number_format($product['depth'], 3, '.', '').
-                    '/'.number_format($product['width'], 3, '.', '')
-                    .'/'.number_format($product['height'], 3, '.', '');
-            }
-            if ($product['is_virtual']) {
-                $data['downloadable'] = 'true';
-            } else {
-                $data['downloadable'] = 'false';
-            }
-            $data['param'] = $params;
-        } else {
-            $data['name'] = $product['name'];
-        }
-        if (Configuration::get('YA_MARKET_DESC_TYPE')) {
-            $data['description'] = $product['description_short'];
-        } else {
-            $data['description'] = $product['description'];
-        }
+        return true;
+    }
 
-        $data['vendor'] = $product['manufacturer_name'];
-        $data['barcode'] = $barcode;
-        $data['delivery'] = 'false';
-        $data['pickup'] = 'false';
-        $data['store'] = 'false';
-        $data['vendorCode'] = $reference;
-        if (Configuration::get('YA_MARKET_SET_DOST')) {
-            $data['delivery'] = 'true';
-        }
-        if (Configuration::get('YA_MARKET_SET_SAMOVIVOZ')) {
-            $data['pickup'] = 'true';
-        }
-        if (Configuration::get('YA_MARKET_SET_ROZNICA')) {
-            $data['store'] = 'true';
-        }
-
-        return $data;
+    /**
+     * @param $key
+     * @param $index
+     * @param null $default
+     * @return mixed
+     */
+    protected function getConfig($key, $index = null, $default = null)
+    {
+        return ym_get_settings($this->settings, $key, $index, $default);
     }
 }
