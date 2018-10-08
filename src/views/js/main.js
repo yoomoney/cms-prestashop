@@ -31,7 +31,26 @@ $(document).ready(function () {
     if (tmp.length) {
         bindReceiptTrigger(tmp.parents('.form-group'));
     }
+    $('.yandex_money_nps_link').on('click', yandex_money_nps_goto);
+    $('.ya_nps_block button.close').on('click', yandex_money_nps_close);
 });
+
+function yandex_money_nps_close() {
+    const link = $('.yandex_money_nps_link');
+    $.post('ajax-tab.php', {
+        ajax: '1',
+        token: link.data('token'),
+        controller: link.data('controller'),
+        action: 'voteNps',
+    }).done(function () {
+        $('.ya_nps_block').slideUp();
+    });
+}
+
+function yandex_money_nps_goto() {
+    window.open('https://yandex.ru/poll/97ptquHpcjXryy3SyRNkug');
+    yandex_money_nps_close();
+}
 
 function bindModeTrigger(root) {
     const paymentMethodWrapper = jQuery('.payment-mode-shop').parents('.form-group');

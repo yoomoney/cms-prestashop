@@ -37,6 +37,7 @@
     </div>
     <div id="moneyorg">
         <div class="errors">{$org_status|escape:'quotes':'UTF-8'}</div>
+        <div class="ya_nps_block">{$nps_block}</div>
         <p>{l s='To operate this module, you need to connect your store' mod='yandexmodule'} <a target="_blank" href="https://kassa.yandex.ru/">{l s='to Yandex.Checkout' mod='yandexmodule'}</a>.</p>
         {$money_org}
     </div>

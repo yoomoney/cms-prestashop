@@ -391,6 +391,32 @@ class KassaModel extends AbstractPaymentModel
     }
 
     /**
+     * @param string $isoCode
+     * @return string
+     */
+    public function getNpsBlock($isoCode)
+    {
+        if ($isoCode !== 'ru') {
+            return '';
+        }
+
+        if (substr(Configuration::get('YA_KASSA_PASSWORD'), 0, 5) !== 'live_') {
+            return '';
+        }
+
+        if (time() < Configuration::get('YA_NPS_VOTE_TIME') + YandexModule::NPS_RETRY_AFTER_DAYS * 86400) {
+            return '';
+        }
+
+        $token = Tools::getAdminTokenLite(YandexModule::ADMIN_CONTROLLER);
+
+        return $this->module->displayConfirmation('Помогите нам улучшить модуль Яндекс.Кассы — ответьте на 
+            <a href="#" onclick="return false;" class="yandex_money_nps_link"
+            data-controller="'.YandexModule::ADMIN_CONTROLLER.'"
+            data-token="'.$token.'">один вопрос</a>');
+    }
+
+    /**
      * @param \Smarty $smarty
      *
      * @return null|string

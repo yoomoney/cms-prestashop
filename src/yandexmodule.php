@@ -14,6 +14,8 @@ class YandexModule extends PaymentModule
 {
     const ADMIN_CONTROLLER = 'AdminYandexModule';
 
+    const NPS_RETRY_AFTER_DAYS = 90;
+
     private $p2p_status = '';
     private $org_status = '';
     private $market_status = '';
@@ -21,6 +23,7 @@ class YandexModule extends PaymentModule
     private $billing_status = '';
     private $metrika_valid;
     private $update_status;
+    private $nps_block = '';
 
     /**
      * @var YandexMoneyModule\Models\KassaModel
@@ -86,7 +89,7 @@ class YandexModule extends PaymentModule
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.1.0';
+        $this->version         = '1.1.1';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -255,6 +258,7 @@ class YandexModule extends PaymentModule
             $this->market_status = $this->getMarketModel()->validateOptions();
             $this->update_status = $this->sendStatistics();
         }
+        $this->nps_block = $this->getKassaModel()->getNpsBlock($this->context->language->iso_code);
     }
 
     public function sendStatistics()
@@ -425,6 +429,7 @@ class YandexModule extends PaymentModule
                 $vars_billing,
                 $forms->getBillingForm($this->getBillingModel())
             ),
+            'nps_block'           => $this->nps_block,
         ));
 
         return $this->display(__FILE__, 'admin.tpl');
