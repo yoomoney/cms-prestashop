@@ -34,6 +34,9 @@ class AdminYandexModuleController extends ModuleAdminController
             case 'cancelPayment':
                 $this->cancelPayment();
                 break;
+            case 'voteNps':
+                $this->voteNps();
+                break;
         }
     }
 
@@ -136,5 +139,12 @@ class AdminYandexModuleController extends ModuleAdminController
         echo json_encode(array('result' => 'success'));
     }
 
+    public function voteNps()
+    {
+        Configuration::UpdateValue('YA_NPS_VOTE_TIME', time());
+
+        header('Content-Type: application/json');
+        echo json_encode(array('result' => 'success'));
+    }
 
 }
