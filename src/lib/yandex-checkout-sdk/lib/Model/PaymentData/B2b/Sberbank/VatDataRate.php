@@ -24,25 +24,28 @@
  * THE SOFTWARE.
  */
 
-namespace YandexCheckout\Model;
+namespace YandexCheckout\Model\PaymentData\B2b\Sberbank;
 
 use YandexCheckout\Common\AbstractEnum;
 
 /**
- * Статус платежа
- *
- * @deprecated Класс будет удалён в одной из будущих версий, используйте класс \YandexCheckout\Model\PaymentStatus
- *
+ * PaymentDataB2bSberbankVatDataRate - Налоговая ставка НДС
+ * |Код|Описание|
+ * --- | ---
+ * |7|7%|
+ * |10|10%|
+ * |18|18%|
  */
-class Status extends AbstractEnum
+class VatDataRate extends AbstractEnum
 {
-    const SUCCEEDED = 'succeeded';
-    const PENDING = 'pending';
-    const CANCELED = 'canceled';
+    const RATE_7  = '7';
+    const RATE_10 = '10';
+    const RATE_18 = '18';
 
     protected static $validValues = array(
-        self::SUCCEEDED => true,
-        self::PENDING => true,
-        self::CANCELED => true,
+        self::RATE_7  => true,
+        self::RATE_10 => true,
+        self::RATE_18 => true,
     );
+
 }

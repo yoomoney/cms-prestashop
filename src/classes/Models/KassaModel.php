@@ -60,25 +60,34 @@ class KassaModel extends AbstractPaymentModel
     private $onHoldStatusId;
     private $cancelStatusId;
     private $apiClient;
+    private $defaultPaymentMode;
+    private $defaultPaymentSubject;
+    private $defaultDeliveryPaymentMode;
+    private $defaultDeliveryPaymentSubject;
+
 
     public function initConfiguration()
     {
-        $this->enabled                = Configuration::get('YA_KASSA_ACTIVE') == '1';
-        $this->shopId                 = Configuration::get('YA_KASSA_SHOP_ID');
-        $this->password               = Configuration::get('YA_KASSA_PASSWORD');
-        $this->epl                    = Configuration::get('YA_KASSA_PAYMENT_MODE') == 'kassa';
-        $this->showYandexButton       = Configuration::get('YA_KASSA_PAY_LOGO_ON') == 'on';
-        $this->showInstallmentsButton = Configuration::get('YA_KASSA_INSTALLMENTS_BUTTON_ON') == 'on';
-        $this->sendReceipt            = Configuration::get('YA_KASSA_SEND_RECEIPT') == '1';
-        $this->defaultTaxRate         = (int)Configuration::get('YA_KASSA_DEFAULT_TAX_RATE');
-        $this->minimumAmount          = (float)Configuration::get('YA_KASSA_MIN');
-        $this->debugLog               = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
-        $this->createStatusId         = Configuration::get('PS_OS_PREPARATION');
-        $this->successStatusId        = (int)Configuration::get('YA_KASSA_SUCCESS_STATUS_ID');
-        $this->enableHoldMode         = Configuration::get('YA_KASSA_ENABLE_HOLD_MODE_ON') === 'on';
-        $this->onHoldStatusId         = (int)Configuration::get('YA_KASSA_ON_HOLD_STATUS_ID');
-        $this->cancelStatusId         = (int)Configuration::get('YA_KASSA_CANCEL_STATUS_ID');
-        $this->paymentDescription     = Configuration::get('YA_KASSA_PAYMENT_DESCRIPTION');
+        $this->enabled                       = Configuration::get('YA_KASSA_ACTIVE') == '1';
+        $this->shopId                        = Configuration::get('YA_KASSA_SHOP_ID');
+        $this->password                      = Configuration::get('YA_KASSA_PASSWORD');
+        $this->epl                           = Configuration::get('YA_KASSA_PAYMENT_MODE') == 'kassa';
+        $this->showYandexButton              = Configuration::get('YA_KASSA_PAY_LOGO_ON') == 'on';
+        $this->showInstallmentsButton        = Configuration::get('YA_KASSA_INSTALLMENTS_BUTTON_ON') == 'on';
+        $this->sendReceipt                   = Configuration::get('YA_KASSA_SEND_RECEIPT') == '1';
+        $this->defaultTaxRate                = (int)Configuration::get('YA_KASSA_DEFAULT_TAX_RATE');
+        $this->minimumAmount                 = (float)Configuration::get('YA_KASSA_MIN');
+        $this->debugLog                      = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
+        $this->createStatusId                = Configuration::get('PS_OS_PREPARATION');
+        $this->successStatusId               = (int)Configuration::get('YA_KASSA_SUCCESS_STATUS_ID');
+        $this->enableHoldMode                = Configuration::get('YA_KASSA_ENABLE_HOLD_MODE_ON') === 'on';
+        $this->onHoldStatusId                = (int)Configuration::get('YA_KASSA_ON_HOLD_STATUS_ID');
+        $this->cancelStatusId                = (int)Configuration::get('YA_KASSA_CANCEL_STATUS_ID');
+        $this->paymentDescription            = Configuration::get('YA_KASSA_PAYMENT_DESCRIPTION');
+        $this->defaultPaymentMode            = Configuration::get('YA_KASSA_DEFAULT_PAYMENT_MODE');
+        $this->defaultPaymentSubject         = Configuration::get('YA_KASSA_DEFAULT_PAYMENT_SUBJECT');
+        $this->defaultDeliveryPaymentMode    = Configuration::get('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE');
+        $this->defaultDeliveryPaymentSubject = Configuration::get('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT');
 
         if (!$this->paymentDescription) {
             $this->paymentDescription = $this->module->l('Payment for order No. %cart_id%');
@@ -157,7 +166,9 @@ class KassaModel extends AbstractPaymentModel
         if ($this->availablePaymentMethods === null) {
             $this->availablePaymentMethods = array();
             foreach (PaymentMethodType::getEnabledValues() as $value) {
-                $this->availablePaymentMethods[$value] = 'YA_KASSA_PAYMENT_'.Tools::strtoupper($value);
+                if ($value !== PaymentMethodType::B2B_SBERBANK) {
+                    $this->availablePaymentMethods[$value] = 'YA_KASSA_PAYMENT_'.Tools::strtoupper($value);
+                }
             }
         }
 
@@ -339,6 +350,18 @@ class KassaModel extends AbstractPaymentModel
         $this->cancelStatusId = (int)Tools::getValue('YA_KASSA_CANCEL_STATUS_ID');
         Configuration::UpdateValue('YA_KASSA_CANCEL_STATUS_ID', $this->cancelStatusId);
 
+        $this->defaultPaymentMode = Tools::getValue('YA_KASSA_DEFAULT_PAYMENT_MODE');
+        Configuration::UpdateValue('YA_KASSA_DEFAULT_PAYMENT_MODE', $this->defaultPaymentMode);
+
+        $this->defaultPaymentSubject = Tools::getValue('YA_KASSA_DEFAULT_PAYMENT_SUBJECT');
+        Configuration::UpdateValue('YA_KASSA_DEFAULT_PAYMENT_SUBJECT', $this->defaultPaymentSubject);
+
+        $this->defaultDeliveryPaymentMode = Tools::getValue('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE');
+        Configuration::UpdateValue('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE', $this->defaultDeliveryPaymentMode);
+
+        $this->defaultDeliveryPaymentSubject = Tools::getValue('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT');
+        Configuration::UpdateValue('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT', $this->defaultDeliveryPaymentSubject);
+
         foreach ($this->getTaxesArray() as $taxRow) {
             Configuration::UpdateValue($taxRow, Tools::getValue($taxRow));
         }
@@ -392,6 +415,7 @@ class KassaModel extends AbstractPaymentModel
 
     /**
      * @param string $isoCode
+     *
      * @return string
      */
     public function getNpsBlock($isoCode)
@@ -544,6 +568,7 @@ class KassaModel extends AbstractPaymentModel
 
     /**
      * @param $orderId
+     *
      * @return null|PaymentInterface
      */
     public function findOrderPayment($orderId)
@@ -773,13 +798,15 @@ class KassaModel extends AbstractPaymentModel
         foreach ($products as $product) {
             $taxIndex = 'YA_NALOG_STAVKA_'.Product::getIdTaxRulesGroupByIdProduct($product['id_product']);
             $taxId    = isset($taxValue[$taxIndex]) ? $taxValue[$taxIndex] : $this->getDefaultTaxRate();
-            $builder->addReceiptItem($product['name'], $product['price_wt'], $product['cart_quantity'], $taxId);
+            $builder->addReceiptItem($product['name'], $product['price_wt'], $product['cart_quantity'], $taxId,
+                $this->defaultPaymentMode, $this->defaultPaymentSubject);
         }
 
         if ($carrier->id && $cart->getPackageShippingCost()) {
             $taxIndex = 'YA_NALOG_STAVKA_'.Carrier::getIdTaxRulesGroupByIdCarrier($carrier->id);
             $taxId    = isset($taxValue[$taxIndex]) ? $taxValue[$taxIndex] : $this->getDefaultTaxRate();
-            $builder->addReceiptShipping($carrier->name, $cart->getPackageShippingCost(), $taxId);
+            $builder->addReceiptShipping($carrier->name, $cart->getPackageShippingCost(), $taxId,
+                $this->defaultDeliveryPaymentMode, $this->defaultDeliveryPaymentSubject);
         }
     }
 
@@ -919,6 +946,7 @@ class KassaModel extends AbstractPaymentModel
 
     /**
      * @param string $paymentMethod
+     *
      * @return bool
      */
     private function getCaptureValue($paymentMethod)
@@ -928,5 +956,34 @@ class KassaModel extends AbstractPaymentModel
         }
 
         return !in_array($paymentMethod, array('', PaymentMethodType::BANK_CARD));
+    }
+
+    public function getDefaultPaymentMode()
+    {
+        return $this->defaultPaymentMode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefaultPaymentSubject()
+    {
+        return $this->defaultPaymentSubject;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefaultDeliveryPaymentMode()
+    {
+        return $this->defaultDeliveryPaymentMode;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefaultDeliveryPaymentSubject()
+    {
+        return $this->defaultDeliveryPaymentSubject;
     }
 }

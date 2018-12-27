@@ -26,23 +26,26 @@
 
 namespace YandexCheckout\Model;
 
-use YandexCheckout\Common\AbstractEnum;
-
 /**
- * Статус платежа
+ * Interface AuthorizationDetailsInterface - Данные об авторизации платежа
  *
- * @deprecated Класс будет удалён в одной из будущих версий, используйте класс \YandexCheckout\Model\PaymentStatus
+ * @package YandexCheckout\Model
  *
+ * @property-read string $rrn Retrieval Reference Number — уникальный идентификатор транзакции в системе эмитента
+ * @property-read string $authCode Код авторизации банковской карты
  */
-class Status extends AbstractEnum
+interface AuthorizationDetailsInterface
 {
-    const SUCCEEDED = 'succeeded';
-    const PENDING = 'pending';
-    const CANCELED = 'canceled';
+    /**
+     * Возвращает Retrieval Reference Number — уникальный идентификатор транзакции в системе эмитента
+     * @return string|null Уникальный идентификатор транзакции
+     */
+    function getRrn();
 
-    protected static $validValues = array(
-        self::SUCCEEDED => true,
-        self::PENDING => true,
-        self::CANCELED => true,
-    );
+    /**
+     * Возвращает код авторизации банковской карты
+     * @return string|null Код авторизации банковской карты
+     */
+    function getAuthCode();
+
 }

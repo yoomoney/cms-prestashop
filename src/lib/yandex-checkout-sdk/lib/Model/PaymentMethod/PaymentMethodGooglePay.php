@@ -24,25 +24,19 @@
  * THE SOFTWARE.
  */
 
-namespace YandexCheckout\Model;
+namespace YandexCheckout\Model\PaymentMethod;
 
-use YandexCheckout\Common\AbstractEnum;
+use YandexCheckout\Model\PaymentMethodType;
 
 /**
- * Статус платежа
- *
- * @deprecated Класс будет удалён в одной из будущих версий, используйте класс \YandexCheckout\Model\PaymentStatus
- *
+ * PaymentMethodGooglePay
+ * Объект, описывающий метод оплаты, при оплате через Google Pay
+ * @property string $type Тип объекта
  */
-class Status extends AbstractEnum
+class PaymentMethodGooglePay extends AbstractPaymentMethod
 {
-    const SUCCEEDED = 'succeeded';
-    const PENDING = 'pending';
-    const CANCELED = 'canceled';
-
-    protected static $validValues = array(
-        self::SUCCEEDED => true,
-        self::PENDING => true,
-        self::CANCELED => true,
-    );
+    public function __construct()
+    {
+        $this->_setType(PaymentMethodType::GOOGLE_PAY);
+    }
 }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The MIT License
  *
@@ -24,25 +23,28 @@
  * THE SOFTWARE.
  */
 
-namespace YandexCheckout\Model;
+namespace YandexCheckout\Model\Receipt;
+
 
 use YandexCheckout\Common\AbstractEnum;
 
-/**
- * Статус платежа
- *
- * @deprecated Класс будет удалён в одной из будущих версий, используйте класс \YandexCheckout\Model\PaymentStatus
- *
- */
-class Status extends AbstractEnum
+class PaymentMode extends AbstractEnum
 {
-    const SUCCEEDED = 'succeeded';
-    const PENDING = 'pending';
-    const CANCELED = 'canceled';
+    const FULL_PREPAYMENT = 'full_prepayment';
+    const PARTIAL_PREPAYMENT = 'partial_prepayment';
+    const ADVANCE = 'advance';
+    const FULL_PAYMENT = 'full_payment';
+    const PARTIAL_PAYMENT = 'partial_payment';
+    const CREDIT = 'credit';
+    const CREDIT_PAYMENT = 'credit_payment';
 
     protected static $validValues = array(
-        self::SUCCEEDED => true,
-        self::PENDING => true,
-        self::CANCELED => true,
+        self::FULL_PREPAYMENT    => true,
+        self::PARTIAL_PREPAYMENT => true,
+        self::ADVANCE            => true,
+        self::FULL_PAYMENT       => true,
+        self::PARTIAL_PAYMENT    => true,
+        self::CREDIT             => true,
+        self::CREDIT_PAYMENT     => true,
     );
 }

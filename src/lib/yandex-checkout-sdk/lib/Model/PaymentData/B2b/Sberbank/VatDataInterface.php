@@ -24,25 +24,37 @@
  * THE SOFTWARE.
  */
 
-namespace YandexCheckout\Model;
+namespace YandexCheckout\Model\PaymentData\B2b\Sberbank;
 
-use YandexCheckout\Common\AbstractEnum;
+use YandexCheckout\Model\AmountInterface;
 
 /**
- * Статус платежа
+ * Interface VatDataInterface
  *
- * @deprecated Класс будет удалён в одной из будущих версий, используйте класс \YandexCheckout\Model\PaymentStatus
+ * @package YandexCheckout\Model
  *
+ * @property-read string $type Способ расчёта НДС
+ * @property-read string $rate Данные об НДС в случае, если сумма НДС включена в сумму платежа
+ * @property-read AmountInterface $amount Сумма НДС
  */
-class Status extends AbstractEnum
+interface VatDataInterface
 {
-    const SUCCEEDED = 'succeeded';
-    const PENDING = 'pending';
-    const CANCELED = 'canceled';
+    /**
+     * Возвращает способ расчёта НДС
+     * @return string Способ расчёта НДС
+     */
+    function getType();
 
-    protected static $validValues = array(
-        self::SUCCEEDED => true,
-        self::PENDING => true,
-        self::CANCELED => true,
-    );
+    /**
+     * Возвращает данные об НДС
+     * @return string Данные об НДС
+     */
+    function getRate();
+
+    /**
+     * Возвращает сумму НДС
+     * @return AmountInterface Сумма НДС
+     */
+    function getAmount();
 }
+

@@ -26,23 +26,26 @@
 
 namespace YandexCheckout\Model;
 
-use YandexCheckout\Common\AbstractEnum;
-
 /**
- * Статус платежа
+ * Interface CancellationDetailsInterface
  *
- * @deprecated Класс будет удалён в одной из будущих версий, используйте класс \YandexCheckout\Model\PaymentStatus
+ * @package YandexCheckout\Model
  *
+ * @property-read string $party Участник процесса платежа, который принял решение об отмене транзакции.
+ * @property-read string $reason Причина отмены платежа.
  */
-class Status extends AbstractEnum
+interface CancellationDetailsInterface
 {
-    const SUCCEEDED = 'succeeded';
-    const PENDING = 'pending';
-    const CANCELED = 'canceled';
+    /**
+     * Возвращает участника процесса платежа, который принял решение об отмене транзакции
+     * @return string Участник процесса платежа
+     */
+    function getParty();
 
-    protected static $validValues = array(
-        self::SUCCEEDED => true,
-        self::PENDING => true,
-        self::CANCELED => true,
-    );
+    /**
+     * Возвращает причину отмены платежа
+     * @return string Причина отмены платежа
+     */
+    function getReason();
+
 }
