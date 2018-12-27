@@ -32,10 +32,13 @@ use YandexCheckout\Model\LegInterface;
 use YandexCheckout\Model\PassengerInterface;
 use YandexCheckout\Model\PaymentData\AbstractPaymentData;
 use YandexCheckout\Model\PaymentData\PaymentDataAlfabank;
+use YandexCheckout\Model\PaymentData\PaymentDataB2bSberbank;
 use YandexCheckout\Model\PaymentData\PaymentDataBankCard;
+use YandexCheckout\Model\PaymentData\PaymentDataGooglePay;
 use YandexCheckout\Model\PaymentData\PaymentDataSberbank;
 use YandexCheckout\Model\PaymentData\PaymentDataYandexWallet;
 use YandexCheckout\Model\PaymentMethodType;
+use YandexCheckout\Model\ReceiptItem;
 
 /**
  * Класс сериалайзера объекта запроса к API на проведение платежа
@@ -55,7 +58,7 @@ class CreatePaymentRequestSerializer
         PaymentMethodType::BANK_CARD      => 'serializePaymentDataBankCard',
         PaymentMethodType::YANDEX_MONEY   => 'serializePaymentDataYandexWallet',
         PaymentMethodType::APPLE_PAY      => 'serializePaymentDataMobile',
-        PaymentMethodType::ANDROID_PAY    => 'serializePaymentDataMobile',
+        PaymentMethodType::GOOGLE_PAY     => 'serializePaymentDataGooglePay',
         PaymentMethodType::SBERBANK       => 'serializePaymentDataSberbank',
         PaymentMethodType::ALFABANK       => 'serializePaymentDataAlfabank',
         PaymentMethodType::WEBMONEY       => 'serializePaymentData',
@@ -63,6 +66,7 @@ class CreatePaymentRequestSerializer
         PaymentMethodType::CASH           => 'serializePaymentDataMobilePhone',
         PaymentMethodType::MOBILE_BALANCE => 'serializePaymentDataMobilePhone',
         PaymentMethodType::INSTALLMENTS   => 'serializePaymentData',
+        PaymentMethodType::B2B_SBERBANK   => 'serializePaymentDataB2BSberbank',
     );
 
     public function serialize(CreatePaymentRequestInterface $request)
@@ -77,17 +81,27 @@ class CreatePaymentRequestSerializer
             $receipt = $request->getReceipt();
             if ($receipt->notEmpty()) {
                 $result['receipt'] = array();
+                /** @var ReceiptItem $item */
                 foreach ($receipt->getItems() as $item) {
-                    $vatId = $item->getVatCode();
-                    if ($vatId === null) {
-                        $vatId = $receipt->getTaxSystemCode();
-                    }
-                    $result['receipt']['items'][] = array(
-                        'description' => $item->getDescription(),
-                        'amount'      => $this->serializeAmount($item->getPrice()),
-                        'quantity'    => $item->getQuantity(),
-                        'vat_code'    => $vatId,
+                    $itemArray = array(
+                        'description'     => $item->getDescription(),
+                        'amount'          => array(
+                            'value'    => $item->getPrice()->getValue(),
+                            'currency' => $item->getPrice()->getCurrency(),
+                        ),
+                        'quantity'        => $item->getQuantity(),
+                        'vat_code'        => $item->getVatCode(),
                     );
+
+                    if ($item->getPaymentSubject()) {
+                        $itemArray['payment_subject'] = $item->getPaymentSubject();
+                    }
+
+                    if ($item->getPaymentMode()) {
+                        $itemArray['payment_mode'] = $item->getPaymentMode();
+                    }
+
+                    $result['receipt']['items'][] = $itemArray;
                 }
                 $value = $receipt->getEmail();
                 if (!empty($value)) {
@@ -258,6 +272,56 @@ class CreatePaymentRequestSerializer
         );
         if ($paymentData->getPhone() !== null) {
             $result['phone'] = $paymentData->getPhone();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param PaymentDataGooglePay $paymentData
+     *
+     * @return array
+     */
+    private function serializePaymentDataGooglePay(PaymentDataGooglePay $paymentData)
+    {
+        $result = array(
+            'type'                  => $paymentData->getType(),
+            'payment_method_token'  => $paymentData->getPaymentMethodToken(),
+            'google_transaction_id' => $paymentData->getGoogleTransactionId(),
+        );
+
+        return $result;
+    }
+
+    /**
+     * @param PaymentDataB2bSberbank $paymentData
+     *
+     * @return array
+     */
+    private function serializePaymentDataB2BSberbank(PaymentDataB2bSberbank $paymentData)
+    {
+        $result = array(
+            'type' => $paymentData->getType(),
+        );
+
+        if ($paymentData->getPaymentPurpose() !== null) {
+            $result['payment_purpose'] = $paymentData->getPaymentPurpose();
+        }
+
+        if ($paymentData->getVatData() !== null) {
+            $vatData = array(
+                'type' => $paymentData->getVatData()->getType(),
+            );
+
+            if ($paymentData->getVatData()->getRate() !== null) {
+                $vatData['rate'] = $paymentData->getVatData()->getRate();
+            }
+
+            if ($paymentData->getVatData()->getAmount() !== null) {
+                $vatData['amount'] = $this->serializeAmount($paymentData->getVatData()->getAmount());
+            }
+
+            $result['vat_data'] = $vatData;
         }
 
         return $result;

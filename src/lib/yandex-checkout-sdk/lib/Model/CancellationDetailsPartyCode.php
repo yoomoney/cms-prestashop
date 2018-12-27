@@ -29,20 +29,29 @@ namespace YandexCheckout\Model;
 use YandexCheckout\Common\AbstractEnum;
 
 /**
- * Статус платежа
- *
- * @deprecated Класс будет удалён в одной из будущих версий, используйте класс \YandexCheckout\Model\PaymentStatus
- *
+ * CancellationDetailsPartyCode - Возможные инициаторы отмены платежа
  */
-class Status extends AbstractEnum
+class CancellationDetailsPartyCode extends AbstractEnum
 {
-    const SUCCEEDED = 'succeeded';
-    const PENDING = 'pending';
-    const CANCELED = 'canceled';
+    /**
+     * Продавец товаров и услуг
+     */
+    const MERCHANT = 'merchant';
+
+    /**
+     * Яндекс.Касса
+     */
+    const YANDEX_CHECKOUT = 'yandex_checkout';
+
+    /**
+     * «Внешние» участники платежного процесса (например, эмитент, сторонний платежный сервис)
+     */
+    const PAYMENT_NETWORK = 'payment_network';
+
 
     protected static $validValues = array(
-        self::SUCCEEDED => true,
-        self::PENDING => true,
-        self::CANCELED => true,
+        self::MERCHANT        => true,
+        self::YANDEX_CHECKOUT => true,
+        self::PAYMENT_NETWORK => true,
     );
 }
