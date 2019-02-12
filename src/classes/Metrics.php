@@ -155,8 +155,9 @@ class Metrics
      */
     public function sendResponse($to, $headers, $params, $type, $pretty = 1)
     {
+        $headers[] = 'Authorization: OAuth '.$this->token;
         $response = $this->post(
-            $this->url_api.$to.'?pretty='.$pretty.'&oauth_token='.$this->token,
+            $this->url_api.$to.'?pretty='.$pretty,
             $headers,
             $params,
             $type
@@ -207,17 +208,17 @@ class Metrics
                 break;
             case 'POST':
                 $headers[] = 'Content-Type: application/x-www-form-urlencoded';
-                $curlOpt[CURLOPT_HTTPHEADER] = $headers;
                 $curlOpt[CURLOPT_POST] = true;
                 $curlOpt[CURLOPT_POSTFIELDS] = http_build_query($params);
                 break;
             case 'POSTJSON':
                 $headers[] = 'Content-Type: application/x-yametrika+json';
-                $curlOpt[CURLOPT_HTTPHEADER] = $headers;
+
                 $curlOpt[CURLOPT_POST] = true;
                 $curlOpt[CURLOPT_POSTFIELDS] = Tools::jsonEncode($params);
                 break;
         }
+        $curlOpt[CURLOPT_HTTPHEADER] = $headers;
         $curl = curl_init($url);
         curl_setopt_array($curl, $curlOpt);
         $rbody = curl_exec($curl);
