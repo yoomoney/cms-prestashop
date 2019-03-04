@@ -191,6 +191,7 @@ class KassaModel extends AbstractPaymentModel
                 PaymentMethodType::SBERBANK       => $this->module->l('Sberbank Online'),
                 PaymentMethodType::ALFABANK       => $this->module->l('Alfa-Click'),
                 PaymentMethodType::QIWI           => $this->module->l('QIWI Wallet'),
+                PaymentMethodType::TINKOFF_BANK   => $this->module->l('Интернет-банк Тинькофф'),
                 PaymentMethodType::INSTALLMENTS   => $this->module->l('Installments (%s Р per month)'),
             );
 

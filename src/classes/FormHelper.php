@@ -310,6 +310,7 @@ class FormHelper
             PaymentMethodType::CASH           => $this->l('Cash via payment kiosks'),
             PaymentMethodType::MOBILE_BALANCE => $this->l('Direct carrier billing'),
             PaymentMethodType::ALFABANK       => $this->l('Alfa-Click'),
+            PaymentMethodType::TINKOFF_BANK   => $this->l('Интернет-банк Тинькофф'),
             PaymentMethodType::INSTALLMENTS   => $this->l('Installments'),
         );
 
@@ -668,39 +669,39 @@ class FormHelper
         }
 
         $form['form']['input'][] = array(
-            'type'         => 'select',
-            'label'        => $this->l('Признак способа расчета'),
-            'name'         => 'YA_KASSA_DEFAULT_PAYMENT_MODE',
-            'options'      => $paymentModeEnumOptions,
-            'value'        => $model->getDefaultPaymentMode(),
-            'class'        => 'kassa_tax_rate',
+            'type'    => 'select',
+            'label'   => $this->l('Признак способа расчета'),
+            'name'    => 'YA_KASSA_DEFAULT_PAYMENT_MODE',
+            'options' => $paymentModeEnumOptions,
+            'value'   => $model->getDefaultPaymentMode(),
+            'class'   => 'kassa_tax_rate',
         );
 
         $form['form']['input'][] = array(
-            'type'         => 'select',
-            'label'        => $this->l('Признак предмета расчета'),
-            'name'         => 'YA_KASSA_DEFAULT_PAYMENT_SUBJECT',
-            'options'      => $paymentSubjectEnumOptions,
-            'value'        => $model->getDefaultPaymentSubject(),
-            'class'        => 'kassa_tax_rate',
+            'type'    => 'select',
+            'label'   => $this->l('Признак предмета расчета'),
+            'name'    => 'YA_KASSA_DEFAULT_PAYMENT_SUBJECT',
+            'options' => $paymentSubjectEnumOptions,
+            'value'   => $model->getDefaultPaymentSubject(),
+            'class'   => 'kassa_tax_rate',
         );
 
         $form['form']['input'][] = array(
-            'type'         => 'select',
-            'label'        => $this->l('Признак способа расчета для доставки'),
-            'name'         => 'YA_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE',
-            'options'      => $paymentModeEnumOptions,
-            'value'        => $model->getDefaultDeliveryPaymentMode(),
-            'class'        => 'kassa_tax_rate',
+            'type'    => 'select',
+            'label'   => $this->l('Признак способа расчета для доставки'),
+            'name'    => 'YA_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE',
+            'options' => $paymentModeEnumOptions,
+            'value'   => $model->getDefaultDeliveryPaymentMode(),
+            'class'   => 'kassa_tax_rate',
         );
 
         $form['form']['input'][] = array(
-            'type'         => 'select',
-            'label'        => $this->l('Признак предмета расчета для доставки'),
-            'name'         => 'YA_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT',
-            'options'      => $paymentSubjectEnumOptions,
-            'value'        => $model->getDefaultDeliveryPaymentSubject(),
-            'class'        => 'kassa_tax_rate',
+            'type'    => 'select',
+            'label'   => $this->l('Признак предмета расчета для доставки'),
+            'name'    => 'YA_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT',
+            'options' => $paymentSubjectEnumOptions,
+            'value'   => $model->getDefaultDeliveryPaymentSubject(),
+            'class'   => 'kassa_tax_rate',
         );
 
         $form['form']['input'][] = array(

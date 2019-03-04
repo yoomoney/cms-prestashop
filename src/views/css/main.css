@@ -23,6 +23,10 @@ p.payment_module a.yandex_money_bank_card {
 	background: url(../img/bank_card.png) 23px 30px no-repeat #fbfbfb;
 }
 
+p.payment_module a.yandex_money_tinkoff_bank {
+	background: url(../img/tinkoff_bank.png) 23px 30px no-repeat #fbfbfb;
+}
+
 p.payment_module a.yandex_money_cash {
 	background: url(../img/cash.png) 23px 30px no-repeat #fbfbfb;
 }
