@@ -118,6 +118,7 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_54943cacb42c23593f245b1fdcf02ad8'
 $_MODULE['<{yandexmodule}prestashop>formhelper_e500e94f457ddd88824c88fda548bed2'] = 'ID приложения OAuth';
 $_MODULE['<{yandexmodule}prestashop>formhelper_84825bf349b53c7499d1bb01c6983e5b'] = 'Пароль приложения OAuth';
 $_MODULE['<{yandexmodule}prestashop>formhelper_6e6917ac6f152e6d77c13e73403648be'] = 'Пароль приложения OAuth';
+$_MODULE['<{yandexmodule}prestashop>formhelper_f4f70727dc34561dfde1a3c529b6205c'] = 'Настройки';
 $_MODULE['<{yandexmodule}prestashop>formhelper_b78af897765e9126a96f5f6c3834e284'] = 'Вебвизор';
 $_MODULE['<{yandexmodule}prestashop>formhelper_4c78d281a74703bf0fa1e67eeb896c16'] = 'Карта кликов';
 $_MODULE['<{yandexmodule}prestashop>formhelper_127cd2dfda4be1020022bfb1b42ebc57'] = 'Отслеживание хеша в адресной строке браузера';
@@ -145,8 +146,9 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_27dda3cb0fb2c7da8fd7751641582a5f'
 $_MODULE['<{yandexmodule}prestashop>formhelper_417b334759a9581d16440d075aa1cd12'] = 'Включить';
 $_MODULE['<{yandexmodule}prestashop>formhelper_b278285aeff5cffad70c9838b3566f5d'] = 'Отключить';
 $_MODULE['<{yandexmodule}prestashop>formhelper_396dea841276c65130749b6d1c2e8517'] = 'Скачать файл журнала событий';
-$_MODULE['<{yandexmodule}prestashop>formhelper_49109d9247c33b657b15e735d818a82c'] = 'НДС';
-$_MODULE['<{yandexmodule}prestashop>formhelper_156b1c57d7c0e2a3f9b8b85642a47982'] = 'Ставка по умолчанию';
+$_MODULE['<{yandexmodule}prestashop>formhelper_4092e11a89c47f931e088bb8a0e514a6'] = 'Без НДС';
+$_MODULE['<{yandexmodule}prestashop>formhelper_7f9a1cc6c7897f7b5b49497ffbecee6a'] = 'Расчетная ставка 10/110';
+$_MODULE['<{yandexmodule}prestashop>formhelper_bd5aee3c162923f88bbdc7646747fc33'] = 'Расчетная ставка 20/120';
 $_MODULE['<{yandexmodule}prestashop>formhelper_4e3c7101fa3d9e76a9f9cda5df6e0493'] = 'Какой статус присваивать заказу, если он:';
 $_MODULE['<{yandexmodule}prestashop>formhelper_ffea110fd47942cef1c5c687a25f9161'] = 'ожидает подтверждения';
 $_MODULE['<{yandexmodule}prestashop>formhelper_7ce590a2ba8bf3a2b19b8c312cc96458'] = 'заказ переходит в этот статус при поступлении и остается в нем пока оператор магазина не подтвердит или не отменит платеж';
