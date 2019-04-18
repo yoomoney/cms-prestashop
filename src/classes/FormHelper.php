@@ -534,7 +534,7 @@ class FormHelper
                 ),
                 array(
                     'id'   => 4,
-                    'name' => '18%',
+                    'name' => '20%',
                 ),
                 array(
                     'id'   => 5,
@@ -542,7 +542,7 @@ class FormHelper
                 ),
                 array(
                     'id'   => 6,
-                    'name' => $this->l('Applicable rate 18/118'),
+                    'name' => $this->l('Applicable rate 20/120'),
                 ),
             ),
             'id'    => 'id',

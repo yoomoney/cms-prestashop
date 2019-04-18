@@ -6,9 +6,9 @@ namespace YandexMoneyModule\Models\Market;
 class YandexMarketSettingsVat extends YandexMarketSettingsAbstract
 {
     private $langExportVat = 'Добавить налоговые ставки в предложения';
-    private $lang18        = '18%';
+    private $lang20        = '20%';
     private $lang10        = '10%';
-    private $lang18118     = '18/118';
+    private $lang20120     = '20/120';
     private $lang10110     = '10/110';
     private $lang0         = '0%';
     private $langNoVat     = 'НДС не облагается';
@@ -86,9 +86,9 @@ HTML;
     private function getTaxList()
     {
         return array(
-            'VAT_18'     => $this->l($this->lang18),
+            'VAT_20'     => $this->l($this->lang20),
             'VAT_10'     => $this->l($this->lang10),
-            'VAT_18_118' => $this->l($this->lang18118),
+            'VAT_20_120' => $this->l($this->lang20120),
             'VAT_10_110' => $this->l($this->lang10110),
             'VAT_0'      => $this->l($this->lang0),
             'NO_VAT'     => $this->l($this->langNoVat),
