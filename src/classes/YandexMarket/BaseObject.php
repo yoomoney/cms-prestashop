@@ -2,7 +2,7 @@
 
 namespace YandexMoneyModule\YandexMarket;
 
-class Object
+class BaseObject
 {
     private $properties = array();
 
