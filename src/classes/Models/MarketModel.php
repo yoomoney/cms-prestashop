@@ -495,6 +495,10 @@ class MarketModel extends AbstractModel
         $productInstance = new Product($product['id_product'], false, $langId);
         $combinations = $productInstance->getAttributeCombinations($langId);
 
+        if (count($combinations) == 0) {
+            return false;
+        }
+
         $exports = array();
         foreach ($combinations as $combination) {
             $attrId = $combination['id_product_attribute'];
