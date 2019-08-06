@@ -336,6 +336,6 @@ $_MODULE['<{yandexmodule}prestashop>kassa_form_faef1666296f6eb16b2a4f390ea30d62'
 $_MODULE['<{yandexmodule}prestashop>kassa_form_63a3ef4d984c4648743529cd0fedde4e'] = 'Phone number linked to QIWI Wallet';
 $_MODULE['<{yandexmodule}prestashop>kassa_form_a64b9392d904405f8a7ec4a37c70c1ca'] = 'Pay';
 $_MODULE['<{yandexmodule}prestashop>kassa_form_9e3f795038088ee81c22ced0b6f491f0'] = 'Specify the login, and we\'ll send the bill in Alfa-Click. All you have do after that is confirm the payment online at the bank\'s website.';
-$_MODULE['<{yandexmodule}prestashop>wallet_form_46322fb08a499ed1397e0a5e1f147aaf'] = 'Yandex.Money';
-$_MODULE['<{yandexmodule}prestashop>wallet_form_9ff5095ba7dc98485e16d743b2e1cbfd'] = 'Bank cards';
+$_MODULE['<{yandexmodule}prestashop>wallet_form_9ff5095ba7dc98485e16d743b2e1cbfd'] = 'Yandex.Money';
+$_MODULE['<{yandexmodule}prestashop>wallet_form_46322fb08a499ed1397e0a5e1f147aaf'] = 'Bank cards';
 $_MODULE['<{yandexmodule}prestashop>billing_form_76728ea0393b4f11a0f8660096bb8498'] = 'Payer\'s full name';

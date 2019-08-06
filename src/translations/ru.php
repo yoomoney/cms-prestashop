@@ -322,5 +322,5 @@ $_MODULE['<{yandexmodule}prestashop>kassa_epl_form_78d450c37ae59bb9c73017b43bc0c
 $_MODULE['<{yandexmodule}prestashop>kassa_epl_form_77f072c589a4ade0fd37ba687f37a7e1'] = 'Оплата с помощью Яндекс.Платёжки';
 $_MODULE['<{yandexmodule}prestashop>kassa_epl_form_9e91dca5be8717bad5e8d4e534fc43c2'] = 'Оплата с помощью Яндекс.Кассы';
 $_MODULE['<{yandexmodule}prestashop>kassa_form_faef1666296f6eb16b2a4f390ea30d62'] = 'Яндекс.Деньги (банковские карты, кошелек и другое)';
-$_MODULE['<{yandexmodule}prestashop>wallet_form_faef1666296f6eb16b2a4f390ea30d62'] = 'Банковские карты — Visa, Mastercard и Maestro, «Мир»';
-$_MODULE['<{yandexmodule}prestashop>wallet_form_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Яндекс.Деньги';
+$_MODULE['<{yandexmodule}prestashop>wallet_form_faef1666296f6eb16b2a4f390ea30d62'] = 'Яндекс.Деньги';
+$_MODULE['<{yandexmodule}prestashop>wallet_form_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Банковские карты — Visa, Mastercard и Maestro, «Мир»';
