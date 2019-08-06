@@ -89,7 +89,7 @@ class YandexModule extends PaymentModule
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.1.7';
+        $this->version         = '1.1.8';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -641,7 +641,19 @@ class YandexModule extends PaymentModule
             ),
         ));
 
+        // генерируем настройки для отображения способов оплаты
+        $paymentOption = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
+        $paymentOption->setModuleName($this->name);
+
         if ($model instanceof \YandexMoneyModule\Models\KassaModel && $model->isEnabled()) {
+            $paymentOption->setCallToActionText(
+                $this->trans(
+                    'Yandex.Checkout (bank cards, e-money, etc.)',
+                    array(),
+                    'Modules.YandexModule.Shop'
+                )
+            );
+
             if ($model->getEPL()) {
                 // если используется выбор на стороне кассы
                 // отображаем шаблон пустым типом платежа
@@ -690,6 +702,14 @@ class YandexModule extends PaymentModule
                 $this->context->smarty->assign('payment_methods', $methods);
             }
         } else {
+            $paymentOption->setCallToActionText(
+                $this->trans(
+                    'Yandex.Money',
+                    array(),
+                    'Modules.YandexModule.Shop'
+                )
+            );
+
             $template = $model->assignVariables($this->context->smarty);
         }
 
@@ -707,18 +727,8 @@ class YandexModule extends PaymentModule
 
             return null;
         }
-        // генерируем настройки для отображения способов оплаты
-        $paymentOption = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
-        $paymentOption->setModuleName($this->name)
-                      ->setCallToActionText(
-                          $this->trans(
-                              'Yandex.Checkout (bank cards, e-money, etc.)',
-                              array(),
-                              'Modules.YandexModule.Shop'
-                          )
-                      )
-                      ->setForm($display);
-
+        
+        $paymentOption->setForm($display);
         $this->log('debug', 'Payment_options: '.json_encode($paymentOption));
 
         return array(
