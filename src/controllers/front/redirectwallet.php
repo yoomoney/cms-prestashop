@@ -48,7 +48,7 @@ class YandexModuleRedirectWalletModuleFrontController extends ModuleFrontControl
         );
 
         if ($result) {
-            $link  = $this->context->link->getPageLink('order-confirmation').'&id_cart='
+            $link  = $this->context->link->getPageLink('order-confirmation').'?id_cart='
                      .$cart->id.'&id_module='.$this->module->id.'&id_order='
                      .$this->module->currentOrder.'&key='.$cart->secure_key;
             $paymentTarget = $this->module->l('Payment for Order N. '.(int)$this->module->currentOrder);
