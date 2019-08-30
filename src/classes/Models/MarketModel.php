@@ -343,6 +343,10 @@ class MarketModel extends AbstractModel
         foreach ($images as $image) {
             $offer->addPicture(Context::getContext()->link
                 ->getImageLink($product['link_rewrite'], $image['id_image']));
+
+            if (count($offer->getPictures()) === 10) {
+                break;
+            }
         }
     }
 
