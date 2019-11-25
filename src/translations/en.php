@@ -169,6 +169,7 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_d9c1b321240272ef302aeb3fd4658e2a'
 $_MODULE['<{yandexmodule}prestashop>formhelper_62e41bf08783fca3cffe987b69e111c7'] = 'Purpose of payment';
 $_MODULE['<{yandexmodule}prestashop>formhelper_a9222713ed63def1a6f5f46205250a49'] = 'Order No. %order_id% Payment via Yandex.Billing';
 $_MODULE['<{yandexmodule}prestashop>formhelper_57297718fdb439175177cf6b196172d1'] = 'Statuses to be sent to Yandex.Market';
+$_MODULE['<{yandexmodule}prestashop>formhelper_5cb172a89bde6fc4cb5233222a2f7ca0'] = 'Order status before the payment';
 $_MODULE['<{yandexmodule}prestashop>installer_cf19f96ac1b9e5fde2bdbc5163d015a4'] = 'Y.CMS Order forwarded to delivery';
 $_MODULE['<{yandexmodule}prestashop>installer_bb64a109595adfa8c37b3eb8238fe26d'] = 'Y.CMS Order cancelled';
 $_MODULE['<{yandexmodule}prestashop>installer_1bf133df8f4fe19748fd3a70a0be23e1'] = 'Y.CMS Order delivered to pickup location';

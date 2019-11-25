@@ -513,13 +513,19 @@ class MarketModel extends AbstractModel
 
             $exports[$attrId]['attributes'][$combination['group_name']] = $combination['attribute_name'];
 
-            if (!isset($exports[$attrId]['url'])) {
-                $exports[$attrId]['url'] = '';
-            }
-            $exports[$attrId]['url'] .= '/'
-                .Tools::str2url($combination['id_attribute'].'-'.$combination['group_name']).'-'
-                .str_replace(Configuration::get('PS_ATTRIBUTE_ANCHOR_SEPARATOR'), '_',
-                    Tools::str2url(str_replace(array(',', '.'), '-', $combination['attribute_name'])));
+            $exports[$attrId]['url'] = Context::getContext()
+                ->link->getProductLink(
+                $product['id_product'],
+                null,
+                null,
+                null,
+                $langId,
+                null,
+                $attrId,
+                false,
+                false,
+                true
+            );
         }
 
         foreach ($exports as $combination) {
@@ -527,15 +533,18 @@ class MarketModel extends AbstractModel
             $offer->setId($product['id_product'].'c'.$combination['id_product_attribute']);
             $offer->setGroupId($product['id_product']);
             $offer->setPrice(Tools::ps_round($combination['price'], 2));
-            $offer->setUrl($offer->getUrl().'#'.$combination['url']);
+            $offer->setUrl($combination['url']);
+
             foreach ($combination['attributes'] as $name => $value) {
                 $offer->addParameter($name, $value);
             }
 
             $images = Image::getImages($langId, $product['id_product'], $combination['id_product_attribute']);
+
             if (empty($images)) {
                 $images = Image::getImages($langId, $product['id_product']);
             }
+
             if (!empty($images)) {
                 foreach ($images as $image) {
                     $url = Context::getContext()->link->getImageLink($product['link_rewrite'], $image['id_image']);

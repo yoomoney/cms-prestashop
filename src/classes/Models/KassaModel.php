@@ -42,6 +42,16 @@ class KassaModel extends AbstractPaymentModel
      */
     const MIN_INSTALLMENTS_AMOUNT = 3000;
 
+    /**
+     * Статус заказа по умолчанию(если не сохранили настройки)
+     */
+    const DEFAULT_PAYMENT_STATUS = _PS_OS_PREPARATION_;
+
+    const DISABLED_PAYMENT_METHODS = array(
+        PaymentMethodType::B2B_SBERBANK,
+        PaymentMethodType::WECHAT,
+    );
+
     private $shopId;
     private $password;
     private $epl;
@@ -78,7 +88,7 @@ class KassaModel extends AbstractPaymentModel
         $this->defaultTaxRate                = (int)Configuration::get('YA_KASSA_DEFAULT_TAX_RATE');
         $this->minimumAmount                 = (float)Configuration::get('YA_KASSA_MIN');
         $this->debugLog                      = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
-        $this->createStatusId                = Configuration::get('PS_OS_PREPARATION');
+        $this->createStatusId                = (int)Configuration::get('YA_KASSA_DEFAULT_PAYMENT_INIT_STATUS');
         $this->successStatusId               = (int)Configuration::get('YA_KASSA_SUCCESS_STATUS_ID');
         $this->enableHoldMode                = Configuration::get('YA_KASSA_ENABLE_HOLD_MODE_ON') === 'on';
         $this->onHoldStatusId                = (int)Configuration::get('YA_KASSA_ON_HOLD_STATUS_ID');
@@ -166,7 +176,7 @@ class KassaModel extends AbstractPaymentModel
         if ($this->availablePaymentMethods === null) {
             $this->availablePaymentMethods = array();
             foreach (PaymentMethodType::getEnabledValues() as $value) {
-                if ($value !== PaymentMethodType::B2B_SBERBANK) {
+                if (!in_array($value, self::DISABLED_PAYMENT_METHODS)) {
                     $this->availablePaymentMethods[$value] = 'YA_KASSA_PAYMENT_'.Tools::strtoupper($value);
                 }
             }
@@ -255,7 +265,7 @@ class KassaModel extends AbstractPaymentModel
      */
     public function getCreateStatusId()
     {
-        return $this->createStatusId;
+        return empty($this->createStatusId) ? self::DEFAULT_PAYMENT_STATUS : $this->createStatusId;
     }
 
     /**
@@ -334,6 +344,9 @@ class KassaModel extends AbstractPaymentModel
 
         Configuration::UpdateValue('YA_KASSA_PAYMENT_MODE', Tools::getValue('YA_KASSA_PAYMENT_MODE'));
         $this->epl = Tools::getValue('YA_KASSA_PAYMENT_MODE') == 'kassa';
+
+        $this->createStatusId = (int)Tools::getValue('YA_KASSA_DEFAULT_PAYMENT_INIT_STATUS');
+        Configuration::UpdateValue('YA_KASSA_DEFAULT_PAYMENT_INIT_STATUS', $this->createStatusId);
 
         $this->successStatusId = (int)Tools::getValue('YA_KASSA_SUCCESS_STATUS_ID');
         Configuration::UpdateValue('YA_KASSA_SUCCESS_STATUS_ID', $this->successStatusId);
@@ -900,6 +913,9 @@ class KassaModel extends AbstractPaymentModel
             $this->apiClient = new Client();
             $this->apiClient->setAuth($this->getShopId(), $this->getPassword());
             $this->apiClient->setLogger($this->module);
+            $userAgent = $this->apiClient->getApiClient()->getUserAgent();
+            $userAgent->setCms("PrestaShop", _PS_VERSION_);
+            $userAgent->setModule("yandex-money-ycms-v2-prestashop", $this->module->version);
         }
 
         return $this->apiClient;

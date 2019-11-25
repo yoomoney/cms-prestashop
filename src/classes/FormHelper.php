@@ -719,6 +719,14 @@ class FormHelper
 
         $form['form']['input'][] = array(
             'type'    => 'select',
+            'label'   => $this->l('Order status before the payment'),
+            'name'    => 'YA_KASSA_DEFAULT_PAYMENT_INIT_STATUS',
+            'value'   => $model->getCreateStatusId(),
+            'options' => $statusOptions,
+        );
+
+        $form['form']['input'][] = array(
+            'type'    => 'select',
             'label'   => $this->l('Order status after the payment'),
             'name'    => 'YA_KASSA_SUCCESS_STATUS_ID',
             'value'   => $model->getSuccessStatusId(),

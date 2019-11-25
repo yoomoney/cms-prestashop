@@ -177,6 +177,7 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_d9c1b321240272ef302aeb3fd4658e2a'
 $_MODULE['<{yandexmodule}prestashop>formhelper_62e41bf08783fca3cffe987b69e111c7'] = 'Назначение платежа';
 $_MODULE['<{yandexmodule}prestashop>formhelper_a9222713ed63def1a6f5f46205250a49'] = 'Номер заказа #order_id# Оплата через Яндекс.Платежку';
 $_MODULE['<{yandexmodule}prestashop>formhelper_57297718fdb439175177cf6b196172d1'] = 'Статус заказа';
+$_MODULE['<{yandexmodule}prestashop>formhelper_5cb172a89bde6fc4cb5233222a2f7ca0'] = 'Статус заказа до оплаты';
 $_MODULE['<{yandexmodule}prestashop>billingmodel_feac4e0fd871a458032a22b5aa390bda'] = 'Не указан ID формы';
 $_MODULE['<{yandexmodule}prestashop>billingmodel_f332904a747849559c3283be380caa6d'] = 'Не указано назначение платежа';
 $_MODULE['<{yandexmodule}prestashop>billingmodel_fc724a540ce30b0b634163c922d60bed'] = 'Настройки были сохранены';
