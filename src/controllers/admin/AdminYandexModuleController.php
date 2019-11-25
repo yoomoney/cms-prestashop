@@ -6,6 +6,7 @@
  * @license  https://money.yandex.ru/doc.xml?id=527052
  */
 
+use YandexCheckout\Model\PaymentStatus;
 use YandexCheckout\Request\Payments\Payment\CreateCaptureRequest;
 
 /**
@@ -53,7 +54,7 @@ class AdminYandexModuleController extends ModuleAdminController
         }
 
         $payment = $kassa->findOrderPayment($orderId);
-        if (!$payment || $payment->getStatus() !== \YandexCheckout\Model\PaymentStatus::WAITING_FOR_CAPTURE) {
+        if (!$payment || $payment->getStatus() !== PaymentStatus::WAITING_FOR_CAPTURE) {
             $this->module->log('error', 'Capture payment error: wrong payment status: '
                 .$payment->getStatus());
             return;
@@ -91,7 +92,7 @@ class AdminYandexModuleController extends ModuleAdminController
             $this->module->log('error', 'Capture error: '.$e->getMessage());
             $response = $payment;
         }
-        if (!$response || $response->getStatus() !== \YandexCheckout\Model\PaymentStatus::SUCCEEDED) {
+        if (!$response || $response->getStatus() !== PaymentStatus::SUCCEEDED) {
             $this->module->log('error', 'Capture payment error: capture failed');
             return;
         }
@@ -118,14 +119,14 @@ class AdminYandexModuleController extends ModuleAdminController
         }
 
         $payment = $kassa->findOrderPayment($orderId);
-        if (!$payment || $payment->getStatus() !== \YandexCheckout\Model\PaymentStatus::WAITING_FOR_CAPTURE) {
+        if (!$payment || $payment->getStatus() !== PaymentStatus::WAITING_FOR_CAPTURE) {
             $this->module->log('error', 'Cancel payment error: wrong payment status: '
                 .$payment->getStatus());
             return;
         }
 
         $response = $kassa->cancelPayment($payment);
-        if (!$response || $response->getStatus() !== \YandexCheckout\Model\PaymentStatus::CANCELED) {
+        if (!$response || $response->getStatus() !== PaymentStatus::CANCELED) {
             $this->module->log('error', 'Cancel payment error: cancel failed');
             return;
         }

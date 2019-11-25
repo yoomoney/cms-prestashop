@@ -1,5 +1,9 @@
 <?php
 
+use YandexCheckout\Model\PaymentMethodType;
+use YandexMoneyModule\InstallmentsApi;
+use YandexMoneyModule\Models\KassaModel;
+
 /**
  * Module is prohibited to sales! Violation of this condition leads to the deprivation of the license!
  *
@@ -89,7 +93,7 @@ class YandexModule extends PaymentModule
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.1.10';
+        $this->version         = '1.1.11';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -442,11 +446,11 @@ class YandexModule extends PaymentModule
         /** @var Order $order */
         $order = $params['order'];
 
-        /** @var \YandexMoneyModule\Models\KassaModel $paymentModel */
+        /** @var KassaModel $paymentModel */
         $paymentModel = $this->getPaymentModel();
         $orderId      = $order->id;
         $payment      = null;
-        if (!($paymentModel instanceof \YandexMoneyModule\Models\KassaModel)) {
+        if (!($paymentModel instanceof KassaModel)) {
             $errors[] = $this->l('Module Yandex.Cash is disabled');
         } else {
             $payment = $paymentModel->findOrderPayment($orderId);
@@ -496,14 +500,14 @@ class YandexModule extends PaymentModule
         $customer = new Customer($params['order']->id_customer);
 
         $names                 = array(
-            \YandexCheckout\Model\PaymentMethodType::BANK_CARD      => $this->l('Bank cards'),
-            \YandexCheckout\Model\PaymentMethodType::YANDEX_MONEY   => $this->l('Yandex.Money'),
-            \YandexCheckout\Model\PaymentMethodType::SBERBANK       => $this->l('Sberbank Online'),
-            \YandexCheckout\Model\PaymentMethodType::QIWI           => $this->l('QIWI Wallet'),
-            \YandexCheckout\Model\PaymentMethodType::WEBMONEY       => $this->l('Webmoney'),
-            \YandexCheckout\Model\PaymentMethodType::CASH           => $this->l('Cash via payment kiosks'),
-            \YandexCheckout\Model\PaymentMethodType::MOBILE_BALANCE => $this->l('Direct carrier billing'),
-            \YandexCheckout\Model\PaymentMethodType::ALFABANK       => $this->l('Alfa-Click'),
+            PaymentMethodType::BANK_CARD      => $this->l('Bank cards'),
+            PaymentMethodType::YANDEX_MONEY   => $this->l('Yandex.Money'),
+            PaymentMethodType::SBERBANK       => $this->l('Sberbank Online'),
+            PaymentMethodType::QIWI           => $this->l('QIWI Wallet'),
+            PaymentMethodType::WEBMONEY       => $this->l('Webmoney'),
+            PaymentMethodType::CASH           => $this->l('Cash via payment kiosks'),
+            PaymentMethodType::MOBILE_BALANCE => $this->l('Direct carrier billing'),
+            PaymentMethodType::ALFABANK       => $this->l('Alfa-Click'),
         );
         $paymentType           = $this->l('Способ оплаты не определён');
         $additionalPaymentInfo = '';
@@ -620,7 +624,7 @@ class YandexModule extends PaymentModule
         $cart                  = $params['cart'];
         $model                 = $this->getPaymentModel();
         $totalAmount           = $cart->getOrderTotal();
-        $isInstallmentsEnabled = $totalAmount > \YandexMoneyModule\Models\KassaModel::MIN_INSTALLMENTS_AMOUNT;
+        $isInstallmentsEnabled = $totalAmount > KassaModel::MIN_INSTALLMENTS_AMOUNT;
         if ($model === null) {
             // если отключен приём платежей - ничего не делаем
             $this->log('debug', 'Payment module disabled');
@@ -645,7 +649,7 @@ class YandexModule extends PaymentModule
         $paymentOption = new PrestaShop\PrestaShop\Core\Payment\PaymentOption();
         $paymentOption->setModuleName($this->name);
 
-        if ($model instanceof \YandexMoneyModule\Models\KassaModel && $model->isEnabled()) {
+        if ($model instanceof KassaModel && $model->isEnabled()) {
             $paymentOption->setCallToActionText(
                 $this->trans(
                     'Yandex.Checkout (bank cards, e-money, etc.)',
@@ -667,19 +671,19 @@ class YandexModule extends PaymentModule
                 $payments = Configuration::getMultiple(array_values($model->getPaymentMethods()));
                 $key      = 'YA_KASSA_PAYMENT_INSTALLMENTS';
                 if (isset($payments[$key]) && $payments[$key] == '1') {
-                    $monthlyInstallment = \YandexMoneyModule\InstallmentsApi::creditPreSchedule(
+                    $monthlyInstallment = InstallmentsApi::creditPreSchedule(
                         $model->getShopId(),
                         $totalAmount
                     );
                     if (!isset($monthlyInstallment['amount'])) {
-                        $errorMessage = \YandexMoneyModule\InstallmentsApi::getLastError() ?: 'Unknown error. Could not get installment amount';
+                        $errorMessage = InstallmentsApi::getLastError() ?: 'Unknown error. Could not get installment amount';
                         $this->log('error', $errorMessage);
                     } else {
                         $installmentLabel = sprintf($this->l('Installments (%s ₽ per month)'),
                             $monthlyInstallment['amount']);
                         $this->log('info', 'Label: '.$installmentLabel);
                         foreach ($methods as $key => $method) {
-                            if ($method['value'] == \YandexCheckout\Model\PaymentMethodType::INSTALLMENTS) {
+                            if ($method['value'] == PaymentMethodType::INSTALLMENTS) {
                                 if ($isInstallmentsEnabled) {
                                     $methods[$key]['name'] = $installmentLabel;
                                 } else {
@@ -810,14 +814,14 @@ class YandexModule extends PaymentModule
                     return null;
                 } else {
                     foreach ($methods as $key => $method) {
-                        if ($method['value'] == \YandexCheckout\Model\PaymentMethodType::INSTALLMENTS) {
-                            if ($total_to_pay > \YandexMoneyModule\Models\KassaModel::MIN_INSTALLMENTS_AMOUNT) {
-                                $monthlyInstallment = \YandexMoneyModule\InstallmentsApi::creditPreSchedule(
+                        if ($method['value'] == PaymentMethodType::INSTALLMENTS) {
+                            if ($total_to_pay > KassaModel::MIN_INSTALLMENTS_AMOUNT) {
+                                $monthlyInstallment = InstallmentsApi::creditPreSchedule(
                                     $kassa->getShopId(),
                                     $total_to_pay
                                 );
                                 if (!isset($monthlyInstallment['amount'])) {
-                                    $errorMessage = \YandexMoneyModule\InstallmentsApi::getLastError() ?: 'Unknown error. Could not get installment amount';
+                                    $errorMessage = InstallmentsApi::getLastError() ?: 'Unknown error. Could not get installment amount';
                                     $this->log('error', $errorMessage);
                                 } else {
                                     $installmentLabel      = sprintf($this->l('Installments (%s ₽ per month)'),
@@ -943,7 +947,7 @@ class YandexModule extends PaymentModule
         $orderId = $kassa->getOrderIdByPayment($payment);
 
         if ($kassa->getEnableHoldMode()
-            && $payment->getPaymentMethod()->getType() === \YandexCheckout\Model\PaymentMethodType::BANK_CARD
+            && $payment->getPaymentMethod()->getType() === PaymentMethodType::BANK_CARD
         ) {
             $this->log('debug', 'Hold payment for order #'.$orderId);
             $history           = new OrderHistory();
