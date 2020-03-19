@@ -34,7 +34,7 @@ $_MODULE['<{yandexmodule}prestashop>yandexmodule_ad0866dbe28c9ee3c0db20b66a3d2eb
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_a63593a811927ba64204f7171601ff6e'] = 'Баланс мобильного';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_621995df232472963068d5acc085332b'] = 'Альфа-Клик';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_4b3e7faab54578d96b7e965a1910832c'] = 'Платёж полностью возвращён';
-$_MODULE['<{yandexmodule}prestashop>yandexmodule_7f3a357d8c73ce62d856e445d46efce8'] = 'Яндекс.Касса (банковские карты, электронные деньги и другое)';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_c43f9ecbcaa84eef858f1cdd6ce4a59b'] = 'Яндекс.Касса (банковские карты, электронные деньги и другое)';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_20a5b4f336715bb1116a4d9a51d4d4b3'] = 'Has declined a request authorization application';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_1c39450f93a524194e7b12fc2e385090'] = 'Заданы не верные настройки оплаты';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_0722d0c5cba4a2b1440b0a899e561a8b'] = 'Параметр задан не верно';

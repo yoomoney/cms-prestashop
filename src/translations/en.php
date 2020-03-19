@@ -38,7 +38,7 @@ $_MODULE['<{yandexmodule}prestashop>yandexmodule_f931ce2695c2de1641bcb85b0f31645
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_2a6b5e2b70f426738047bc84dd5f22c4'] = 'Specify login for Alfa-Click:';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_be02696c0d0899163c862a7274198d36'] = 'Phone number';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_4b3e7faab54578d96b7e965a1910832c'] = 'Full refund';
-$_MODULE['<{yandexmodule}prestashop>yandexmodule_7f3a357d8c73ce62d856e445d46efce8'] = 'Yandex.Checkout (bank cards, e-money, etc.)';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_c43f9ecbcaa84eef858f1cdd6ce4a59b'] = 'Yandex.Checkout (bank cards, e-money, etc.)';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_5b6c5dcd58c20b12f50335c6d6f10309'] = 'Select payment method';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_bd40340e00e4456d034af486feb3d998'] = 'Unable to make the payment';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_e6a2e577cf0c8aa8192300235d39a1ac'] = 'Canceled';

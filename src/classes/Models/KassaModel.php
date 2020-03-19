@@ -47,7 +47,7 @@ class KassaModel extends AbstractPaymentModel
      */
     const DEFAULT_PAYMENT_STATUS = _PS_OS_PREPARATION_;
 
-    const DISABLED_PAYMENT_METHODS = array(
+    private static $disabledPaymentMethods = array(
         PaymentMethodType::B2B_SBERBANK,
         PaymentMethodType::WECHAT,
     );
@@ -176,7 +176,7 @@ class KassaModel extends AbstractPaymentModel
         if ($this->availablePaymentMethods === null) {
             $this->availablePaymentMethods = array();
             foreach (PaymentMethodType::getEnabledValues() as $value) {
-                if (!in_array($value, self::DISABLED_PAYMENT_METHODS)) {
+                if (!in_array($value, self::getDisabledPaymentMethods())) {
                     $this->availablePaymentMethods[$value] = 'YA_KASSA_PAYMENT_'.Tools::strtoupper($value);
                 }
             }
@@ -822,6 +822,11 @@ class KassaModel extends AbstractPaymentModel
             $builder->addReceiptShipping($carrier->name, $cart->getPackageShippingCost(), $taxId,
                 $this->defaultDeliveryPaymentMode, $this->defaultDeliveryPaymentSubject);
         }
+    }
+
+    private static function getDisabledPaymentMethods()
+    {
+        return self::$disabledPaymentMethods;
     }
 
     private function insertPaymentInfo(CreatePaymentResponse $payment, $orderId)

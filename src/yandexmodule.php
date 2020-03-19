@@ -93,7 +93,7 @@ class YandexModule extends PaymentModule
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.1.11';
+        $this->version         = '1.1.12';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -651,11 +651,7 @@ class YandexModule extends PaymentModule
 
         if ($model instanceof KassaModel && $model->isEnabled()) {
             $paymentOption->setCallToActionText(
-                $this->trans(
-                    'Yandex.Checkout (bank cards, e-money, etc.)',
-                    array(),
-                    'Modules.YandexModule.Shop'
-                )
+                $this->l('Yandex.Checkout (bank cards, e-money, etc.)')
             );
 
             if ($model->getEPL()) {
@@ -707,11 +703,7 @@ class YandexModule extends PaymentModule
             }
         } else {
             $paymentOption->setCallToActionText(
-                $this->trans(
-                    'Yandex.Money',
-                    array(),
-                    'Modules.YandexModule.Shop'
-                )
+                $this->l('Yandex.Money')
             );
 
             $template = $model->assignVariables($this->context->smarty);
