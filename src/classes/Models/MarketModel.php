@@ -511,6 +511,8 @@ class MarketModel extends AbstractModel
 
             $exports[$attrId]['price'] = Product::getPriceStatic($product['id_product'], true, $attrId);
 
+            $exports[$attrId]['attribute_price'] = Product::getPriceStatic($product['id_product'], true, $attrId, 6, null, false, false);
+
             $exports[$attrId]['attributes'][$combination['group_name']] = $combination['attribute_name'];
 
             $exports[$attrId]['url'] = Context::getContext()
@@ -533,6 +535,7 @@ class MarketModel extends AbstractModel
             $offer->setId($product['id_product'].'c'.$combination['id_product_attribute']);
             $offer->setGroupId($product['id_product']);
             $offer->setPrice(Tools::ps_round($combination['price'], 2));
+            $offer->setOldPrice(Tools::ps_round($combination['attribute_price'], 2));
             $offer->setUrl($combination['url']);
 
             foreach ($combination['attributes'] as $name => $value) {
