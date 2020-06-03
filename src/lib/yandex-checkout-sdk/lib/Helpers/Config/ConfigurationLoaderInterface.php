@@ -28,5 +28,13 @@ namespace YandexCheckout\Helpers\Config;
 
 interface ConfigurationLoaderInterface
 {
+    /**
+     * @return mixed
+     */
     public function getConfig();
+
+    /**
+     * @return mixed
+     */
+    public function load();
 }
