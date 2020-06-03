@@ -36,6 +36,7 @@ use YandexCheckout\Model\ReceiptCustomerInterface;
 use YandexCheckout\Model\ReceiptItemInterface;
 use YandexCheckout\Model\ReceiptType;
 use YandexCheckout\Model\SettlementInterface;
+use YandexCheckout\Model\SupplierInterface;
 
 class CreatePostReceiptRequestBuilder extends AbstractRequestBuilder
 {
@@ -156,6 +157,16 @@ class CreatePostReceiptRequestBuilder extends AbstractRequestBuilder
     }
 
     /**
+     * @param string $value
+     * @return CreatePostReceiptRequestBuilder
+     */
+    public function setOnBehalfOf($value)
+    {
+        $this->currentObject->setOnBehalfOf($value);
+        return $this;
+    }
+
+    /**
      * @param SettlementInterface[] $value
      * @return CreatePostReceiptRequestBuilder
      */
@@ -186,13 +197,13 @@ class CreatePostReceiptRequestBuilder extends AbstractRequestBuilder
     {
         if (!empty($options)) {
             $this->setOptions($options);
-        }
 
-        if ($options['type'] === ReceiptType::PAYMENT && !empty($options['payment_id'])) {
-            $this->setObjectId($options['payment_id']);
-        }
-        if ($options['type'] === ReceiptType::REFUND && !empty($options['refund_id'])) {
-            $this->setObjectId($options['refund_id']);
+            if ($options['type'] === ReceiptType::PAYMENT && !empty($options['payment_id'])) {
+                $this->setObjectId($options['payment_id']);
+            }
+            if ($options['type'] === ReceiptType::REFUND && !empty($options['refund_id'])) {
+                $this->setObjectId($options['refund_id']);
+            }
         }
 
         return parent::build($options);
