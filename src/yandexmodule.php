@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . "/lib/autoload.php";
+require_once __DIR__ . "/lib/yandex-checkout-sdk/lib/autoload.php";
 
 use YandexCheckout\Model\PaymentMethodType;
 use YandexMoneyModule\InstallmentsApi;
@@ -93,7 +95,7 @@ class YandexModule extends PaymentModule
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.2.0';
+        $this->version         = '1.2.1';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
