@@ -95,7 +95,7 @@ class YandexModule extends PaymentModule
 
         $this->name            = 'yandexmodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '1.3.1';
+        $this->version         = '1.3.2';
         $this->author          = $this->l('Yandex.Money');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -727,7 +727,8 @@ class YandexModule extends PaymentModule
         }
         
         $paymentOption->setForm($display);
-        $this->log('debug', 'Payment_options: '.json_encode($paymentOption));
+        $json_options = JSON_UNESCAPED_UNICODE;
+        $this->log('debug', 'Payment_options: '.json_encode($paymentOption->toArray(), $json_options));
 
         return array(
             $paymentOption,
@@ -773,7 +774,7 @@ class YandexModule extends PaymentModule
         $total_to_pay    = $cart->getOrderTotal(true);
         $rub_currency_id = Currency::getIdByIsoCode('RUB');
         if ($cart->id_currency != $rub_currency_id) {
-            $from_currency = new Currency($cart->id_curre1ncy);
+            $from_currency = new Currency($cart->id_currency);
             $to_currency   = new Currency($rub_currency_id);
             $total_to_pay  = Tools::convertPriceFull($total_to_pay, $from_currency, $to_currency);
         }
@@ -910,6 +911,27 @@ class YandexModule extends PaymentModule
                 'reference'   => $order->reference,
                 'contact_url' => $this->context->link->getPageLink('contact', true),
             ));
+        } else {
+            $this->log('debug', 'Payment ' . $payment->getId() . ' status for order #' . $order->id . ' is ' . $payment->getStatus() . '.');
+            if ($id_order = (int) Tools::getValue('id_order')) {
+                $oldCart = new Cart(Order::getCartIdStatic($id_order, $this->context->customer->id));
+                $duplication = $oldCart->duplicate();
+                if (!$duplication || !Validate::isLoadedObject($duplication['cart'])) {
+                    $this->errors[] = $this->trans('Sorry. We cannot renew your order.', array(), 'Shop.Notifications.Error');
+                } elseif (!$duplication['success']) {
+                    $this->errors[] = $this->trans(
+                        'Some items are no longer available, and we are unable to renew your order.', array(), 'Shop.Notifications.Error'
+                    );
+                } else {
+                    $this->context->cookie->id_cart = $duplication['cart']->id;
+                    $context = $this->context;
+                    $context->cart = $duplication['cart'];
+                    CartRule::autoAddToCart($context);
+                    $this->context->cookie->write();
+                    $this->log('debug', 'Order #' . $order->id . ' was duplicated.');
+                    Tools::redirect('index.php?controller=order');
+                }
+            }
         }
         $template = 'kassa_payment_'.($success ? 'success' : 'failure');
         if (version_compare(_PS_VERSION_, '1.7.0') > 0) {
@@ -970,9 +992,9 @@ class YandexModule extends PaymentModule
 
     public function hookDisplayOrderConfirmation($params)
     {
-        if (!Configuration::get('YA_METRICS_ACTIVE')) {
-            return false;
-        }
+//        if (!Configuration::get('YA_METRICS_ACTIVE')) {
+//            return false;
+//        }
 
         if (version_compare(_PS_VERSION_, '1.7.0') < 0) {
             $orderId      = (string)$params['objOrder']->id;
