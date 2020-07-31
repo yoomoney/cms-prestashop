@@ -879,13 +879,13 @@ class FormHelper
         return array(
             'form' => array(
                 'legend' => array(
-                    'title' => $this->l('The module settings Yandex.Billing'),
+                    'title' => $this->l('The module settings Billing'),
                     'icon'  => 'icon-cogs',
                 ),
                 'input'  => array(
                     array(
                         'type'     => 'radio',
-                        'label'    => $this->l('Activate payments via Yandex.Billing'),
+                        'label'    => $this->l('Activate payments via Billing'),
                         'name'     => 'YA_BILLING_ACTIVE',
                         'required' => false,
                         'class'    => 't',
@@ -908,7 +908,7 @@ class FormHelper
                         'col'   => 4,
                         'class' => 't',
                         'type'  => 'text',
-                        'label' => $this->l('Yandex.Billing\'s identifier'),
+                        'label' => $this->l('Billing\'s identifier'),
                         'name'  => 'YA_BILLING_ID',
                         'value' => $model->getFormId(),
                     ),
@@ -918,11 +918,11 @@ class FormHelper
                         'type'    => 'text',
                         'desc'    => $this->l(
                             'Payment purpose is added to the payment order: specify whatever will help identify the'
-                            .' order paid via Yandex.Billing'
+                            .' order paid via Billing'
                         ),
                         'name'    => 'YA_BILLING_PURPOSE',
                         'label'   => $this->l('Payment purpose'),
-                        'default' => $this->l('Order No. #order_id# Payment via Yandex.Billing'),
+                        'default' => $this->l('Order No. #order_id# Payment via Billing'),
                         'value'   => $model->getPurpose(),
                     ),
                     array(

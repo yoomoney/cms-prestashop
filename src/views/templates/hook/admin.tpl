@@ -21,7 +21,7 @@
     <ul>
         <li><a href="#moneyorg">{l s='Yandex.Kassa' mod='yandexmodule'}</a></li>
         <li><a href="#money">{l s='Yandex.Money' mod='yandexmodule'}</a></li>
-        <li><a href="#billing">{l s='Yandex.Billing' mod='yandexmodule'}</a></li>
+        <li><a href="#billing">{l s='Billing' mod='yandexmodule'}</a></li>
         <li><a href="#metrika">{l s='Yandex.Metrics' mod='yandexmodule'}</a></li>
         <li><a href="#market">{l s='Yandex.Market' mod='yandexmodule'}</a></li>
     </ul>
@@ -32,7 +32,7 @@
     </div>
     <div id="billing">
         <div class="errors">{$billing_status|escape:'quotes':'UTF-8'}</div>
-        <p>{l s='This is a payment form for your site. It allows for accepting payments to your company account from cards and Yandex.Money e-wallets without a contract. To set it up, you need to provide the Yandex.Billing identifier: we will send it via email after you' mod='yandexmodule'} <a href="https://money.yandex.ru/fastpay/">{l s='create a form in construction kit' mod='yandexmodule'}</a></p>
+        <p>{l s='This is a payment form for your site. It allows for accepting payments to your company account from cards and Yandex.Money e-wallets without a contract. To set it up, you need to provide the Billing identifier: we will send it via email after you' mod='yandexmodule'} <a href="https://money.yandex.ru/fastpay/">{l s='create a form in construction kit' mod='yandexmodule'}</a></p>
         {$billing_form}
     </div>
     <div id="moneyorg">

@@ -10,7 +10,7 @@
 *}
 
 {capture name=path}
-    {l s='Payment with Yandex.Billing.' mod='yandexmodule'}
+    {l s='Payment with Billing.' mod='yandexmodule'}
 {/capture}
 
 <h1 class="page-heading">
@@ -33,7 +33,7 @@
         {/if}
         <div class="box cheque-box">
             <h3 class="page-subheading">
-                {l s='Yandex.Billing (bank card, e-wallets).' mod='yandexmodule'}
+                {l s='Billing (bank card, e-wallets).' mod='yandexmodule'}
             </h3>
             <p class="cheque-indent">
                 <strong class="dark">

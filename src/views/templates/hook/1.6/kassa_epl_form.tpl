@@ -54,7 +54,7 @@
         {if !$model->getShowYandexPaymentButton()}
             <p class="payment_module">
                 <a href="{$link->getModuleLink('yandexmodule', 'paymentkassa')|escape:'quotes':'UTF-8'}"
-                   title="{l s='Payment with Yandex.Billing' mod='yandexmodule'}"
+                   title="{l s='Payment with Billing' mod='yandexmodule'}"
                    class="yandex_money_yandex_money yandex_money_payment">
                     {l s='Payment with Yandex.Kassa' mod='yandexmodule'}
                 </a>

@@ -10,7 +10,7 @@
 *}
 
 {capture name=path}
-    {l s='Payment with Yandex.Billing.' mod='yandexmodule'}
+    {l s='Payment with Billing.' mod='yandexmodule'}
 {/capture}
 
 <h1 class="page-heading">
