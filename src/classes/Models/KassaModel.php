@@ -864,9 +864,6 @@ class KassaModel extends AbstractPaymentModel
             'created_at' => $refund->getCreatedAt()->format('Y-m-d H:i:s'),
             'comment'    => $comment,
         );
-        if ($refund->getAuthorizedAt() !== null) {
-            $row['authorized_at'] = $refund->getAuthorizedAt()->format('Y-m-d H:i:s');
-        }
 
         return Db::getInstance()->insert('ya_money_refunds', array($row));
     }
