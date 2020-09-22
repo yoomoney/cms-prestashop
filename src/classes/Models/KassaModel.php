@@ -52,6 +52,12 @@ class KassaModel extends AbstractPaymentModel
         PaymentMethodType::WECHAT,
     );
 
+    const PAYMENT_METHOD_WIDGET = 'widget';
+
+    private static $customPaymentMethods = array(
+        self::PAYMENT_METHOD_WIDGET,
+    );
+
     private $shopId;
     private $password;
     private $epl;
@@ -175,7 +181,8 @@ class KassaModel extends AbstractPaymentModel
     {
         if ($this->availablePaymentMethods === null) {
             $this->availablePaymentMethods = array();
-            foreach (PaymentMethodType::getEnabledValues() as $value) {
+            $enabledPaymentMethods = array_merge(PaymentMethodType::getEnabledValues(), self::getCustomPaymentMethods());
+            foreach ($enabledPaymentMethods as $value) {
                 if (!in_array($value, self::getDisabledPaymentMethods())) {
                     $this->availablePaymentMethods[$value] = 'YA_KASSA_PAYMENT_'.Tools::strtoupper($value);
                 }
@@ -203,6 +210,7 @@ class KassaModel extends AbstractPaymentModel
                 PaymentMethodType::QIWI           => $this->module->l('QIWI Wallet'),
                 PaymentMethodType::TINKOFF_BANK   => $this->module->l('Интернет-банк Тинькофф'),
                 PaymentMethodType::INSTALLMENTS   => $this->module->l('Installments (%s Р per month)'),
+                self::PAYMENT_METHOD_WIDGET       => $this->module->l('Bank cards, Apple Pay, Google Play'),
             );
 
             $payments = Configuration::getMultiple(array_values($this->getPaymentMethods()));
@@ -356,6 +364,14 @@ class KassaModel extends AbstractPaymentModel
         if ($this->enableHoldMode) {
             $module = new yandexmodule();
             $module->installTabIfNeeded();
+        }
+
+        if (Tools::getValue("YA_KASSA_PAYMENT_WIDGET") == '1') {
+            if (!$this->installVerifyAppleFile()) {
+                $errors .= $this->module->displayWarning(
+                    htmlspecialchars_decode($this->module->l('Чтобы покупатели могли заплатить вам через Apple Pay, <a href=\"https://kassa.yandex.ru/docs/merchant.ru.yandex.kassa\">скачайте файл apple-developer-merchantid-domain-association</a> и добавьте его в папку ./well-known на вашем сайте. Если не знаете, как это сделать, обратитесь к администратору сайта или в поддержку хостинга. Не забудьте также подключить оплату через Apple Pay <a href=\"https://kassa.yandex.ru/my/payment-methods/settings#applePay\">в личном кабинете Кассы</a>. <a href=\"https://kassa.yandex.ru/developers/payment-forms/widget#apple-pay-configuration\">Почитать о подключении Apple Pay в документации Кассы</a>'))
+                );
+            }
         }
 
         $this->onHoldStatusId = (int)Tools::getValue('YA_KASSA_ON_HOLD_STATUS_ID');
@@ -544,6 +560,9 @@ class KassaModel extends AbstractPaymentModel
                         'type'  => $paymentMethod,
                         'phone' => preg_replace('/[^\d]+/', '', Tools::getValue('qiwiPhone')),
                     );
+                } elseif ($paymentMethod === self::PAYMENT_METHOD_WIDGET) {
+                    $confirmation = ConfirmationType::EMBEDDED;
+                    $paymentMethod = null;
                 }
                 $builder->setPaymentMethodData($paymentMethod);
             }
@@ -824,9 +843,41 @@ class KassaModel extends AbstractPaymentModel
         }
     }
 
+    private function installVerifyAppleFile()
+    {
+        clearstatcache();
+        $pluginAssociationPath = YANDEX_MONEY_MODULE_ROOT_PATH . "apple-developer-merchantid-domain-association";
+        $rootDir = _PS_CORE_DIR_;
+        $rootAssociationPath = $rootDir . DIRECTORY_SEPARATOR . ".well-known" . DIRECTORY_SEPARATOR . "apple-developer-merchantid-domain-association";
+
+        if (file_exists($rootAssociationPath)) {
+            return true;
+        }
+
+        if (!file_exists($rootDir. DIRECTORY_SEPARATOR . '.well-known')) {
+            if (!@mkdir($rootDir. DIRECTORY_SEPARATOR . '.well-known', 0755)) {
+                return false;
+            }
+        }
+
+        if (!@copy($pluginAssociationPath, $rootAssociationPath)) {
+            return false;
+        }
+
+        return true;
+    }
+
     private static function getDisabledPaymentMethods()
     {
         return self::$disabledPaymentMethods;
+    }
+
+    /**
+     * @return array custom payment methods
+     */
+    private static function getCustomPaymentMethods()
+    {
+        return self::$customPaymentMethods;
     }
 
     private function insertPaymentInfo(CreatePaymentResponse $payment, $orderId)

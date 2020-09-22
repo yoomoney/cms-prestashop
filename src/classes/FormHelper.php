@@ -25,6 +25,7 @@ use YandexCheckout\Model\PaymentMethodType;
 use YandexCheckout\Model\Receipt\PaymentMode;
 use YandexCheckout\Model\Receipt\PaymentSubject;
 use yandexmodule;
+use YandexMoneyModule\Models\KassaModel;
 use YandexMoneyModule\Models\Market\YandexMarketSettings;
 
 class FormHelper
@@ -312,6 +313,7 @@ class FormHelper
             PaymentMethodType::ALFABANK       => $this->l('Alfa-Click'),
             PaymentMethodType::TINKOFF_BANK   => $this->l('Интернет-банк Тинькофф'),
             PaymentMethodType::INSTALLMENTS   => $this->l('Installments'),
+            KassaModel::PAYMENT_METHOD_WIDGET => $this->l('Payment widget from Yandex.Checkout (cards, Apple Pay and Google Play)')
         );
 
         $paymentModeEnum = array(
@@ -365,7 +367,7 @@ class FormHelper
         foreach (array_keys($model->getPaymentMethods()) as $key) {
             $paymentMethodOptions['query'][] = array(
                 'id'   => Tools::strtoupper($key),
-                'name' => $this->l($names[$key]),
+                'name' => $names[$key],
                 'val'  => 1,
             );
         }

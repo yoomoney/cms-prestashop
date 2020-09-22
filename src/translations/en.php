@@ -4,6 +4,7 @@ global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{yandexmodule}prestashop>actions_c3dca352ec9e5dd8c6f100c25e7c691a'] = 'Invalid Security Token!';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_082bd9fce144ff335837dd4cc9fbf935'] = 'Yandex.Money';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_de24f90c1d6457d5d796d669580ed375'] = 'Bank cards, Apple Pay, Google Play';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_a79541c6ecb3e0c3e633ae1dcc71ce2b'] = 'Y.CMS 2.0 Prestashop';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_493140388ba4ddfeda8e007f8dc4729f'] = 'Do you really want to uninstall the module?';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_309244368ba557406a7fb9b0f43fa96a'] = 'Currency is not defined!';
@@ -170,6 +171,7 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_62e41bf08783fca3cffe987b69e111c7'
 $_MODULE['<{yandexmodule}prestashop>formhelper_c40c3fe02e171a99399b551398b2e339'] = 'Order No. %order_id% Payment via Billing';
 $_MODULE['<{yandexmodule}prestashop>formhelper_57297718fdb439175177cf6b196172d1'] = 'Statuses to be sent to Yandex.Market';
 $_MODULE['<{yandexmodule}prestashop>formhelper_5cb172a89bde6fc4cb5233222a2f7ca0'] = 'Order status before the payment';
+$_MODULE['<{yandexmodule}prestashop>formhelper_528591ee7f999b91ed061cbfe77ee1a2'] = 'Payment widget from Yandex.Checkout (cards, Apple Pay and Google Play)';
 $_MODULE['<{yandexmodule}prestashop>installer_cf19f96ac1b9e5fde2bdbc5163d015a4'] = 'Y.CMS Order forwarded to delivery';
 $_MODULE['<{yandexmodule}prestashop>installer_bb64a109595adfa8c37b3eb8238fe26d'] = 'Y.CMS Order cancelled';
 $_MODULE['<{yandexmodule}prestashop>installer_1bf133df8f4fe19748fd3a70a0be23e1'] = 'Y.CMS Order delivered to pickup location';
@@ -196,10 +198,12 @@ $_MODULE['<{yandexmodule}prestashop>kassamodel_2f0b3c5f5a44698fa66bd5a30677d2bb'
 $_MODULE['<{yandexmodule}prestashop>kassamodel_48204bcecf095e7b9e5101d46d95eb6f'] = 'Sberbank Online';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_eb6f2920c23b02505450b4e3f305b3f1'] = 'Alfa-Click';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_02c53e8daafa908528986df7f6bf8fbd'] = 'QIWI Wallet';
+$_MODULE['<{yandexmodule}prestashop>kassamodel_de24f90c1d6457d5d796d669580ed375'] = 'Bank cards, Apple Pay, Google Play';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_66fc7e320665a5b631baf5691d7afbe8'] = 'Check shopid';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_9b13c92b7a167f93ea8c1fe4ab8a0138'] = 'Check secret key';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_04d5654893445386467d319f359b5541'] = 'Check shopId and Secret key—there is an error somewhere. Better yet, copy them directly from your <a href="https://kassa.yandex.ru/my" target="_blank">Yandex.Checkout\'s Merchant Profile</a>';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_448d469024be191a65ad530a9be76c92'] = 'You have enabled the test mode. Check the payment making process and contact Yandex.Checkout\'s manager. They will provide you with shopId the Secret key. <a href="https://yandex.ru/support/checkout/payments/api.html#api__04" target="_blank">Manual</a>';
+$_MODULE['<{yandexmodule}prestashop>kassamodel_d820dcd8817ed028fdf4f3c69f3a6172'] = 'Чтобы покупатели могли заплатить вам через Apple Pay, <a href=\"https://kassa.yandex.ru/docs/merchant.ru.yandex.kassa\">скачайте файл apple-developer-merchantid-domain-association</a> и добавьте его в папку ./well-known на вашем сайте. Если не знаете, как это сделать, обратитесь к администратору сайта или в поддержку хостинга. Не забудьте также подключить оплату через Apple Pay <a href=\"https://kassa.yandex.ru/my/payment-methods/settings#applePay\">в личном кабинете Кассы</a>. <a href=\"https://kassa.yandex.ru/developers/payment-forms/widget#apple-pay-configuration\">Почитать о подключении Apple Pay в документации Кассы</a>';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_9aa3172c0d2e2ae1ab491b461f963403'] = 'Please select at least one option from the list';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_fc724a540ce30b0b634163c922d60bed'] = 'Settings were saved';
 $_MODULE['<{yandexmodule}prestashop>marketmodel_c2a7f5c59ea7f454894cdda28fc0fee8'] = 'Store name is missing';
