@@ -41,14 +41,18 @@
 {/if}
 {/foreach}
 <form method="post" action="{$action|escape:'htmlall':'UTF-8'}" style="display: none;" id="ym-form-payment">
+    <script src="https://kassa.yandex.ru/checkout-ui/v2.js"></script>
     <input type="hidden" class="form-check-input" name="payment_method" id="ym-form-payment-type" value="" />
     <input type="hidden" class="form-check-input" name="qiwiPhone" id="ym-form-qiwi-phone" value="" />
     <input type="hidden" class="form-check-input" name="alfaLogin" id="ym-form-alfa-login" value="" />
+    <div id="payment-form-widget"></div>
 </form>
 
 
 <script type="text/javascript">
     jQuery(document).ready(function () {
+        var form = document.getElementById('ym-form-payment');
+
         jQuery('.yandex_money_payment').bind('click', function () {
             if (this.dataset.value === 'qiwi') {
                 jQuery('.additional-fields').css('display', 'none');
@@ -73,5 +77,38 @@
             form.payment_method.value = this.dataset.value;
             form.submit();
         });
+
+        form.onsubmit = function (e) {
+            var paymentMethod = form.payment_method.value;
+            if (paymentMethod !== 'widget') {
+                return;
+            }
+            e.preventDefault();
+            var request = new XMLHttpRequest();
+            request.open("POST", "{$action|escape:'htmlall':'UTF-8'}", true);
+            request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            request.responseType = "json";
+            request.addEventListener("readystatechange", () => {
+                if (request.readyState === 4 && request.status === 200) {
+                    let response = request.response;
+                    initWidget(response);
+                }
+            });
+            request.send('payment_method=' + paymentMethod);
+        }
+
+        function initWidget(data) {
+            const checkout = new window.YandexCheckout({
+                confirmation_token: data.confirmation_token,
+                return_url: data.return_url,
+                embedded_3ds: true,
+                error_callback(error) {
+                    console.log(error);
+                    window.location.redirect(data.return_url);
+                }
+            });
+
+            checkout.render('payment-form-widget');
+        }
     });
 </script>

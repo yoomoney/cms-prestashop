@@ -8,6 +8,7 @@ define('YANDEX_MONEY_PSR_LOG_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'y
     .DIRECTORY_SEPARATOR.'Psr'
     .DIRECTORY_SEPARATOR.'Log');
 define('YANDEX_MONEY_MODULE_CLASS_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'classes');
+define('YANDEX_MONEY_MODULE_ROOT_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR);
 
 function yandexMoneyLoadClass($className)
 {

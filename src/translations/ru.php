@@ -4,6 +4,7 @@ global $_MODULE;
 $_MODULE = array();
 $_MODULE['<{yandexmodule}prestashop>actions_c3dca352ec9e5dd8c6f100c25e7c691a'] = 'Не верный токен!';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_faef1666296f6eb16b2a4f390ea30d62'] = 'Яндекс.Деньги';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_de24f90c1d6457d5d796d669580ed375'] = 'Банковские карты, Apple Pay, Google Pay';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_a79541c6ecb3e0c3e633ae1dcc71ce2b'] = 'Модуль Y.CMS 2.0 для Prestashop';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_493140388ba4ddfeda8e007f8dc4729f'] = 'Вы действительно хотите удалить модуль?';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_309244368ba557406a7fb9b0f43fa96a'] = 'Не установлена валюта!';
@@ -133,6 +134,7 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_ad0866dbe28c9ee3c0db20b66a3d2ebd'
 $_MODULE['<{yandexmodule}prestashop>formhelper_a63593a811927ba64204f7171601ff6e'] = 'Мобильный баланс';
 $_MODULE['<{yandexmodule}prestashop>formhelper_621995df232472963068d5acc085332b'] = 'Альфа-клик';
 $_MODULE['<{yandexmodule}prestashop>formhelper_ba5376b5ba3216a7a51eabb18265d921'] = 'Заплатить по частям';
+$_MODULE['<{yandexmodule}prestashop>formhelper_528591ee7f999b91ed061cbfe77ee1a2'] = 'Платёжный виджет Кассы (карты, Apple Pay и Google Pay)';
 $_MODULE['<{yandexmodule}prestashop>formhelper_93cba07454f06a4a960172bbd6e2a435'] = 'Да';
 $_MODULE['<{yandexmodule}prestashop>formhelper_bafd7322c6e97d25b6299b5d6fe8920b'] = 'Нет';
 $_MODULE['<{yandexmodule}prestashop>formhelper_77ae253367b37a7ffeed106cfba63d37'] = 'shopId';
@@ -191,9 +193,11 @@ $_MODULE['<{yandexmodule}prestashop>kassamodel_ee55b43dc97b2011716c124c0d412642'
 $_MODULE['<{yandexmodule}prestashop>kassamodel_621995df232472963068d5acc085332b'] = 'Альфа-клик';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_f7337702a47bd4cd79b8c8f2f0ec52ed'] = 'QIWI Wallet';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_80409180da043f65b866dbc0cbee9714'] = 'Заплатить по частям (%s ₽ в месяц)';
+$_MODULE['<{yandexmodule}prestashop>kassamodel_de24f90c1d6457d5d796d669580ed375'] = 'Банковские карты, Apple Pay, Google Pay';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_66fc7e320665a5b631baf5691d7afbe8'] = 'Не был указана shop ID';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_9b13c92b7a167f93ea8c1fe4ab8a0138'] = 'Не было указано секретное слово';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_847bdca161490e69de38179502c03ab3'] = 'shopId или секретное слово заданы не верно: при проверке не удалось получить информацию от API Яндекс.Кассы!';
+$_MODULE['<{yandexmodule}prestashop>kassamodel_d820dcd8817ed028fdf4f3c69f3a6172'] = 'Чтобы покупатели могли заплатить вам через Apple Pay, <a href=\"https://kassa.yandex.ru/docs/merchant.ru.yandex.kassa\">скачайте файл apple-developer-merchantid-domain-association</a> и добавьте его в папку ./well-known на вашем сайте. Если не знаете, как это сделать, обратитесь к администратору сайта или в поддержку хостинга. Не забудьте также подключить оплату через Apple Pay <a href=\"https://kassa.yandex.ru/my/payment-methods/settings#applePay\">в личном кабинете Кассы</a>. <a href=\"https://kassa.yandex.ru/developers/payment-forms/widget#apple-pay-configuration\">Почитать о подключении Apple Pay в документации Кассы</a>';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_9aa3172c0d2e2ae1ab491b461f963403'] = 'Выберите хотя бы один способ оплаты';
 $_MODULE['<{yandexmodule}prestashop>kassamodel_fc724a540ce30b0b634163c922d60bed'] = 'Настройки были сохранены';
 $_MODULE['<{yandexmodule}prestashop>marketmodel_c2a7f5c59ea7f454894cdda28fc0fee8'] = 'Не указано название компании';
@@ -323,5 +327,6 @@ $_MODULE['<{yandexmodule}prestashop>kassa_epl_form_78d450c37ae59bb9c73017b43bc0c
 $_MODULE['<{yandexmodule}prestashop>kassa_epl_form_77f072c589a4ade0fd37ba687f37a7e1'] = 'Оплата с помощью Платёжки';
 $_MODULE['<{yandexmodule}prestashop>kassa_epl_form_9e91dca5be8717bad5e8d4e534fc43c2'] = 'Оплата с помощью Яндекс.Кассы';
 $_MODULE['<{yandexmodule}prestashop>kassa_form_faef1666296f6eb16b2a4f390ea30d62'] = 'Яндекс.Деньги (банковские карты, кошелек и другое)';
+$_MODULE['<{yandexmodule}prestashop>kassa_form_de24f90c1d6457d5d796d669580ed375'] = 'Банковские карты, Apple Pay, Google Pay';
 $_MODULE['<{yandexmodule}prestashop>wallet_form_faef1666296f6eb16b2a4f390ea30d62'] = 'Яндекс.Деньги';
 $_MODULE['<{yandexmodule}prestashop>wallet_form_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Банковские карты — Visa, Mastercard и Maestro, «Мир»';

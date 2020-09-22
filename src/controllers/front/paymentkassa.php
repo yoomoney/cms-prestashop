@@ -9,6 +9,8 @@
  * @category  Front Office Features
  * @package   Yandex Payment Solution
  */
+
+use YandexCheckout\Model\Confirmation\ConfirmationEmbedded;
 use YandexCheckout\Model\Confirmation\ConfirmationRedirect;
 use YandexCheckout\Model\PaymentMethodType;
 
@@ -87,9 +89,9 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
         $currency = $this->context->currency;
         $total    = (float)$cart->getOrderTotal(true, Cart::BOTH);
         if (isset($paymentMethodInfo)) {
-            $paymentLabel          = $paymentMethodInfo['value'] == PaymentMethodType::INSTALLMENTS
-                ? $this->module->l('Installments')
-                : $paymentMethodInfo['name'];
+            $paymentLabel = $paymentMethodInfo['value'] == PaymentMethodType::INSTALLMENTS
+                          ? $this->module->l('Installments')
+                          : $paymentMethodInfo['name'];
             $paymentMethodInfoName = ': '.$paymentLabel;
         } else {
             $paymentMethodInfoName = '';
@@ -106,19 +108,20 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
             null,
             (int)$currency->id,
             false,
-            $customer->secure_key
+            $cart->secure_key
         );
         if (!$isOrderValid) {
             $this->errorRedirect($this->module->l('Failed to validate order'), 'index.php?controller=order&step=1');
         }
 
-        $returnUrl = 'index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$this->module->id
+        $returnUrl = Tools::getShopDomain(true).__PS_BASE_URI__ .'index.php?controller=order-confirmation&id_cart='.$cart->id.'&id_module='.$this->module->id
                      .'&id_order='.$this->module->currentOrder.'&key='.$customer->secure_key;
+
         $payment   = $kassa->createPayment(
             $this->context,
             $cart,
             $paymentMethod,
-            Tools::getShopDomain(true).__PS_BASE_URI__.$returnUrl
+            $returnUrl
         );
         $errorUrl  = 'index.php?controller=order&submitReorder=&id_order='.$this->module->currentOrder;
         if ($payment === null) {
@@ -129,6 +132,14 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
         if ($confirmation instanceof ConfirmationRedirect) {
             $this->module->log('info', 'Redirect user to payment page '.$confirmation->getConfirmationUrl());
             Tools::redirect($confirmation->getConfirmationUrl());
+        } elseif ($confirmation instanceof ConfirmationEmbedded) {
+            $response = array(
+                'confirmation_token' => $payment->getConfirmation()->getConfirmationToken(),
+                'return_url' => $returnUrl,
+            );
+            $this->module->log('info', 'Return confirmation token: ' . $response['confirmation_token']);
+            echo json_encode($response);
+            exit();
         } else {
             $this->module->log('info', 'Redirect user to confirmation page '.$returnUrl);
             Tools::redirect($returnUrl);
