@@ -40,7 +40,7 @@ $_MODULE['<{yandexmodule}prestashop>yandexmodule_2a6b5e2b70f426738047bc84dd5f22c
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_be02696c0d0899163c862a7274198d36'] = 'Phone number';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_4b3e7faab54578d96b7e965a1910832c'] = 'Full refund';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_c43f9ecbcaa84eef858f1cdd6ce4a59b'] = 'Yandex.Checkout (bank cards, e-money, etc.)';
-$_MODULE['<{yandexmodule}prestashop>yandexmodule_5b6c5dcd58c20b12f50335c6d6f10309'] = 'Select payment method';
+$_MODULE['<{yandexmodule}prestashop>yandexmodule_7768d98226feb41e4efea8f71217318b'] = 'Select payment method';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_bd40340e00e4456d034af486feb3d998'] = 'Unable to make the payment';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_e6a2e577cf0c8aa8192300235d39a1ac'] = 'Canceled';
 $_MODULE['<{yandexmodule}prestashop>yandexmodule_20a5b4f336715bb1116a4d9a51d4d4b3'] = 'Has declined a request authorization application';
@@ -131,9 +131,9 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_93cba07454f06a4a960172bbd6e2a435'
 $_MODULE['<{yandexmodule}prestashop>formhelper_bafd7322c6e97d25b6299b5d6fe8920b'] = 'No';
 $_MODULE['<{yandexmodule}prestashop>formhelper_77ae253367b37a7ffeed106cfba63d37'] = 'shopId';
 $_MODULE['<{yandexmodule}prestashop>formhelper_a09a7a6e949aab436f7b4bcd16ea8379'] = 'Secret key';
-$_MODULE['<{yandexmodule}prestashop>formhelper_f3db77dca0afe2ca395d4c641230ddd6'] = 'Select payment method';
-$_MODULE['<{yandexmodule}prestashop>formhelper_683531b1938c0a3144bd2ec2c3b018ca'] = 'On Yandex.Checkout\'s site';
-$_MODULE['<{yandexmodule}prestashop>formhelper_34fc70d33c11c98da9f853f815099b38'] = 'On the store\'s site';
+$_MODULE['<{yandexmodule}prestashop>formhelper_7768d98226feb41e4efea8f71217318b'] = 'Select payment method';
+$_MODULE['<{yandexmodule}prestashop>formhelper_d69a7a0b023911d9b6e5148b88c10d8e'] = 'On Yandex.Checkout\'s site';
+$_MODULE['<{yandexmodule}prestashop>formhelper_52f52bbdae452da8b04aeb85ab42e3ae'] = 'On the store\'s site';
 $_MODULE['<{yandexmodule}prestashop>formhelper_65b42007117fefeb9d122c9d582c2e7e'] = 'Use a button with \'Pay with Yandex\' text';
 $_MODULE['<{yandexmodule}prestashop>formhelper_27dda3cb0fb2c7da8fd7751641582a5f'] = 'Transmit details for receipts to Yandex.Checkout (Federal Law 54-FZ)';
 $_MODULE['<{yandexmodule}prestashop>formhelper_417b334759a9581d16440d075aa1cd12'] = 'Enable';
@@ -226,7 +226,7 @@ $_MODULE['<{yandexmodule}prestashop>walletmodel_80d40851e2805bf494e47dbeeeb40b58
 $_MODULE['<{yandexmodule}prestashop>walletmodel_a0f153214235ddda2940f52a3488253b'] = 'Specify App ID';
 $_MODULE['<{yandexmodule}prestashop>walletmodel_010ed66f110e5499b3e6652056717134'] = 'Specify the codeword';
 $_MODULE['<{yandexmodule}prestashop>walletmodel_fc724a540ce30b0b634163c922d60bed'] = 'Settings were saved';
-$_MODULE['<{yandexmodule}prestashop>walletmodel_5b6c5dcd58c20b12f50335c6d6f10309'] = 'Select payment method';
+$_MODULE['<{yandexmodule}prestashop>walletmodel_7768d98226feb41e4efea8f71217318b'] = 'Select payment method';
 $_MODULE['<{yandexmodule}prestashop>paymentcard_8538a3918b9588cd07f838706f709127'] = 'Перенаправление на';
 $_MODULE['<{yandexmodule}prestashop>paymentcard_aa563f53e61ac8767c947bab6a51633a'] = 'От Яндекс.Денег получен невалидный ответ';
 $_MODULE['<{yandexmodule}prestashop>paymentcard_6b2266c1ba7007ce4d8d107e76568be3'] = 'Неверные отпарвляемые данные';

@@ -88,6 +88,7 @@ function initWidget(data) {
         confirmation_token: data.confirmation_token,
         return_url: data.return_url,
         embedded_3ds: true,
+        newDesign: true,
         error_callback(error) {
             console.log(error);
             window.location.redirect(data.return_url);

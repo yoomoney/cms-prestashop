@@ -51,6 +51,10 @@ p.payment_module a.yandex_money_installments {
 	background: url(../img/installments.png) 23px 30px no-repeat #fbfbfb;
 }
 
+p.payment_module a.yandex_money_widget {
+	background: url(../img/widget.png) 23px 30px no-repeat #fbfbfb;
+}
+
 p.payment_module a.yandex_money_yandex_money:hover,
 p.payment_module a.yandex_money_bank_card:hover,
 p.payment_module a.ym_AC:hover,

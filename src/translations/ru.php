@@ -143,6 +143,9 @@ $_MODULE['<{yandexmodule}prestashop>formhelper_f988ad4d489f259bf1c1960ed81282b2'
 $_MODULE['<{yandexmodule}prestashop>formhelper_65b42007117fefeb9d122c9d582c2e7e'] = 'Назвать кнопку оплаты «Заплатить через Яндекс»';
 $_MODULE['<{yandexmodule}prestashop>formhelper_08dd74d5ebac2acb6dbf78593ae75a4e'] = 'Добавить кнопку «Заплатить по частям»';
 $_MODULE['<{yandexmodule}prestashop>formhelper_0f6ec6c603cd5935515aecd633d0fde7'] = 'Это описание транзакции, которое пользователь увидит при оплате, а вы — в личном кабинете Яндекс.Кассы. Например, «Оплата заказа №72». Чтобы в описание подставлялся номер заказа (как в примере), поставьте на его месте %cart_id% (Оплата заказа %cart_id%). Ограничение для описания — 128 символов.';
+$_MODULE['<{yandexmodule}prestashop>formhelper_7768d98226feb41e4efea8f71217318b'] = 'Выбор метода оплаты';
+$_MODULE['<{yandexmodule}prestashop>formhelper_d69a7a0b023911d9b6e5148b88c10d8e'] = 'На стороне Кассы';
+$_MODULE['<{yandexmodule}prestashop>formhelper_52f52bbdae452da8b04aeb85ab42e3ae'] = 'На стороне сайта';
 $_MODULE['<{yandexmodule}prestashop>formhelper_9ffebefa70eb18ef4b2008f8faaee976'] = 'Описание платежа';
 $_MODULE['<{yandexmodule}prestashop>formhelper_27dda3cb0fb2c7da8fd7751641582a5f'] = 'Отправлять в Яндекс.Кассу данные для чеков (54-ФЗ)';
 $_MODULE['<{yandexmodule}prestashop>formhelper_417b334759a9581d16440d075aa1cd12'] = 'Включить';
