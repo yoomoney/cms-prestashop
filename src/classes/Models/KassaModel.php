@@ -641,7 +641,7 @@ class KassaModel extends AbstractPaymentModel
             $builder = CreateRefundRequest::builder();
             $builder->setPaymentId($payment->getId())
                     ->setAmount($amount)
-                    ->setComment($comment);
+                    ->setDescription($comment);
             $request = $builder->build();
         } catch (\Exception $e) {
             $this->module->log('error', 'Failed to create refund request: '.$e->getMessage());

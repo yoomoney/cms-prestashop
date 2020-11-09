@@ -10,7 +10,7 @@
 *}
 {if $update_status}
     <div class="alert alert-warning">{l s='Your module version is outdated. You can ' mod='yandexmodule'}
-        <a target='_blank' href='https://github.com/yandex-money/yandex-money-cms-prestashop/releases'>
+        <a target='_blank' href='https://github.com/yoomoney/yandex-money-ycms-v2-prestashop/releases'>
             {l s='download and install ' mod='yandexmodule'}</a> {l s='a new one' mod='yandexmodule'}
         {$update_status|escape:'htmlall':'UTF-8'}</div>
 {/if}
