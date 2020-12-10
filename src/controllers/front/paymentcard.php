@@ -2,15 +2,15 @@
 /**
  * Module is prohibited to sales! Violation of this condition leads to the deprivation of the license!
  *
- * @author    Yandex.Money <cms@yamoney.ru>
- * @copyright © 2015-2017 NBCO Yandex.Money LLC
- * @license   https://money.yandex.ru/doc.xml?id=527052
+ * @author    YooMoney <cms@yoomoney.ru>
+ * @copyright © 2020 "YooMoney", NBСO LLC
+ * @license   https://yoomoney.ru/doc.xml?id=527052
  *
  * @category  Front Office Features
- * @package   Yandex Payment Solution
+ * @package   YooMoney Payment Solution
  */
 
-class YandexModulePaymentCardModuleFrontController extends ModuleFrontController
+class YooMoneyModulePaymentCardModuleFrontController extends ModuleFrontController
 {
     public $display_header = true;
     public $display_column_left = true;
@@ -22,7 +22,7 @@ class YandexModulePaymentCardModuleFrontController extends ModuleFrontController
     public function postProcess()
     {
         parent::postProcess();
-        $this->log_on = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
+        $this->log_on = Configuration::get('YOOMONEY_KASSA_LOGGING_ON') == 'on';
         $cart = $this->context->cart;
         if ($cart->id_customer == 0
             || $cart->id_address_delivery == 0
@@ -38,8 +38,8 @@ class YandexModulePaymentCardModuleFrontController extends ModuleFrontController
         }
 
         $this->module->payment_status = false;
-        $requestId = $this->module->getCipher()->decrypt(urldecode($this->context->cookie->ya_encrypt_CRequestId));
-        $instance_id = $this->module->getCipher()->decrypt(urldecode($this->context->cookie->ya_encrypt_CInstanceId));
+        $requestId = $this->module->getCipher()->decrypt(urldecode($this->context->cookie->yoomoney_encrypt_CRequestId));
+        $instance_id = $this->module->getCipher()->decrypt(urldecode($this->context->cookie->yoomoney_encrypt_CInstanceId));
         if ($this->log_on) {
             $this->module->log('info', 'payment_card: cookie_requestId'.print_r($requestId, true));
         }
@@ -53,18 +53,18 @@ class YandexModulePaymentCardModuleFrontController extends ModuleFrontController
             if ($res->status == 'success') {
                 //TODO Отправить повторный
                 ///*
-                $external_payment = new YandexModuleExternalPayment($instance_id);
+                $external_payment = new YooMoneyModuleExternalPayment($instance_id);
                 do {
                     $process_options = array(
                         "request_id" => $requestId,
                         'ext_auth_success_uri' => $this->context->link->getModuleLink(
-                            'yandexmodule',
+                            'yoomoneymodule',
                             'paymentcard',
                             array(),
                             true
                         ),
                         'ext_auth_fail_uri' => $this->context->link->getModuleLink(
-                            'yandexmodule',
+                            'yoomoneymodule',
                             'paymentcard',
                             array(),
                             true
@@ -114,7 +114,7 @@ class YandexModulePaymentCardModuleFrontController extends ModuleFrontController
                 $this->errors[] = $this->module->descriptionError($res->error);
             }
         } else {
-            $this->errors[] = $this->module->l('Not received the correct data from Yandex.Money');
+            $this->errors[] = $this->module->l('Not received the correct data from YooMoney');
             if ($this->log_on) {
                 $this->module->log('info', 'payment_card: Error '.$this->module->l('Invalid send data'));
             }
@@ -124,7 +124,7 @@ class YandexModulePaymentCardModuleFrontController extends ModuleFrontController
 
     public function updateStatus(&$resp)
     {
-        $this->log_on = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
+        $this->log_on = Configuration::get('YOOMONEY_KASSA_LOGGING_ON') == 'on';
         if ($resp->status == 'success') {
             $cart = $this->context->cart;
             $link = $this->context->link->getPageLink('order-confirmation').'&id_cart='

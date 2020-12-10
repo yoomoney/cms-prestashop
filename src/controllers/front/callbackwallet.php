@@ -1,7 +1,7 @@
 <?php
 
 
-class YandexModuleCallbackWalletModuleFrontController extends ModuleFrontController
+class YooMoneyModuleCallbackWalletModuleFrontController extends ModuleFrontController
 {
     /**
      * @see FrontController::postProcess()
@@ -16,7 +16,7 @@ class YandexModuleCallbackWalletModuleFrontController extends ModuleFrontControl
             if (isset($order)) {
                 $history           = new OrderHistory();
                 $history->id_order = $order->id;
-                $state             = Configuration::get('YA_WALLET_END_STATUS');
+                $state             = Configuration::get('YOOMONEY_WALLET_END_STATUS');
                 if (empty($state)) {
                     $state = Configuration::get('PS_OS_PAYMENT');
                 }
@@ -36,7 +36,7 @@ class YandexModuleCallbackWalletModuleFrontController extends ModuleFrontControl
             $shaHash = $_POST['sha1_hash'];
         }
 
-        $notificationSecret = Configuration::get('YA_WALLET_PASSWORD');
+        $notificationSecret = Configuration::get('YOOMONEY_WALLET_PASSWORD');
 
         $notificationType = isset($_POST['notification_type']) ? $_POST['notification_type'] : '';
         $operationId      = isset($_POST['operation_id']) ? $_POST['operation_id'] : '';

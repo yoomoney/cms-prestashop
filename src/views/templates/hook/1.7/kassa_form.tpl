@@ -1,17 +1,17 @@
 {**
 * Module is prohibited to sales! Violation of this condition leads to the deprivation of the license!
 *
-* @author    Yandex.Money <cms@yamoney.ru>
-* @copyright © 2015-2017 NBCO Yandex.Money LLC
-* @license   https://money.yandex.ru/doc.xml?id=527052
+* @author    YooMoney <cms@yoomoney.ru>
+* @copyright © 2020 "YooMoney", NBСO LLC
+* @license   https://yoomoney.ru/doc.xml?id=527052
 *
 * @category  Front Office Features
-* @package   Yandex Payment Solution
+* @package   YooMoney Payment Solution
 *
 * @var KassaModel $model
 *}
-<form method="post" action="{$action|escape:'htmlall':'UTF-8'}" id="ya-form">
-    <script src="https://kassa.yandex.ru/checkout-ui/v2.js"></script>
+<form method="post" action="{$action|escape:'htmlall':'UTF-8'}" id="yoomoney-form">
+    <script src="https://yookassa.ru/checkout-ui/v2.js"></script>
     <fieldset class="form-group">
         <legend>{$label|escape:'htmlall':'UTF-8'}</legend>
         {foreach from=$payment_methods item=method}
@@ -24,13 +24,13 @@
             </div>
             {if $method.value == 'alfabank'}
                 <div id="alfa-login-container" class="form-group additional-fields" style="display: none;">
-                    <label for="alfa-login">{l s='Specify the login, and we\'ll send the bill in Alfa-Click. All you have do after that is confirm the payment online at the bank\'s website.' mod='yandexmodule'}</label>
+                    <label for="alfa-login">{l s='Specify the login, and we\'ll send the bill in Alfa-Click. All you have do after that is confirm the payment online at the bank\'s website.' mod='yoomoneymodule'}</label>
                     <input type="text" name="alfaLogin" id="alfa-login" value="" />
                 </div>
             {/if}
             {if $method.value == 'qiwi'}
                 <div id="qiwi-phone-container" class="form-group additional-fields" style="display: none;">
-                    <label for="qiwi-phone">{l s='Phone number linked to QIWI Wallet' mod='yandexmodule'}</label>
+                    <label for="qiwi-phone">{l s='Phone number linked to QIWI Wallet' mod='yoomoneymodule'}</label>
                     <input type="text" name="qiwiPhone" id="qiwi-phone" value="" />
                 </div>
             {/if}
@@ -40,7 +40,7 @@
 </form>
 <script type="text/javascript">
 
-var form = document.getElementById('ya-form');
+var form = document.getElementById('yoomoney-form');
 function onChangePaymentMethod() {
     var alfa = document.getElementById('alfa-login-container');
     var qiwi = document.getElementById('qiwi-phone-container');
@@ -84,7 +84,7 @@ form.onsubmit = function (e) {
 
 function initWidget(data) {
     console.log(data);
-    const checkout = new window.YandexCheckout({
+    const checkout = new window.YooMoneyCheckoutWidget({
         confirmation_token: data.confirmation_token,
         return_url: data.return_url,
         embedded_3ds: true,

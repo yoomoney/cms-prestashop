@@ -2,15 +2,15 @@
 /**
  * Module is prohibited to sales! Violation of this condition leads to the deprivation of the license!
  *
- * @author    Yandex.Money <cms@yamoney.ru>
- * @copyright © 2015-2017 NBCO Yandex.Money LLC
- * @license   https://money.yandex.ru/doc.xml?id=527052
+ * @author    YooMoney <cms@yoomoney.ru>
+ * @copyright © 2020 "YooMoney", NBСO LLC
+ * @license   https://yoomoney.ru/doc.xml?id=527052
  *
  * @category  Front Office Features
- * @package   Yandex Payment Solution
+ * @package   YooMoney Payment Solution
  */
 
-class YandexModuleRedirectCardModuleFrontController extends ModuleFrontController
+class YooMoneyModuleRedirectCardModuleFrontController extends ModuleFrontController
 {
     public $display_header = true;
     public $display_column_left = true;
@@ -21,7 +21,7 @@ class YandexModuleRedirectCardModuleFrontController extends ModuleFrontControlle
     public function postProcess()
     {
         parent::postProcess();
-        $this->log_on = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
+        $this->log_on = Configuration::get('YOOMONEY_KASSA_LOGGING_ON') == 'on';
         $cart = $this->context->cart;
         if ($cart->id_customer == 0
             || $cart->id_address_delivery == 0
@@ -53,7 +53,7 @@ class YandexModuleRedirectCardModuleFrontController extends ModuleFrontControlle
             Tools::redirect('index.php?controller=order&step=3');
         } elseif (!empty($code) && $cnf) {
             $comment = $message = $this->module->l('Total:').$total_to_pay.$this->module->l(' rub');
-            $response = YandexModuleExternalPayment::getInstanceId(Configuration::get('YA_WALLET_APPLICATION_ID'));
+            $response = YooMoneyModuleExternalPayment::getInstanceId(Configuration::get('YOOMONEY_WALLET_APPLICATION_ID'));
             if ($response->status == "success") {
                 if ($this->log_on) {
                     $this->module->log(
@@ -62,10 +62,10 @@ class YandexModuleRedirectCardModuleFrontController extends ModuleFrontControlle
                     );
                 }
                 $instance_id = $response->instance_id;
-                $external_payment = new YandexModuleExternalPayment($instance_id);
+                $external_payment = new YooMoneyModuleExternalPayment($instance_id);
                 $payment_options = array(
                     "pattern_id" => "p2p",
-                    "to" => Configuration::get('YA_WALLET_ACCOUNT_ID'),
+                    "to" => Configuration::get('YOOMONEY_WALLET_ACCOUNT_ID'),
                     "amount_due" => $total_to_pay,
                     "comment" => trim($comment),
                     "message" => trim($message),
@@ -80,9 +80,9 @@ class YandexModuleRedirectCardModuleFrontController extends ModuleFrontControlle
                         $this->module->log('info', 'card_redirect:  '.$this->module->l('Request success'));
                     }
                     $request_id = $response->request_id;
-                    $this->context->cookie->ya_encrypt_CRequestId
+                    $this->context->cookie->yoomoney_encrypt_CRequestId
                         = urlencode($this->module->getCipher()->encrypt($request_id));
-                    $this->context->cookie->ya_encrypt_CInstanceId
+                    $this->context->cookie->yoomoney_encrypt_CInstanceId
                         = urlencode($this->module->getCipher()->encrypt($instance_id));
                     $this->context->cookie->write();
                     
@@ -90,13 +90,13 @@ class YandexModuleRedirectCardModuleFrontController extends ModuleFrontControlle
                         $process_options = array(
                             "request_id" => $request_id,
                             'ext_auth_success_uri' => $this->context->link->getModuleLink(
-                                'yandexmodule',
+                                'yoomoneymodule',
                                 'paymentcard',
                                 array(),
                                 true
                             ),
                             'ext_auth_fail_uri' => $this->context->link->getModuleLink(
-                                'yandexmodule',
+                                'yoomoneymodule',
                                 'paymentcard',
                                 array(),
                                 true
@@ -140,7 +140,7 @@ class YandexModuleRedirectCardModuleFrontController extends ModuleFrontControlle
     
     public function updateStatus(&$resp)
     {
-        $this->log_on = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
+        $this->log_on = Configuration::get('YOOMONEY_KASSA_LOGGING_ON') == 'on';
         if ($resp->status == 'success') {
             $cart = $this->context->cart;
             if ($cart->orderExists()) {

@@ -3,14 +3,14 @@
 /**
  * Module is prohibited to sales! Violation of this condition leads to the deprivation of the license!
  *
- * @author    Yandex.Money <cms@yamoney.ru>
- * @copyright © 2015-2017 NBCO Yandex.Money LLC
- * @license   https://money.yandex.ru/doc.xml?id=527052
+ * @author    YooMoney <cms@yoomoney.ru>
+ * @copyright © 2020 "YooMoney", NBСO LLC
+ * @license   https://yoomoney.ru/doc.xml?id=527052
  *
  * @category  Front Office Features
- * @package   Yandex Payment Solution
+ * @package   YooMoney Payment Solution
  */
-class YandexModuleRedirectWalletModuleFrontController extends ModuleFrontController
+class YooMoneyModuleRedirectWalletModuleFrontController extends ModuleFrontController
 {
     public $display_header = true;
     public $display_column_left = true;
@@ -39,7 +39,7 @@ class YandexModuleRedirectWalletModuleFrontController extends ModuleFrontControl
             (int)$this->context->cart->id,
             Configuration::get('PS_OS_PREPARATION'),
             $this->context->cart->getOrderTotal(true, Cart::BOTH),
-            'Yandex.Деньги',
+            'ЮMoney',
             null,
             array(),
             null,
@@ -53,7 +53,7 @@ class YandexModuleRedirectWalletModuleFrontController extends ModuleFrontControl
                      .$this->module->currentOrder.'&key='.$cart->secure_key;
             $paymentTarget = $this->module->l('Payment for Order N. '.(int)$this->module->currentOrder);
             $this->context->smarty->assign(array(
-                'receiver'     => Configuration::get('YA_WALLET_ACCOUNT_ID'),
+                'receiver'     => Configuration::get('YOOMONEY_WALLET_ACCOUNT_ID'),
                 'amount'       => $totalAmount,
                 'paymentType'  => $paymentType,
                 'formcomment'  => '',
@@ -70,7 +70,7 @@ class YandexModuleRedirectWalletModuleFrontController extends ModuleFrontControl
             if (version_compare(_PS_VERSION_, '1.7.0') < 0) {
                 $this->setTemplate('wallet_redirect.tpl');
             } else {
-                $this->setTemplate('module:yandexmodule/views/templates/front/wallet_redirect_17.tpl');
+                $this->setTemplate('module:yoomoneymodule/views/templates/front/wallet_redirect_17.tpl');
             }
         } else {
             Tools::redirect('index.php?controller=order&step=3');

@@ -1,26 +1,15 @@
 <?php
 
-define('YANDEX_MONEY_SDK_ROOT_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'yandex-checkout-sdk' . DIRECTORY_SEPARATOR . 'lib');
-define('YANDEX_MONEY_PSR_LOG_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . 'yandex-checkout-sdk'
-    .DIRECTORY_SEPARATOR.'vendor'
-    .DIRECTORY_SEPARATOR.'psr'
-    .DIRECTORY_SEPARATOR.'log'
-    .DIRECTORY_SEPARATOR.'Psr'
-    .DIRECTORY_SEPARATOR.'Log');
-define('YANDEX_MONEY_MODULE_CLASS_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'classes');
-define('YANDEX_MONEY_MODULE_ROOT_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR);
+require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-function yandexMoneyLoadClass($className)
+define('YOOMONEY_MODULE_ROOT_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR);
+define('YOOMONEY_MODULE_CLASS_PATH', YOOMONEY_MODULE_ROOT_PATH . 'classes');
+
+function yooMoneyLoadClass($className)
 {
-    if (strncmp('YandexCheckout', $className, 14) === 0) {
-        $path = YANDEX_MONEY_SDK_ROOT_PATH;
+    if (strncmp('YooMoneyModule', $className, 14) === 0) {
+        $path = YOOMONEY_MODULE_CLASS_PATH;
         $length = 14;
-    } elseif (strncmp('Psr\Log', $className, 7) === 0) {
-        $path = YANDEX_MONEY_PSR_LOG_PATH;
-        $length = 7;
-    } elseif (strncmp('YandexMoneyModule', $className, 17) === 0) {
-        $path = YANDEX_MONEY_MODULE_CLASS_PATH;
-        $length = 17;
     } else {
         return;
     }
@@ -31,8 +20,8 @@ function yandexMoneyLoadClass($className)
     }
     $path .= '.php';
     if (file_exists($path)) {
-        include $path;
+        require_once $path;
     }
 }
 
-spl_autoload_register('yandexMoneyLoadClass');
+spl_autoload_register('yooMoneyLoadClass');

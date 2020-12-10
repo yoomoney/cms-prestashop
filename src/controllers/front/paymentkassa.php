@@ -2,24 +2,24 @@
 /**
  * Module is prohibited to sales! Violation of this condition leads to the deprivation of the license!
  *
- * @author    Yandex.Money <cms@yamoney.ru>
- * @copyright © 2015-2017 NBCO Yandex.Money LLC
- * @license   https://money.yandex.ru/doc.xml?id=527052
+ * @author    YooMoney <cms@yoomoney.ru>
+ * @copyright © 2020 "YooMoney", NBСO LLC
+ * @license   https://yoomoney.ru/doc.xml?id=527052
  *
  * @category  Front Office Features
- * @package   Yandex Payment Solution
+ * @package   YooMoney Payment Solution
  */
 
-use YandexCheckout\Model\Confirmation\ConfirmationEmbedded;
-use YandexCheckout\Model\Confirmation\ConfirmationRedirect;
-use YandexCheckout\Model\PaymentMethodType;
+use YooKassa\Model\Confirmation\ConfirmationEmbedded;
+use YooKassa\Model\Confirmation\ConfirmationRedirect;
+use YooKassa\Model\PaymentMethodType;
 
 /**
- * Class YandexModulePaymentKassaModuleFrontController
+ * Class YooMoneyModulePaymentKassaModuleFrontController
  *
- * @property yandexmodule $module
+ * @property yoomoneymodule $module
  */
-class YandexModulePaymentKassaModuleFrontController extends ModuleFrontController
+class YooMoneyModulePaymentKassaModuleFrontController extends ModuleFrontController
 {
     public $display_header = true;
     public $display_column_left = true;
@@ -47,7 +47,7 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
         // end of the checkout process
         $authorized = false;
         foreach (Module::getPaymentModules() as $module) {
-            if ($module['name'] == 'yandexmodule') {
+            if ($module['name'] == 'yoomoneymodule') {
                 $authorized = true;
                 break;
             }
@@ -102,7 +102,7 @@ class YandexModulePaymentKassaModuleFrontController extends ModuleFrontControlle
             $cart->id,
             $kassa->getCreateStatusId(),
             $total,
-            $this->module->l('Payment via Yandex.Checkout')
+            $this->module->l('Payment via YooKassa')
             .$paymentMethodInfoName,
             null,
             null,

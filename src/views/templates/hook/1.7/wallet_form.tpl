@@ -1,12 +1,12 @@
 {**
 * Module is prohibited to sales! Violation of this condition leads to the deprivation of the license!
 *
-* @author    Yandex.Money <cms@yamoney.ru>
-* @copyright © 2015-2017 NBCO Yandex.Money LLC
-* @license   https://money.yandex.ru/doc.xml?id=527052
+* @author    YooMoney <cms@yoomoney.ru>
+* @copyright © 2020 "YooMoney", NBСO LLC
+* @license   https://yoomoney.ru/doc.xml?id=527052
 *
 * @category  Front Office Features
-* @package   Yandex Payment Solution
+* @package   YooMoney Payment Solution
 *}
 
 <form method="post" action="{$action|escape:'htmlall':'UTF-8'}">
@@ -15,15 +15,15 @@
     <fieldset class="form-group">
         <legend>{$label|escape:'htmlall':'UTF-8'}</legend>
         <div class="form-check">
-            <label for="yandex_money_wallet" class="form-check-label">
-                <input type="radio" class="form-check-input" name="type" id="yandex_money_wallet" value="wallet" />
-                <img src="{$image_dir|escape:'htmlall':'UTF-8'}yandex_money.png" />
-                {l s='Yandex.Money' mod='yandexmodule'}
+            <label for="yoomoney_wallet" class="form-check-label">
+                <input type="radio" class="form-check-input" name="type" id="yoomoney_wallet" value="wallet" />
+                <img src="{$image_dir|escape:'htmlall':'UTF-8'}yoo_money.png" />
+                {l s='YooMoney' mod='yoomoneymodule'}
             </label><br />
-            <label for="yandex_money_card" class="form-check-label">
-                <input type="radio" class="form-check-input" name="type" id="yandex_money_card" value="card" />
+            <label for="yoomoney_card" class="form-check-label">
+                <input type="radio" class="form-check-input" name="type" id="yoomoney_card" value="card" />
                 <img src="{$image_dir|escape:'htmlall':'UTF-8'}bank_card.png" />
-                {l s='Bank cards' mod='yandexmodule'}
+                {l s='Bank cards' mod='yoomoneymodule'}
             </label>
         </div>
     </fieldset>
