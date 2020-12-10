@@ -1,11 +1,11 @@
 <?php
 /**
- * @author Yandex.Money <cms@yamoney.ru>
- * @copyright © 2015-2017 NBCO Yandex.Money LLC
- * @license  https://money.yandex.ru/doc.xml?id=527052
+ * @author YooMoney <cms@yoomoney.ru>
+ * @copyright © 2020 "YooMoney", NBСO LLC
+ * @license  https://yoomoney.ru/doc.xml?id=527052
  */
 
-namespace YandexMoneyModule\Models;
+namespace YooMoneyModule\Models;
 
 use Carrier;
 use Cart;
@@ -18,22 +18,22 @@ use Product;
 use Tax;
 use Tools;
 
-use YandexCheckout\Client;
-use YandexCheckout\Common\Exceptions\NotFoundException;
-use YandexCheckout\Model\ConfirmationType;
-use YandexCheckout\Model\Payment;
-use YandexCheckout\Model\PaymentInterface;
-use YandexCheckout\Model\PaymentMethodType;
-use YandexCheckout\Model\RefundInterface;
-use YandexCheckout\Model\RefundStatus;
-use YandexCheckout\Request\Payments\CreatePaymentRequest;
-use YandexCheckout\Request\Payments\CreatePaymentRequestBuilder;
-use YandexCheckout\Request\Payments\CreatePaymentResponse;
-use YandexCheckout\Request\Payments\Payment\CreateCaptureRequest;
-use YandexCheckout\Request\Payments\Payment\CreateCaptureRequestBuilder;
-use YandexCheckout\Request\Payments\Payment\CreateCaptureRequestSerializer;
-use YandexCheckout\Request\Refunds\CreateRefundRequest;
-use YandexModule;
+use YooKassa\Client;
+use YooKassa\Common\Exceptions\NotFoundException;
+use YooKassa\Model\ConfirmationType;
+use YooKassa\Model\Payment;
+use YooKassa\Model\PaymentInterface;
+use YooKassa\Model\PaymentMethodType;
+use YooKassa\Model\RefundInterface;
+use YooKassa\Model\RefundStatus;
+use YooKassa\Request\Payments\CreatePaymentRequest;
+use YooKassa\Request\Payments\CreatePaymentRequestBuilder;
+use YooKassa\Request\Payments\CreatePaymentResponse;
+use YooKassa\Request\Payments\Payment\CreateCaptureRequest;
+use YooKassa\Request\Payments\Payment\CreateCaptureRequestBuilder;
+use YooKassa\Request\Payments\Payment\CreateCaptureRequestSerializer;
+use YooKassa\Request\Refunds\CreateRefundRequest;
+use YooMoneyModule;
 
 class KassaModel extends AbstractPaymentModel
 {
@@ -61,7 +61,6 @@ class KassaModel extends AbstractPaymentModel
     private $shopId;
     private $password;
     private $epl;
-    private $showYandexButton;
     private $showInstallmentsButton;
     private $availablePaymentMethods;
     private $enabledPaymentMethods;
@@ -84,26 +83,25 @@ class KassaModel extends AbstractPaymentModel
 
     public function initConfiguration()
     {
-        $this->enabled                       = Configuration::get('YA_KASSA_ACTIVE') == '1';
-        $this->shopId                        = Configuration::get('YA_KASSA_SHOP_ID');
-        $this->password                      = Configuration::get('YA_KASSA_PASSWORD');
-        $this->epl                           = Configuration::get('YA_KASSA_PAYMENT_MODE') == 'kassa';
-        $this->showYandexButton              = Configuration::get('YA_KASSA_PAY_LOGO_ON') == 'on';
-        $this->showInstallmentsButton        = Configuration::get('YA_KASSA_INSTALLMENTS_BUTTON_ON') == 'on';
-        $this->sendReceipt                   = Configuration::get('YA_KASSA_SEND_RECEIPT') == '1';
-        $this->defaultTaxRate                = (int)Configuration::get('YA_KASSA_DEFAULT_TAX_RATE');
-        $this->minimumAmount                 = (float)Configuration::get('YA_KASSA_MIN');
-        $this->debugLog                      = Configuration::get('YA_KASSA_LOGGING_ON') == 'on';
-        $this->createStatusId                = (int)Configuration::get('YA_KASSA_DEFAULT_PAYMENT_INIT_STATUS');
-        $this->successStatusId               = (int)Configuration::get('YA_KASSA_SUCCESS_STATUS_ID');
-        $this->enableHoldMode                = Configuration::get('YA_KASSA_ENABLE_HOLD_MODE_ON') === 'on';
-        $this->onHoldStatusId                = (int)Configuration::get('YA_KASSA_ON_HOLD_STATUS_ID');
-        $this->cancelStatusId                = (int)Configuration::get('YA_KASSA_CANCEL_STATUS_ID');
-        $this->paymentDescription            = Configuration::get('YA_KASSA_PAYMENT_DESCRIPTION');
-        $this->defaultPaymentMode            = Configuration::get('YA_KASSA_DEFAULT_PAYMENT_MODE');
-        $this->defaultPaymentSubject         = Configuration::get('YA_KASSA_DEFAULT_PAYMENT_SUBJECT');
-        $this->defaultDeliveryPaymentMode    = Configuration::get('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE');
-        $this->defaultDeliveryPaymentSubject = Configuration::get('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT');
+        $this->enabled                       = Configuration::get('YOOMONEY_KASSA_ACTIVE') == '1';
+        $this->shopId                        = Configuration::get('YOOMONEY_KASSA_SHOP_ID');
+        $this->password                      = Configuration::get('YOOMONEY_KASSA_PASSWORD');
+        $this->epl                           = Configuration::get('YOOMONEY_KASSA_PAYMENT_MODE') == 'kassa';
+        $this->showInstallmentsButton        = Configuration::get('YOOMONEY_KASSA_INSTALLMENTS_BUTTON_ON') == 'on';
+        $this->sendReceipt                   = Configuration::get('YOOMONEY_KASSA_SEND_RECEIPT') == '1';
+        $this->defaultTaxRate                = (int)Configuration::get('YOOMONEY_KASSA_DEFAULT_TAX_RATE');
+        $this->minimumAmount                 = (float)Configuration::get('YOOMONEY_KASSA_MIN');
+        $this->debugLog                      = Configuration::get('YOOMONEY_KASSA_LOGGING_ON') == 'on';
+        $this->createStatusId                = (int)Configuration::get('YOOMONEY_KASSA_DEFAULT_PAYMENT_INIT_STATUS');
+        $this->successStatusId               = (int)Configuration::get('YOOMONEY_KASSA_SUCCESS_STATUS_ID');
+        $this->enableHoldMode                = Configuration::get('YOOMONEY_KASSA_ENABLE_HOLD_MODE_ON') === 'on';
+        $this->onHoldStatusId                = (int)Configuration::get('YOOMONEY_KASSA_ON_HOLD_STATUS_ID');
+        $this->cancelStatusId                = (int)Configuration::get('YOOMONEY_KASSA_CANCEL_STATUS_ID');
+        $this->paymentDescription            = Configuration::get('YOOMONEY_KASSA_PAYMENT_DESCRIPTION');
+        $this->defaultPaymentMode            = Configuration::get('YOOMONEY_KASSA_DEFAULT_PAYMENT_MODE');
+        $this->defaultPaymentSubject         = Configuration::get('YOOMONEY_KASSA_DEFAULT_PAYMENT_SUBJECT');
+        $this->defaultDeliveryPaymentMode    = Configuration::get('YOOMONEY_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE');
+        $this->defaultDeliveryPaymentSubject = Configuration::get('YOOMONEY_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT');
 
         if (!$this->paymentDescription) {
             $this->paymentDescription = $this->module->l('Payment for order No. %cart_id%');
@@ -137,14 +135,6 @@ class KassaModel extends AbstractPaymentModel
     public function getEPL()
     {
         return $this->epl;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getShowYandexPaymentButton()
-    {
-        return $this->showYandexButton;
     }
 
     /**
@@ -184,7 +174,7 @@ class KassaModel extends AbstractPaymentModel
             $enabledPaymentMethods = array_merge(PaymentMethodType::getEnabledValues(), self::getCustomPaymentMethods());
             foreach ($enabledPaymentMethods as $value) {
                 if (!in_array($value, self::getDisabledPaymentMethods())) {
-                    $this->availablePaymentMethods[$value] = 'YA_KASSA_PAYMENT_'.Tools::strtoupper($value);
+                    $this->availablePaymentMethods[$value] = 'YOOMONEY_KASSA_PAYMENT_'.Tools::strtoupper($value);
                 }
             }
         }
@@ -200,7 +190,7 @@ class KassaModel extends AbstractPaymentModel
         if ($this->enabledPaymentMethods === null) {
             $this->enabledPaymentMethods = array();
             $paymentMethodNames          = array(
-                PaymentMethodType::YANDEX_MONEY   => $this->module->l('Yandex.Money'),
+                PaymentMethodType::YOO_MONEY      => $this->module->l('YooMoney'),
                 PaymentMethodType::BANK_CARD      => $this->module->l('Bank cards'),
                 PaymentMethodType::MOBILE_BALANCE => $this->module->l('Direct carrier billing'),
                 PaymentMethodType::WEBMONEY       => $this->module->l('Webmoney'),
@@ -216,7 +206,7 @@ class KassaModel extends AbstractPaymentModel
             $payments = Configuration::getMultiple(array_values($this->getPaymentMethods()));
 
             foreach ($paymentMethodNames as $id => $loc) {
-                $key = 'YA_KASSA_PAYMENT_'.Tools::strtoupper($id);
+                $key = 'YOOMONEY_KASSA_PAYMENT_'.Tools::strtoupper($id);
                 if (isset($payments[$key]) && $payments[$key] == '1') {
                     $this->enabledPaymentMethods[] = array(
                         'name'  => $loc,
@@ -312,22 +302,21 @@ class KassaModel extends AbstractPaymentModel
     {
         $errors = '';
 
-        $this->enabled = Tools::getValue('YA_KASSA_ACTIVE') == '1';
-        Configuration::UpdateValue('YA_KASSA_ACTIVE', $this->enabled ? 1 : 0);
+        $this->enabled = Tools::getValue('YOOMONEY_KASSA_ACTIVE') == '1';
+        Configuration::UpdateValue('YOOMONEY_KASSA_ACTIVE', $this->enabled ? 1 : 0);
 
         if ($this->enabled) {
-            Configuration::UpdateValue('YA_WALLET_ACTIVE', 0);
-            Configuration::UpdateValue('YA_BILLING_ACTIVE', 0);
+            Configuration::UpdateValue('YOOMONEY_WALLET_ACTIVE', 0);
         }
 
-        $this->defaultTaxRate = (int)Tools::getValue('YA_KASSA_DEFAULT_TAX_RATE');
-        Configuration::UpdateValue('YA_KASSA_DEFAULT_TAX_RATE', $this->defaultTaxRate);
+        $this->defaultTaxRate = (int)Tools::getValue('YOOMONEY_KASSA_DEFAULT_TAX_RATE');
+        Configuration::UpdateValue('YOOMONEY_KASSA_DEFAULT_TAX_RATE', $this->defaultTaxRate);
 
-        Configuration::UpdateValue('YA_KASSA_SEND_RECEIPT', Tools::getValue('YA_KASSA_SEND_RECEIPT'));
-        $this->sendReceipt = Tools::getValue('YA_KASSA_SEND_RECEIPT') == '1';
+        Configuration::UpdateValue('YOOMONEY_KASSA_SEND_RECEIPT', Tools::getValue('YOOMONEY_KASSA_SEND_RECEIPT'));
+        $this->sendReceipt = Tools::getValue('YOOMONEY_KASSA_SEND_RECEIPT') == '1';
 
-        $this->minimumAmount = (float)Tools::getValue('YA_KASSA_MIN');
-        Configuration::UpdateValue('YA_KASSA_MIN', $this->minimumAmount);
+        $this->minimumAmount = (float)Tools::getValue('YOOMONEY_KASSA_MIN');
+        Configuration::UpdateValue('YOOMONEY_KASSA_MIN', $this->minimumAmount);
 
         $count = 0;
         foreach ($this->getPaymentMethods() as $method) {
@@ -337,94 +326,92 @@ class KassaModel extends AbstractPaymentModel
             }
         }
 
-        Configuration::UpdateValue('YA_KASSA_LOGGING_ON', Tools::getValue('YA_KASSA_LOGGING_ON'));
+        Configuration::UpdateValue('YOOMONEY_KASSA_LOGGING_ON', Tools::getValue('YOOMONEY_KASSA_LOGGING_ON'));
 
-        Configuration::UpdateValue('YA_KASSA_PAY_LOGO_ON', Tools::getValue('YA_KASSA_PAY_LOGO_ON'));
-        $this->showYandexButton = Tools::getValue('YA_KASSA_PAY_LOGO_ON') == 'on';
+        Configuration::UpdateValue('YOOMONEY_KASSA_PAY_LOGO_ON', Tools::getValue('YOOMONEY_KASSA_PAY_LOGO_ON'));
 
-        Configuration::UpdateValue('YA_KASSA_INSTALLMENTS_BUTTON_ON',
-            Tools::getValue('YA_KASSA_INSTALLMENTS_BUTTON_ON'));
-        $this->showYandexButton = Tools::getValue('YA_KASSA_INSTALLMENTS_BUTTON_ON') == 'on';
+        Configuration::UpdateValue('YOOMONEY_KASSA_INSTALLMENTS_BUTTON_ON',
+            Tools::getValue('YOOMONEY_KASSA_INSTALLMENTS_BUTTON_ON'));
 
-        Configuration::UpdateValue('YA_KASSA_PAYMENT_DESCRIPTION',
-            Tools::getValue('YA_KASSA_PAYMENT_DESCRIPTION'));
-        $this->paymentDescription = Tools::getValue('YA_KASSA_PAYMENT_DESCRIPTION');
+        Configuration::UpdateValue('YOOMONEY_KASSA_PAYMENT_DESCRIPTION',
+            Tools::getValue('YOOMONEY_KASSA_PAYMENT_DESCRIPTION'));
+        $this->paymentDescription = Tools::getValue('YOOMONEY_KASSA_PAYMENT_DESCRIPTION');
 
-        Configuration::UpdateValue('YA_KASSA_PAYMENT_MODE', Tools::getValue('YA_KASSA_PAYMENT_MODE'));
-        $this->epl = Tools::getValue('YA_KASSA_PAYMENT_MODE') == 'kassa';
+        Configuration::UpdateValue('YOOMONEY_KASSA_PAYMENT_MODE', Tools::getValue('YOOMONEY_KASSA_PAYMENT_MODE'));
+        $this->epl = Tools::getValue('YOOMONEY_KASSA_PAYMENT_MODE') == 'kassa';
 
-        $this->createStatusId = (int)Tools::getValue('YA_KASSA_DEFAULT_PAYMENT_INIT_STATUS');
-        Configuration::UpdateValue('YA_KASSA_DEFAULT_PAYMENT_INIT_STATUS', $this->createStatusId);
+        $this->createStatusId = (int)Tools::getValue('YOOMONEY_KASSA_DEFAULT_PAYMENT_INIT_STATUS');
+        Configuration::UpdateValue('YOOMONEY_KASSA_DEFAULT_PAYMENT_INIT_STATUS', $this->createStatusId);
 
-        $this->successStatusId = (int)Tools::getValue('YA_KASSA_SUCCESS_STATUS_ID');
-        Configuration::UpdateValue('YA_KASSA_SUCCESS_STATUS_ID', $this->successStatusId);
+        $this->successStatusId = (int)Tools::getValue('YOOMONEY_KASSA_SUCCESS_STATUS_ID');
+        Configuration::UpdateValue('YOOMONEY_KASSA_SUCCESS_STATUS_ID', $this->successStatusId);
 
-        $this->enableHoldMode = Tools::getValue('YA_KASSA_ENABLE_HOLD_MODE_ON') === 'on';
-        Configuration::UpdateValue('YA_KASSA_ENABLE_HOLD_MODE_ON', Tools::getValue('YA_KASSA_ENABLE_HOLD_MODE_ON'));
+        $this->enableHoldMode = Tools::getValue('YOOMONEY_KASSA_ENABLE_HOLD_MODE_ON') === 'on';
+        Configuration::UpdateValue('YOOMONEY_KASSA_ENABLE_HOLD_MODE_ON', Tools::getValue('YOOMONEY_KASSA_ENABLE_HOLD_MODE_ON'));
         if ($this->enableHoldMode) {
-            $module = new yandexmodule();
+            $module = new YooMoneyModule();
             $module->installTabIfNeeded();
         }
 
-        if (Tools::getValue("YA_KASSA_PAYMENT_WIDGET") == '1') {
+        if (Tools::getValue("YOOMONEY_KASSA_PAYMENT_WIDGET") == '1') {
             if (!$this->installVerifyAppleFile()) {
                 $errors .= $this->module->displayWarning(
-                    htmlspecialchars_decode($this->module->l('Чтобы покупатели могли заплатить вам через Apple Pay, <a href=\"https://kassa.yandex.ru/docs/merchant.ru.yandex.kassa\">скачайте файл apple-developer-merchantid-domain-association</a> и добавьте его в папку ./well-known на вашем сайте. Если не знаете, как это сделать, обратитесь к администратору сайта или в поддержку хостинга. Не забудьте также подключить оплату через Apple Pay <a href=\"https://kassa.yandex.ru/my/payment-methods/settings#applePay\">в личном кабинете Кассы</a>. <a href=\"https://kassa.yandex.ru/developers/payment-forms/widget#apple-pay-configuration\">Почитать о подключении Apple Pay в документации Кассы</a>'))
+                    htmlspecialchars_decode($this->module->l('Чтобы покупатели могли заплатить вам через Apple Pay, <a href=\"https://yookassa.ru/docs/merchant.ru.yandex.kassa\">скачайте файл apple-developer-merchantid-domain-association</a> и добавьте его в папку ./well-known на вашем сайте. Если не знаете, как это сделать, обратитесь к администратору сайта или в поддержку хостинга. Не забудьте также подключить оплату через Apple Pay <a href=\"https://yookassa.ru/my/payment-methods/settings#applePay\">в личном кабинете Кассы</a>. <a href=\"https://yookassa.ru/developers/payment-forms/widget#apple-pay-configuration\">Почитать о подключении Apple Pay в документации Кассы</a>'))
                 );
             }
         }
 
-        $this->onHoldStatusId = (int)Tools::getValue('YA_KASSA_ON_HOLD_STATUS_ID');
-        Configuration::UpdateValue('YA_KASSA_ON_HOLD_STATUS_ID', $this->onHoldStatusId);
+        $this->onHoldStatusId = (int)Tools::getValue('YOOMONEY_KASSA_ON_HOLD_STATUS_ID');
+        Configuration::UpdateValue('YOOMONEY_KASSA_ON_HOLD_STATUS_ID', $this->onHoldStatusId);
 
-        $this->cancelStatusId = (int)Tools::getValue('YA_KASSA_CANCEL_STATUS_ID');
-        Configuration::UpdateValue('YA_KASSA_CANCEL_STATUS_ID', $this->cancelStatusId);
+        $this->cancelStatusId = (int)Tools::getValue('YOOMONEY_KASSA_CANCEL_STATUS_ID');
+        Configuration::UpdateValue('YOOMONEY_KASSA_CANCEL_STATUS_ID', $this->cancelStatusId);
 
-        $this->defaultPaymentMode = Tools::getValue('YA_KASSA_DEFAULT_PAYMENT_MODE');
-        Configuration::UpdateValue('YA_KASSA_DEFAULT_PAYMENT_MODE', $this->defaultPaymentMode);
+        $this->defaultPaymentMode = Tools::getValue('YOOMONEY_KASSA_DEFAULT_PAYMENT_MODE');
+        Configuration::UpdateValue('YOOMONEY_KASSA_DEFAULT_PAYMENT_MODE', $this->defaultPaymentMode);
 
-        $this->defaultPaymentSubject = Tools::getValue('YA_KASSA_DEFAULT_PAYMENT_SUBJECT');
-        Configuration::UpdateValue('YA_KASSA_DEFAULT_PAYMENT_SUBJECT', $this->defaultPaymentSubject);
+        $this->defaultPaymentSubject = Tools::getValue('YOOMONEY_KASSA_DEFAULT_PAYMENT_SUBJECT');
+        Configuration::UpdateValue('YOOMONEY_KASSA_DEFAULT_PAYMENT_SUBJECT', $this->defaultPaymentSubject);
 
-        $this->defaultDeliveryPaymentMode = Tools::getValue('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE');
-        Configuration::UpdateValue('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE', $this->defaultDeliveryPaymentMode);
+        $this->defaultDeliveryPaymentMode = Tools::getValue('YOOMONEY_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE');
+        Configuration::UpdateValue('YOOMONEY_KASSA_DEFAULT_DELIVERY_PAYMENT_MODE', $this->defaultDeliveryPaymentMode);
 
-        $this->defaultDeliveryPaymentSubject = Tools::getValue('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT');
-        Configuration::UpdateValue('YA_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT', $this->defaultDeliveryPaymentSubject);
+        $this->defaultDeliveryPaymentSubject = Tools::getValue('YOOMONEY_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT');
+        Configuration::UpdateValue('YOOMONEY_KASSA_DEFAULT_DELIVERY_PAYMENT_SUBJECT', $this->defaultDeliveryPaymentSubject);
 
         foreach ($this->getTaxesArray() as $taxRow) {
             Configuration::UpdateValue($taxRow, Tools::getValue($taxRow));
         }
 
         $isShopIdValid = false;
-        if (Tools::getValue('YA_KASSA_SHOP_ID') == '') {
+        if (Tools::getValue('YOOMONEY_KASSA_SHOP_ID') == '') {
             $errors .= $this->module->displayError($this->module->l('ShopId not specified!'));
         } else {
             $isShopIdValid = true;
-            $this->shopId  = trim(Tools::getValue('YA_KASSA_SHOP_ID'));
-            Configuration::UpdateValue('YA_KASSA_SHOP_ID', $this->shopId);
+            $this->shopId  = trim(Tools::getValue('YOOMONEY_KASSA_SHOP_ID'));
+            Configuration::UpdateValue('YOOMONEY_KASSA_SHOP_ID', $this->shopId);
         }
 
-        if (Tools::getValue('YA_KASSA_PASSWORD') == '') {
+        if (Tools::getValue('YOOMONEY_KASSA_PASSWORD') == '') {
             $errors .= $this->module->displayError($this->module->l('The password is not specified!'));
         } else {
-            $this->password = trim(Tools::getValue('YA_KASSA_PASSWORD'));
-            Configuration::UpdateValue('YA_KASSA_PASSWORD', $this->password);
+            $this->password = trim(Tools::getValue('YOOMONEY_KASSA_PASSWORD'));
+            Configuration::UpdateValue('YOOMONEY_KASSA_PASSWORD', $this->password);
 
             if ($isShopIdValid) {
                 if (!$this->testConnection()) {
                     $errors .= $this->module->displayError(
                         $this->module->l('Check shopId and Secret key—there is an error somewhere. Better yet, copy them directly from your ')
-                        .'<a href="https://kassa.yandex.ru/my" target="_blank">'.$this->module->l('Yandex.Checkout\'s Merchant Profile').'</a>'
+                        .'<a href="https://yookassa.ru/my" target="_blank">'.$this->module->l('YooKassa\'s Merchant Profile').'</a>'
                     );
                     if ($this->enabled) {
                         $this->enabled = false;
-                        Configuration::UpdateValue('YA_KASSA_ACTIVE', 0);
+                        Configuration::UpdateValue('YOOMONEY_KASSA_ACTIVE', 0);
                     }
-                } elseif (strncmp('test_', Tools::getValue('YA_KASSA_PASSWORD'), 5) === 0) {
+                } elseif (strncmp('test_', Tools::getValue('YOOMONEY_KASSA_PASSWORD'), 5) === 0) {
                     $errors .= $this->module->displayWarning(
-                        $this->module->l('You have enabled the test mode. Check the payment making process and contact Yandex.Checkout\'s manager. They will provide you with shopId the Secret key. ')
-                        .'<a href="https://yandex.ru/support/checkout/payments/api.html#api__04" target="_blank">'.$this->module->l('Manual').'</a>'
+                        $this->module->l('You have enabled the test mode. Check the payment making process and contact YooKassa\'s manager. They will provide you with shopId the Secret key. ')
+                        .'<a href="https://yookassa.ru/docs/support/payments/onboarding/integration" target="_blank">'.$this->module->l('Manual').'</a>'
                     );
                 }
             }
@@ -454,19 +441,19 @@ class KassaModel extends AbstractPaymentModel
             return '';
         }
 
-        if (substr(Configuration::get('YA_KASSA_PASSWORD'), 0, 5) !== 'live_') {
+        if (substr(Configuration::get('YOOMONEY_KASSA_PASSWORD'), 0, 5) !== 'live_') {
             return '';
         }
 
-        if (time() < Configuration::get('YA_NPS_VOTE_TIME') + YandexModule::NPS_RETRY_AFTER_DAYS * 86400) {
+        if (time() < Configuration::get('YOOMONEY_NPS_VOTE_TIME') + YooMoneyModule::NPS_RETRY_AFTER_DAYS * 86400) {
             return '';
         }
 
-        $token = Tools::getAdminTokenLite(YandexModule::ADMIN_CONTROLLER);
+        $token = Tools::getAdminTokenLite(YooMoneyModule::ADMIN_CONTROLLER);
 
-        return $this->module->displayConfirmation('Помогите нам улучшить модуль Яндекс.Кассы — ответьте на 
-            <a href="#" onclick="return false;" class="yandex_money_nps_link"
-            data-controller="'.YandexModule::ADMIN_CONTROLLER.'"
+        return $this->module->displayConfirmation('Помогите нам улучшить модуль ЮKassa — ответьте на 
+            <a href="#" onclick="return false;" class="yoomoney_nps_link"
+            data-controller="'.YooMoneyModule::ADMIN_CONTROLLER.'"
             data-token="'.$token.'">один вопрос</a>');
     }
 
@@ -478,7 +465,7 @@ class KassaModel extends AbstractPaymentModel
     public function assignVariables($smarty)
     {
         if ($this->getEPL()) {
-            $template = 'module:yandexmodule/views/templates/hook/1.7/kassa_epl_form.tpl';
+            $template = 'module:yoomoneymodule/views/templates/hook/1.7/kassa_epl_form.tpl';
         } else {
             $methods = $this->getEnabledPaymentMethods();
             if (empty($methods)) {
@@ -488,7 +475,7 @@ class KassaModel extends AbstractPaymentModel
 
                 return null;
             }
-            $template = 'module:yandexmodule/views/templates/hook/1.7/kassa_form.tpl';
+            $template = 'module:yoomoneymodule/views/templates/hook/1.7/kassa_form.tpl';
             $smarty->assign('label', $this->module->l('Please select payment method'));
             $smarty->assign('payment_methods', $methods);
         }
@@ -502,7 +489,7 @@ class KassaModel extends AbstractPaymentModel
 
         $taxArray = array();
         foreach ($taxes as $tax) {
-            $taxArray[] = 'YA_KASSA_TAX_RATE_'.$tax['id_tax'];
+            $taxArray[] = 'YOOMONEY_KASSA_TAX_RATE_'.$tax['id_tax'];
         }
 
         if ($config) {
@@ -540,7 +527,7 @@ class KassaModel extends AbstractPaymentModel
                     ->setDescription($description)
                     ->setClientIp($_SERVER['REMOTE_ADDR'])
                     ->setMetadata(array(
-                        'cms_name'       => 'ya_api_ycms_prestashop',
+                        'cms_name'       => 'yoomoney_api_ycms_prestashop',
                         'module_version' => $this->module->version,
                     ));
 
@@ -696,7 +683,7 @@ class KassaModel extends AbstractPaymentModel
     {
         $query = new DbQuery();
         $query->select('*');
-        $query->from('ya_money_refunds');
+        $query->from('yoomoney_refunds');
         $query->where('order_id = '.(int)$orderId);
         $recordSet = Db::getInstance()->query($query);
         if ($recordSet) {
@@ -739,7 +726,7 @@ class KassaModel extends AbstractPaymentModel
     {
         $query = new DbQuery();
         $query->select('order_id');
-        $query->from('ya_money_payments');
+        $query->from('yoomoney_payments');
         $query->where('payment_id = \''.$payment->getId().'\'');
         $row = Db::getInstance()->getRow($query);
         if (!empty($row)) {
@@ -761,7 +748,7 @@ class KassaModel extends AbstractPaymentModel
         if ($payment->getCapturedAt() !== null) {
             $update['captured_at'] = $payment->getCapturedAt()->format('Y-m-d H:i:s');
         }
-        Db::getInstance()->update('ya_money_payments', $update, '`payment_id` = \''.$payment->getId().'\'');
+        Db::getInstance()->update('yoomoney_payments', $update, '`payment_id` = \''.$payment->getId().'\'');
     }
 
     /**
@@ -829,14 +816,14 @@ class KassaModel extends AbstractPaymentModel
         $carrier  = new Carrier($cart->id_carrier);
 
         foreach ($products as $product) {
-            $taxIndex = 'YA_NALOG_STAVKA_'.Product::getIdTaxRulesGroupByIdProduct($product['id_product']);
+            $taxIndex = 'YOOMONEY_NALOG_STAVKA_'.Product::getIdTaxRulesGroupByIdProduct($product['id_product']);
             $taxId    = isset($taxValue[$taxIndex]) ? $taxValue[$taxIndex] : $this->getDefaultTaxRate();
             $builder->addReceiptItem($product['name'], $product['price_wt'], $product['cart_quantity'], $taxId,
                 $this->defaultPaymentMode, $this->defaultPaymentSubject);
         }
 
         if ($carrier->id && $cart->getPackageShippingCost()) {
-            $taxIndex = 'YA_NALOG_STAVKA_'.Carrier::getIdTaxRulesGroupByIdCarrier($carrier->id);
+            $taxIndex = 'YOOMONEY_NALOG_STAVKA_'.Carrier::getIdTaxRulesGroupByIdCarrier($carrier->id);
             $taxId    = isset($taxValue[$taxIndex]) ? $taxValue[$taxIndex] : $this->getDefaultTaxRate();
             $builder->addReceiptShipping($carrier->name, $cart->getPackageShippingCost(), $taxId,
                 $this->defaultDeliveryPaymentMode, $this->defaultDeliveryPaymentSubject);
@@ -846,7 +833,7 @@ class KassaModel extends AbstractPaymentModel
     private function installVerifyAppleFile()
     {
         clearstatcache();
-        $pluginAssociationPath = YANDEX_MONEY_MODULE_ROOT_PATH . "apple-developer-merchantid-domain-association";
+        $pluginAssociationPath = YOOMONEY_MODULE_ROOT_PATH . "apple-developer-merchantid-domain-association";
         $rootDir = _PS_CORE_DIR_;
         $rootAssociationPath = $rootDir . DIRECTORY_SEPARATOR . ".well-known" . DIRECTORY_SEPARATOR . "apple-developer-merchantid-domain-association";
 
@@ -894,7 +881,7 @@ class KassaModel extends AbstractPaymentModel
             'created_at'        => $payment->getCreatedAt()->format('Y-m-d H:i:s'),
         );
 
-        return Db::getInstance()->insert('ya_money_payments', array($row));
+        return Db::getInstance()->insert('yoomoney_payments', array($row));
     }
 
     /**
@@ -916,7 +903,7 @@ class KassaModel extends AbstractPaymentModel
             'comment'    => $comment,
         );
 
-        return Db::getInstance()->insert('ya_money_refunds', array($row));
+        return Db::getInstance()->insert('yoomoney_refunds', array($row));
     }
 
     /**
@@ -928,7 +915,7 @@ class KassaModel extends AbstractPaymentModel
     {
         $query = new DbQuery();
         $query->select('*');
-        $query->from('ya_money_payments');
+        $query->from('yoomoney_payments');
         $query->where('order_id = '.(int)$orderId);
 
         return Db::getInstance()->GetRow($query);
@@ -968,7 +955,7 @@ class KassaModel extends AbstractPaymentModel
             $this->apiClient->setLogger($this->module);
             $userAgent = $this->apiClient->getApiClient()->getUserAgent();
             $userAgent->setCms("PrestaShop", _PS_VERSION_);
-            $userAgent->setModule("yandex-money-ycms-v2-prestashop", $this->module->version);
+            $userAgent->setModule("yoomoney-ycms-v2-prestashop", $this->module->version);
         }
 
         return $this->apiClient;

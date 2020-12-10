@@ -1,25 +1,25 @@
 <?php
 /**
- * @author Yandex.Money <cms@yamoney.ru>
- * @copyright © 2015-2017 NBCO Yandex.Money LLC
- * @license  https://money.yandex.ru/doc.xml?id=527052
+ * @author YooMoney <cms@yoomoney.ru>
+ * @copyright © 2020 "YooMoney", NBСO LLC
+ * @license  https://yoomoney.ru/doc.xml?id=527052
  */
 
-namespace YandexMoneyModule;
+namespace YooMoneyModule;
 
 /**
  * Класс хэлпер, используемый при установку и удалении модуля
  *
- * @package YandexMoneyModule
+ * @package YooMoneyModule
  */
 class Installer
 {
     /**
-     * @var \yandexmodule
+     * @var \yoomoneymodule
      */
     private $module;
 
-    public function __construct(\yandexmodule $module)
+    public function __construct(\yoomoneymodule $module)
     {
         $this->module = $module;
     }
@@ -30,7 +30,7 @@ class Installer
     public function addDatabaseTables()
     {
         $sql = array();
-        $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'yandex_market_orders`
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `'._DB_PREFIX_.'yoomoney_market_orders`
             (
                 `id_order` int(10) NOT NULL,
                 `id_market_order` varchar(100) NOT NULL,
@@ -42,7 +42,7 @@ class Installer
                 PRIMARY KEY  (`id_order`,`id_market_order`)
             ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci';
 
-        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ya_money_payments` (
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'yoomoney_payments` (
             `order_id`          INTEGER  NOT NULL,
             `payment_id`        CHAR(36) NOT NULL,
             `status`            ENUM(\'pending\', \'waiting_for_capture\', \'succeeded\', \'canceled\') NOT NULL,
@@ -53,11 +53,11 @@ class Installer
             `created_at`        DATETIME NOT NULL,
             `captured_at`       DATETIME NOT NULL DEFAULT \'0000-00-00 00:00:00\',
 
-            CONSTRAINT `' . _DB_PREFIX_ . 'ya_money_payment_pk` PRIMARY KEY (`order_id`),
-            CONSTRAINT `' . _DB_PREFIX_ . 'ya_money_payment_unq_payment_id` UNIQUE (`payment_id`) 
+            CONSTRAINT `' . _DB_PREFIX_ . 'yoomoney_payment_pk` PRIMARY KEY (`order_id`),
+            CONSTRAINT `' . _DB_PREFIX_ . 'yoomoney_payment_unq_payment_id` UNIQUE (`payment_id`) 
         ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci';
 
-        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'ya_money_refunds` (
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'yoomoney_refunds` (
             `refund_id`         CHAR(36) NOT NULL,
             `order_id`          INTEGER  NOT NULL,
             `payment_id`        CHAR(36) NOT NULL,
@@ -68,7 +68,7 @@ class Installer
             `authorized_at`     DATETIME NOT NULL DEFAULT \'0000-00-00 00:00:00\',
             `comment`           VARCHAR(254) NOT NULL,
 
-            CONSTRAINT `' . _DB_PREFIX_ . 'ya_money_refunds_pk` PRIMARY KEY (`refund_id`)
+            CONSTRAINT `' . _DB_PREFIX_ . 'yoomoney_refunds_pk` PRIMARY KEY (`refund_id`)
         ) ENGINE='._MYSQL_ENGINE_.' DEFAULT CHARSET=UTF8 COLLATE=utf8_general_ci';
 
         foreach ($sql as $query) {
@@ -83,50 +83,12 @@ class Installer
     public function removeDatabaseTables()
     {
         $sql = array(
-            'DROP TABLE IF EXISTS `'._DB_PREFIX_.'yandex_market_orders`',
-            'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ya_money_payments`',
-            'DROP TABLE IF EXISTS `'._DB_PREFIX_.'ya_money_refunds`',
+            'DROP TABLE IF EXISTS `'._DB_PREFIX_.'yoomoney_market_orders`',
+            'DROP TABLE IF EXISTS `'._DB_PREFIX_.'yoomoney_payments`',
+            'DROP TABLE IF EXISTS `'._DB_PREFIX_.'yoomoney_refunds`',
         );
         foreach ($sql as $query) {
             \Db::getInstance()->execute($query);
-        }
-    }
-
-    /**
-     *
-     */
-    public function addServiceCustomer()
-    {
-        $customer = new \Customer();
-        $customer->firstname = $this->module->l('Service user for YCMS');
-        $customer->lastname = $this->module->l('Service user for YCMS');
-        if (property_exists($customer, 'middlename')) {
-            $customer->middlename = $this->module->l('Service user for YCMS');
-        }
-        $customer->email = 'service@example.com';
-        if (version_compare(_PS_VERSION_, '1.7.0') < 0) {
-            $customer->passwd = \Tools::encrypt('OPC123456dmo');
-        } else {
-            $customer->passwd = \Tools::hash('OPC123456dmo');
-        }
-        $customer->newsletter = 1;
-        $customer->optin = 1;
-        $customer->active = 0;
-        $customer->add();
-        \Configuration::updateValue('YA_MARKET_ORDERS_CUSTOMER', $customer->id);
-        \Configuration::updateValue('YA_KASSA_PAYMENT_MODE', 'off');
-    }
-
-    /**
-     * При удалении модуля удаляет сервисного пользователя
-     */
-    public function removeServiceCustomer()
-    {
-        $id = (int) \Configuration::get('YA_MARKET_ORDERS_CUSTOMER');
-        if ($id > 0) {
-            $customer = new \Customer($id);
-            $customer->id = $id;
-            $customer->delete();
         }
     }
 
@@ -134,10 +96,10 @@ class Installer
     {
         $tab = new \Tab();
         $tab->active = 1;
-        $tab->class_name = \YandexModule::ADMIN_CONTROLLER;
+        $tab->class_name = \YooMoneyModule::ADMIN_CONTROLLER;
         $tab->name = array();
         foreach (\Language::getLanguages(true) as $lang) {
-            $tab->name[$lang['id_lang']] = \YandexModule::ADMIN_CONTROLLER;
+            $tab->name[$lang['id_lang']] = \YooMoneyModule::ADMIN_CONTROLLER;
         }
         $tab->id_parent = -1;
         $tab->module = $this->module->name;
@@ -146,7 +108,7 @@ class Installer
     }
 
     public function uninstallTab() {
-        $id_tab = (int)\Tab::getIdFromClassName(\YandexModule::ADMIN_CONTROLLER);
+        $id_tab = (int)\Tab::getIdFromClassName(\YooMoneyModule::ADMIN_CONTROLLER);
         if ($id_tab) {
             $tab = new \Tab($id_tab);
             return $tab->delete();
@@ -156,7 +118,7 @@ class Installer
     }
 
     public function issetTab() {
-        return \Tab::getIdFromClassName(\YandexModule::ADMIN_CONTROLLER) !== false;
+        return \Tab::getIdFromClassName(\YooMoneyModule::ADMIN_CONTROLLER) !== false;
     }
 
 }

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace YandexMoneyModule;
+namespace YooMoneyModule;
 
 
 class InstallmentsApi
@@ -10,7 +10,7 @@ class InstallmentsApi
 
     public static function creditPreSchedule($shopId, $orderSum)
     {
-        $url = 'https://money.yandex.ru/credit/order/ajax/credit-pre-schedule?'.http_build_query(array(
+        $url = 'https://yoomoney.ru/credit/order/ajax/credit-pre-schedule?'.http_build_query(array(
                 'shopId' => $shopId,
                 'sum'    => $orderSum,
             ));

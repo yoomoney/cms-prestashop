@@ -2,15 +2,15 @@
 /**
  * Module is prohibited to sales! Violation of this condition leads to the deprivation of the license!
  *
- * @author    Yandex.Money <cms@yamoney.ru>
- * @copyright © 2015-2017 NBCO Yandex.Money LLC
- * @license   https://money.yandex.ru/doc.xml?id=527052
+ * @author    YooMoney <cms@yoomoney.ru>
+ * @copyright © 2020 "YooMoney", NBСO LLC
+ * @license   https://yoomoney.ru/doc.xml?id=527052
  *
  * @category  Front Office Features
- * @package   Yandex Payment Solution
+ * @package   YooMoney Payment Solution
  */
 
-class YandexModuleRedirectModuleFrontController extends ModuleFrontController
+class YooMoneyModuleRedirectModuleFrontController extends ModuleFrontController
 {
     public $display_header = true;
     public $display_column_left = true;
@@ -54,21 +54,6 @@ class YandexModuleRedirectModuleFrontController extends ModuleFrontController
                 
         $this->myCart=$this->context->cart;
         $this->module->payment_status = '';
-        $code = Tools::getValue('code');
-        $type = Tools::getValue('type');
-        if (empty($code)) {
-            if ($type == 'yabilling') {
-                $this->module->log('info', 'redirect: '.$this->module->l('Type billing'));
-                Tools::redirect(
-                    $this->context->link->getModuleLink(
-                        'yandexmodule',
-                        'redirectbilling',
-                        array('code' => true, 'cnf' => true),
-                        true
-                    ),
-                    ''
-                );
-            }
-        }
+
     }
 }

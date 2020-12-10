@@ -1,21 +1,21 @@
 <?php
 /**
- * @author Yandex.Money <cms@yamoney.ru>
- * @copyright © 2015-2017 NBCO Yandex.Money LLC
- * @license  https://money.yandex.ru/doc.xml?id=527052
+ * @author YooMoney <cms@yoomoney.ru>
+ * @copyright © 2020 "YooMoney", NBСO LLC
+ * @license  https://yoomoney.ru/doc.xml?id=527052
  */
-use YandexCheckout\Model\Notification\NotificationSucceeded;
-use YandexCheckout\Model\Notification\NotificationWaitingForCapture;
-use YandexCheckout\Model\NotificationEventType;
-use YandexCheckout\Model\Payment;
-use YandexCheckout\Model\PaymentStatus;
+use YooKassa\Model\Notification\NotificationSucceeded;
+use YooKassa\Model\Notification\NotificationWaitingForCapture;
+use YooKassa\Model\NotificationEventType;
+use YooKassa\Model\Payment;
+use YooKassa\Model\PaymentStatus;
 
 /**
- * Class YandexModulePaymentKassaModuleFrontController
+ * Class YooMoneyModulePaymentKassaModuleFrontController
  *
- * @property yandexmodule $module
+ * @property yoomoneymodule $module
  */
-class YandexModuleNotifyCaptureModuleFrontController extends ModuleFrontController
+class YooMoneyModuleNotifyCaptureModuleFrontController extends ModuleFrontController
 {
     public function postProcess()
     {
