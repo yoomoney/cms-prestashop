@@ -8,7 +8,7 @@
 * @category  Front Office Features
 * @package   YooMoney Payment Solution
 *}
-<script src="https://static.yandex.net/kassa/pay-in-parts/ui/v1/"></script>
+<script src="https://static.yoomoney.ru/checkout-credit-ui/v1/index.js"></script>
 <style type="text/css">
 
     .yoomoney-pay-button {
@@ -64,12 +64,12 @@
 </div>
 {if $model->getShowInstallmentsButton()}
     <script>
-        const yamoneyCheckoutCreditUI = YandexCheckoutCreditUI({
+        const yoomoneyCheckoutCreditUI = YandexCheckoutCreditUI({
             shopId: '{$model->getShopId()}',
             sum: '{$amount}',
             language: 'ru'
         });
-        const yamoneyCheckoutCreditButton = yamoneyCheckoutCreditUI({
+        const yoomoneyCheckoutCreditButton = yoomoneyCheckoutCreditUI({
             type: 'button',
             theme: 'default',
             domSelector: '.installment-wrapper'
