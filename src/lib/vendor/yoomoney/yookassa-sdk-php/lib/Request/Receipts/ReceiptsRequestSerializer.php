@@ -29,7 +29,7 @@ namespace YooKassa\Request\Receipts;
 /**
  * Класс сериализатора объектов запросов к API для получения списка возвратов
  *
- * @package YooKassa\Request\Receipts
+ * @package YooKassa
  */
 class ReceiptsRequestSerializer
 {
@@ -50,8 +50,9 @@ class ReceiptsRequestSerializer
 
     /**
      * Сериализует объект запроса к API для дальнейшей его отправки
+     *
      * @param ReceiptsRequestInterface $request Сериализуемый объект
-     * @return array Массив с инфомрацией, отпарвляемый в дальнейшем в API
+     * @return array Массив с информацией, отправляемый в дальнейшем в API
      */
     public function serialize(ReceiptsRequestInterface $request)
     {
@@ -61,7 +62,7 @@ class ReceiptsRequestSerializer
             if (!empty($value)) {
                 if ($value instanceof \DateTime) {
                     if ($value->getTimestamp() > 1) {
-                        $result[$name] = $value->format(DATE_ATOM);
+                        $result[$name] = $value->format(YOOKASSA_DATE);
                     }
                 } else {
                     $result[$name] = $value;

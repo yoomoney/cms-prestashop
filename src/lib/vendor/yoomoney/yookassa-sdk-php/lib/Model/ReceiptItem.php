@@ -30,6 +30,7 @@ use YooKassa\Common\AbstractObject;
 use YooKassa\Common\Exceptions\EmptyPropertyValueException;
 use YooKassa\Common\Exceptions\InvalidPropertyValueException;
 use YooKassa\Common\Exceptions\InvalidPropertyValueTypeException;
+use YooKassa\Helpers\ProductCode;
 use YooKassa\Helpers\TypeCast;
 use YooKassa\Model\Receipt\AgentType;
 use YooKassa\Model\Receipt\ReceiptItemAmount;
@@ -110,7 +111,7 @@ class ReceiptItem extends AbstractObject implements ReceiptItemInterface
     private $_excise;
 
     /**
-     * @var SupplierInterface Информация о поставщике товара или услуги
+     * @var Supplier Информация о поставщике товара или услуги
      */
     private $_supplier;
 
@@ -340,12 +341,15 @@ class ReceiptItem extends AbstractObject implements ReceiptItemInterface
     /**
      * Устанавливает код товара — уникальный номер, который присваивается экземпляру товара при маркировке
      *
-     * @param string $value Код товара
+     * @param string|ProductCode $value Код товара
      *
      * @throws InvalidPropertyValueTypeException Выбрасывается если в качестве аргумента была передана не строка
      */
     public function setProductCode($value)
     {
+        if ($value instanceof ProductCode) {
+            $value = (string)$value;
+        }
         if ($value === null || $value === '') {
             $this->_productCode = null;
         } elseif (!TypeCast::canCastToString($value)) {
@@ -494,7 +498,7 @@ class ReceiptItem extends AbstractObject implements ReceiptItemInterface
     /**
      * Возвращает информацию о поставщике товара или услуги.
      *
-     * @return SupplierInterface
+     * @return Supplier
      */
     public function getSupplier()
     {
@@ -528,7 +532,8 @@ class ReceiptItem extends AbstractObject implements ReceiptItemInterface
     }
 
     /**
-     * @param string $value
+     * Устанавливает тип посредника, реализующего товар или услугу
+     * @param string $value Тип посредника
      */
     public function setAgentType($value)
     {
@@ -553,6 +558,11 @@ class ReceiptItem extends AbstractObject implements ReceiptItemInterface
         $this->_agentType = $value;
     }
 
+    /**
+     * Возвращает тип посредника, реализующего товар или услугу
+     *
+     * @return string Тип посредника
+     */
     public function getAgentType()
     {
         return $this->_agentType;
@@ -560,7 +570,8 @@ class ReceiptItem extends AbstractObject implements ReceiptItemInterface
 
 
     /**
-     * Проверяет, является ли текущий элемент чека доствкой
+     * Проверяет, является ли текущий элемент чека доставкой
+     *
      * @return bool True если доставка, false если обычный товар
      */
     public function isShipping()
@@ -626,6 +637,7 @@ class ReceiptItem extends AbstractObject implements ReceiptItemInterface
 
     /**
      * Устанавливает значения свойств текущего объекта из массива
+     *
      * @param array|\Traversable $sourceArray Ассоциативный массив с настройками
      */
     public function fromArray($sourceArray)
@@ -639,6 +651,8 @@ class ReceiptItem extends AbstractObject implements ReceiptItemInterface
     }
 
     /**
+     * @inheritdoc
+     *
      * @return array
      */
     public function jsonSerialize()

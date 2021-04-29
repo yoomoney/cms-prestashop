@@ -66,6 +66,7 @@ class KassaModel extends AbstractPaymentModel
     private $enabledPaymentMethods;
     private $sendReceipt;
     private $defaultTaxRate;
+    private $defaultTaxSystemCode;
     private $minimumAmount;
     private $paymentDescription;
     private $debugLog;
@@ -90,6 +91,7 @@ class KassaModel extends AbstractPaymentModel
         $this->showInstallmentsButton        = Configuration::get('YOOMONEY_KASSA_INSTALLMENTS_BUTTON_ON') == 'on';
         $this->sendReceipt                   = Configuration::get('YOOMONEY_KASSA_SEND_RECEIPT') == '1';
         $this->defaultTaxRate                = (int)Configuration::get('YOOMONEY_KASSA_DEFAULT_TAX_RATE');
+        $this->defaultTaxSystemCode          = (int)Configuration::get('YOOMONEY_KASSA_DEFAULT_TAX_SYSTEM');
         $this->minimumAmount                 = (float)Configuration::get('YOOMONEY_KASSA_MIN');
         $this->debugLog                      = Configuration::get('YOOMONEY_KASSA_LOGGING_ON') == 'on';
         $this->createStatusId                = (int)Configuration::get('YOOMONEY_KASSA_DEFAULT_PAYMENT_INIT_STATUS');
@@ -312,6 +314,9 @@ class KassaModel extends AbstractPaymentModel
         $this->defaultTaxRate = (int)Tools::getValue('YOOMONEY_KASSA_DEFAULT_TAX_RATE');
         Configuration::UpdateValue('YOOMONEY_KASSA_DEFAULT_TAX_RATE', $this->defaultTaxRate);
 
+        $this->defaultTaxSystemCode = (int)Tools::getValue('YOOMONEY_KASSA_DEFAULT_TAX_SYSTEM');
+        Configuration::UpdateValue('YOOMONEY_KASSA_DEFAULT_TAX_SYSTEM', $this->defaultTaxSystemCode);
+
         Configuration::UpdateValue('YOOMONEY_KASSA_SEND_RECEIPT', Tools::getValue('YOOMONEY_KASSA_SEND_RECEIPT'));
         $this->sendReceipt = Tools::getValue('YOOMONEY_KASSA_SEND_RECEIPT') == '1';
 
@@ -410,8 +415,8 @@ class KassaModel extends AbstractPaymentModel
                     }
                 } elseif (strncmp('test_', Tools::getValue('YOOMONEY_KASSA_PASSWORD'), 5) === 0) {
                     $errors .= $this->module->displayWarning(
-                        $this->module->l('You have enabled the test mode. Check the payment making process and contact YooKassa\'s manager. They will provide you with shopId the Secret key. ')
-                        .'<a href="https://yookassa.ru/docs/support/payments/onboarding/integration" target="_blank">'.$this->module->l('Manual').'</a>'
+                        $this->module->l('You have enabled the test mode. Check the payment making process and contact YooKassa\'s manager. They will provide you with shopId the Secret key.')
+                        .' <a href="https://yookassa.ru/docs/support/payments/onboarding/integration" target="_blank">'.$this->module->l('Manual').'</a>'
                     );
                 }
             }
@@ -828,6 +833,10 @@ class KassaModel extends AbstractPaymentModel
             $builder->addReceiptShipping($carrier->name, $cart->getPackageShippingCost(), $taxId,
                 $this->defaultDeliveryPaymentMode, $this->defaultDeliveryPaymentSubject);
         }
+
+        if (!empty($this->defaultTaxSystemCode)) {
+            $builder->setTaxSystemCode($this->defaultTaxSystemCode);
+        }
     }
 
     private function installVerifyAppleFile()
@@ -1013,6 +1022,11 @@ class KassaModel extends AbstractPaymentModel
         }
 
         return !in_array($paymentMethod, array('', PaymentMethodType::BANK_CARD));
+    }
+
+    public function getDefaultTaxSystemCode()
+    {
+        return $this->defaultTaxSystemCode;
     }
 
     public function getDefaultPaymentMode()

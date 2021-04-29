@@ -129,9 +129,7 @@ class FormHelper
                 'input'   => array(
                     array(
                         'type'     => 'radio',
-                        'label'    => $this->l(
-                            'Activate payments via YooKassa'
-                        ),
+                        'label'    => $this->l('Activate payments via YooKassa'),
                         'name'     => 'YOOMONEY_KASSA_ACTIVE',
                         'required' => false,
                         'class'    => 't',
@@ -398,6 +396,57 @@ class FormHelper
         }
 
         $form['form']['input'][] = array(
+            'type'         => 'html',
+            'label'        => '',
+            'html_content' => '<hr>',
+        );
+
+        $taxSystemOptions = array(
+            'query' => array(
+                array(
+                    'id'   => '',
+                    'name' => '-',
+                ),
+                array(
+                    'id'   => 1,
+                    'name' => $this->l('Общая система налогообложения'),
+                ),
+                array(
+                    'id'   => 2,
+                    'name' => $this->l('Упрощенная (УСН, доходы)'),
+                ),
+                array(
+                    'id'   => 3,
+                    'name' => $this->l('Упрощенная (УСН, доходы минус расходы)'),
+                ),
+                array(
+                    'id'   => 4,
+                    'name' => $this->l('Единый налог на вмененный доход (ЕНВД)'),
+                ),
+                array(
+                    'id'   => 5,
+                    'name' => $this->l('Единый сельскохозяйственный налог (ЕСН)'),
+                ),
+                array(
+                    'id'   => 6,
+                    'name' => $this->l('Патентная система налогообложения'),
+                ),
+            ),
+            'id'    => 'id',
+            'name'  => 'name',
+        );
+
+        $form['form']['input'][] = array(
+            'type'    => 'select',
+            'label'   => $this->l('Система налогообложения по умолчанию'),
+            'name'    => 'YOOMONEY_KASSA_DEFAULT_TAX_SYSTEM',
+            'options' => $taxSystemOptions,
+            'value'   => $model->getDefaultTaxSystemCode(),
+            'class'   => 'kassa_tax_system',
+            'desc'     => $this->l('Выберите систему налогообложения по умолчанию. Параметр необходим, только если у вас несколько систем налогообложения, в остальных случаях не передается.'),
+        );
+
+        $form['form']['input'][] = array(
             'type'    => 'select',
             'label'   => $this->l('Признак способа расчета'),
             'name'    => 'YOOMONEY_KASSA_DEFAULT_PAYMENT_MODE',
@@ -431,6 +480,12 @@ class FormHelper
             'options' => $paymentSubjectEnumOptions,
             'value'   => $model->getDefaultDeliveryPaymentSubject(),
             'class'   => 'kassa_tax_rate',
+        );
+
+        $form['form']['input'][] = array(
+            'type'         => 'html',
+            'label'        => '',
+            'html_content' => '<hr>',
         );
 
         $form['form']['input'][] = array(

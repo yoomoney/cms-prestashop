@@ -83,13 +83,12 @@ form.onsubmit = function (e) {
 }
 
 function initWidget(data) {
-    console.log(data);
     const checkout = new window.YooMoneyCheckoutWidget({
         confirmation_token: data.confirmation_token,
         return_url: data.return_url,
         embedded_3ds: true,
         newDesign: true,
-        error_callback(error) {
+        error_callback: function(error) {
             console.log(error);
             window.location.redirect(data.return_url);
         }

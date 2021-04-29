@@ -71,7 +71,7 @@ class YooMoneyModule extends PaymentModule
 
         $this->name            = 'yoomoneymodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '2.0.1';
+        $this->version         = '2.1.0';
         $this->author          = $this->l('YooMoney');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
