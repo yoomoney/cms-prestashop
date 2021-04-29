@@ -10,7 +10,7 @@ $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_309244368ba557406a7fb9b0f43
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_499b896f297fadc71abca71203f69a16'] = 'You can find your shopID and codeword in your';
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_3335b38fc195769adf15d011b3bcb3e0'] = 'Merchant Profile';
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_d420828d54b431552d76ec90aac9568f'] = 'after signing up for YooKassa.';
-$_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_bc06f90aaef4d2fd154814a17bcb3200'] = 'YooKassa module is disabled';
+$_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_011515439e2f05fa5aee98c9b6d68016'] = 'YooKassa module is disabled';
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_87e3a24016419087509c5c2dceae8e1b'] = 'Specified order not found';
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_4ffc34f91eaef85424d3e46efd315475'] = 'Add a comment to the refund';
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_3d91d1bd9c5ffe3618d82fb4db29652f'] = 'Invalid refund amount';
@@ -47,8 +47,6 @@ $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_ad2d96ead5504254623837bb1a3
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_3512e59f8a3b981ebc4bf58a1b7fdc89'] = 'The payment was not canceled. Try again.';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_87763c7387b7723be773ffdbdbd2aecf'] = 'Activate payments via YooKassa';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_039900bd2904ddb3b5b74b5249b7a79d'] = 'Activate payments via YooMoney Wallet';
-$_MODULE['<{yoomoneymodule}prestashop>formhelper_9382dd1ae03a8a1b27d522cd44bbaf3f'] = 'On YooKassa\'s site';
-$_MODULE['<{yoomoneymodule}prestashop>formhelper_fec223780f9abc49f84f7bc9e7cd0e2f'] = 'On the store\'s site';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Bank cards';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_4af90d43c2b7b70f1bdc9cc8837429c6'] = 'YooMoney';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_ee55b43dc97b2011716c124c0d412642'] = 'Sberbank Online';
@@ -68,7 +66,8 @@ $_MODULE['<{yoomoneymodule}prestashop>formhelper_3e303fb8057dc3a1fe51bef2b7d8697
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_e2fd2aa66c0eb38b11ac777c2ff34bb6'] = 'Then copy it here.';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_952bf87c967660b7bbd4e1eb08cefc92'] = 'Secret key';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_7768d98226feb41e4efea8f71217318b'] = 'Select payment method';
-$_MODULE['<{yoomoneymodule}prestashop>formhelper_65b42007117fefeb9d122c9d582c2e7e'] = 'Use a button with \'Pay with YooMoney\' text';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_d6b0b39c0473b643763633d5de968b31'] = 'On YooKassa\'s site';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_52f52bbdae452da8b04aeb85ab42e3ae'] = 'On the store\'s site';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_08dd74d5ebac2acb6dbf78593ae75a4e'] = 'Add the Installments payment method to checkout page';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_425f909342565bc3cae0f6990a8a2407'] = 'Full description of the transaction that the user will see during the checkout process. You can find it in your YooKassa Merchant Profile. For example, \"Payment for order No. 72 by user@yoomoney.ru\". Limitations: no more than 128 symbols';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_9ffebefa70eb18ef4b2008f8faaee976'] = 'Transaction data';
@@ -84,7 +83,7 @@ $_MODULE['<{yoomoneymodule}prestashop>formhelper_ffea110fd47942cef1c5c687a25f916
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_7ce590a2ba8bf3a2b19b8c312cc96458'] = 'the order status will be changed to this one after the funds are credited, until the store\'s operator either captures or cancels the payment';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_d5c39a1d9aced393f835f334a1fb9206'] = 'canceled';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_79cab9afc965a279edd596941b2eebb2'] = 'the order status will be changed to this one after the payment is canceled';
-$_MODULE['<{yoomoneymodule}prestashop>formhelper_27dda3cb0fb2c7da8fd7751641582a5f'] = 'Transmit details for receipts to YooKassa (Federal Law 54-FZ)';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_d13ef7212d7a2a24032adaca0f35218b'] = 'Transmit details for receipts to YooKassa (Federal Law 54-FZ)';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_2faec1f9f8cc7f8f40d521c4dd574f49'] = 'Enable';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_bcfaccebf745acfd5e75351095a5394a'] = 'Disable';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_43183e955e3019bf7f8c942e016b7b13'] = 'VAT';
@@ -93,6 +92,14 @@ $_MODULE['<{yoomoneymodule}prestashop>formhelper_785d4b16fc800589e811ec37e3b0acc
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_0bdd09fd35cf041be164f2cad23e1831'] = 'Compare rates';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_f44a06cb9ed1089fc8260e1ea7baa6be'] = 'Rate at your store';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_eb87884a7f244f88ab9597128c38fc34'] = 'Rate for the receipt to the tax service';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_31f33f3abe036acb73740e38aa428b96'] = 'General tax system';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_c312eec9bc05d4ca36b8c0b97d6361f8'] = 'Simplified (STS, income)';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_10a32a52ec8ef4dba251e40f5c085bc8'] = 'Simplified (STS, income with costs deducted)';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_ee3890b3cc52e05d98faeceaae55f0d3'] = 'Unified tax on imputed income (ENVD)';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_d543313331865a30387343d27aa8f40c'] = 'Unified agricultural tax (ESN)';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_e032aa607069a6d8c81f8ff43481ca41'] = 'Patent Based Tax System';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_2b9823dd0d7bbb9a13df373e4afa30a8'] = 'Default tax system';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_959d81b055a352b4eab15a7b2b277b9f'] = 'Select the default tax system. This parameter is only required if you have several tax systems, otherwise it is not passed.';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_1afb2ec8182f7e5795b997dc90631740'] = 'Payment mode';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_4553de979f29a0d60cab8ec8ba2d51cd'] = 'Payment subject';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_7afd6992d41a61512de818a7a188f25f'] = 'Delivery payment mode';
@@ -132,7 +139,7 @@ $_MODULE['<{yoomoneymodule}prestashop>kassamodel_66fc7e320665a5b631baf5691d7afbe
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_9b13c92b7a167f93ea8c1fe4ab8a0138'] = 'Check secret key';
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_d4a3d8954e9368e570d7a635abe223b1'] = 'Check shopId and Secret key—there is an error somewhere. Better yet, copy them directly from your ';
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_80c1bdd580873e86406a1127aa48bdc8'] = 'YooKassa\'s Merchant Profile';
-$_MODULE['<{yoomoneymodule}prestashop>kassamodel_7f0a0c54e73bce69f8240ed848287442'] = 'You have enabled the test mode. Check the payment making process and contact YooKassa\'s manager. They will provide you with shopId the Secret key. ';
+$_MODULE['<{yoomoneymodule}prestashop>kassamodel_7f0a0c54e73bce69f8240ed848287442'] = 'You have enabled the test mode. Check the payment making process and contact YooKassa\'s manager. They will provide you with shopId the Secret key.';
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_e1ba155a9f2e8c3be94020eef32a0301'] = 'Manual';
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_56bef11a785db2fdfb3194f88eb524bb'] = 'Please select at least one option from the list';
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_fc724a540ce30b0b634163c922d60bed'] = 'Settings were saved';
@@ -247,7 +254,7 @@ $_MODULE['<{yoomoneymodule}prestashop>kassa_returns_content_cc61945cbbf46721a053
 $_MODULE['<{yoomoneymodule}prestashop>kassa_returns_content_dd8366c780bd2ce22a842d6384fec8b2'] = 'Refund amount';
 $_MODULE['<{yoomoneymodule}prestashop>kassa_returns_content_a147bbf49f674e55d1594a294528ddf5'] = 'Comment to the refund';
 $_MODULE['<{yoomoneymodule}prestashop>kassa_returns_content_120afe5d62a46ed230ceace578ab80cb'] = 'Make the refund';
-$_MODULE['<{yoomoneymodule}prestashop>kassa_returns_content_664ba36c32f928e8f6095a923558ddd7'] = 'Не найден платёж';
+$_MODULE['<{yoomoneymodule}prestashop>kassa_returns_content_664ba36c32f928e8f6095a923558ddd7'] = 'Payment not found';
 $_MODULE['<{yoomoneymodule}prestashop>kassa_returns_content_1574ffd6d9d7ad4b05e8dafbe994a03b'] = 'List of the refunds';
 $_MODULE['<{yoomoneymodule}prestashop>kassa_returns_content_6ce51dbbc6f455d10801215b1812734c'] = 'Date of the refund';
 $_MODULE['<{yoomoneymodule}prestashop>kassa_returns_content_ec53a8c4f07baed5d8825072c89799be'] = 'Status';
@@ -258,9 +265,7 @@ $_MODULE['<{yoomoneymodule}prestashop>paymentreturn_878c9cfae6779e0c60568a94b4c7
 $_MODULE['<{yoomoneymodule}prestashop>paymentreturn_bd4b16c61338791b30d1216b293bc78e'] = 'List of products in the order:';
 $_MODULE['<{yoomoneymodule}prestashop>paymentreturn_801ab24683a4a8c433c6eb40c48bcd9d'] = 'Download';
 $_MODULE['<{yoomoneymodule}prestashop>billing_form_95628ca06e568a00a4907ea977ff33b5'] = 'Billing';
-$_MODULE['<{yoomoneymodule}prestashop>kassa_epl_form_78d450c37ae59bb9c73017b43bc0cb8f'] = 'Pay with YooKassa';
-$_MODULE['<{yoomoneymodule}prestashop>kassa_epl_form_95628ca06e568a00a4907ea977ff33b5'] = 'Payments via Billing';
-$_MODULE['<{yoomoneymodule}prestashop>kassa_epl_form_9e91dca5be8717bad5e8d4e534fc43c2'] = 'Payments via YooKassa';
+$_MODULE['<{yoomoneymodule}prestashop>kassa_epl_form_079abf7cf4775442de4a8926e6ccac81'] = 'Payment with YooKassa';
 $_MODULE['<{yoomoneymodule}prestashop>kassa_form_4af90d43c2b7b70f1bdc9cc8837429c6'] = 'YooMoney';
 $_MODULE['<{yoomoneymodule}prestashop>kassa_form_c064469e5ec070851413c34392fe117c'] = 'Phone number linked to QIWI Wallet';
 $_MODULE['<{yoomoneymodule}prestashop>kassa_form_99938b17c91170dfb0c2f3f8bc9f2a85'] = 'Pay';

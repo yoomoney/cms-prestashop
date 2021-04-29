@@ -104,7 +104,7 @@
                 return_url: data.return_url,
                 embedded_3ds: true,
                 newDesign: true,
-                error_callback(error) {
+                error_callback: function(error) {
                     console.log(error);
                     window.location.redirect(data.return_url);
                 }

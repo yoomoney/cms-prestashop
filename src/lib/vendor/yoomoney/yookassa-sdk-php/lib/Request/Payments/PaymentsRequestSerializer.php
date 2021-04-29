@@ -29,7 +29,7 @@ namespace YooKassa\Request\Payments;
 /**
  * Класс сериализатора объектов запросов к API для получения списка платежей
  *
- * @package YooKassa\Request\Payments
+ * @package YooKassa
  */
 class PaymentsRequestSerializer
 {
@@ -64,7 +64,7 @@ class PaymentsRequestSerializer
             if (!empty($value)) {
                 if ($value instanceof \DateTime) {
                     if ($value->getTimestamp() > 1) {
-                        $result[$name] = $value->format(DATE_ATOM);
+                        $result[$name] = $value->format(YOOKASSA_DATE);
                     }
                 } else {
                     $result[$name] = $value;

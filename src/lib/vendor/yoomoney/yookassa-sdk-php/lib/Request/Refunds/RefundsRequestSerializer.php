@@ -29,7 +29,7 @@ namespace YooKassa\Request\Refunds;
 /**
  * Класс сериализатора объектов запросов к API для получения списка возвратов
  *
- * @package YooKassa\Request\Refunds
+ * @package YooKassa
  */
 class RefundsRequestSerializer
 {
@@ -60,7 +60,7 @@ class RefundsRequestSerializer
             if (!empty($value)) {
                 if ($value instanceof \DateTime) {
                     if ($value->getTimestamp() > 1) {
-                        $result[$name] = $value->format(DATE_ATOM);
+                        $result[$name] = $value->format(YOOKASSA_DATE);
                     }
                 } else {
                     $result[$name] = $value;
