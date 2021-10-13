@@ -50,7 +50,7 @@ class FormHelper
         $names                = array(
             PaymentMethodType::BANK_CARD      => $this->l('Bank cards'),
             PaymentMethodType::YOO_MONEY      => $this->l('YooMoney'),
-            PaymentMethodType::SBERBANK       => $this->l('Sberbank Online'),
+            PaymentMethodType::SBERBANK       => $this->l('SberPay'),
             PaymentMethodType::QIWI           => $this->l('QIWI Wallet'),
             PaymentMethodType::WEBMONEY       => $this->l('Webmoney'),
             PaymentMethodType::CASH           => $this->l('Cash via payment kiosks'),

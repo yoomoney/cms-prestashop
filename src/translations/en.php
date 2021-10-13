@@ -16,7 +16,7 @@ $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_4ffc34f91eaef85424d3e46efd3
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_3d91d1bd9c5ffe3618d82fb4db29652f'] = 'Invalid refund amount';
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_16300af76572242cc925c8c157cba6f1'] = 'Unable to make the refund';
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Bank cards';
-$_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_ee55b43dc97b2011716c124c0d412642'] = 'Sberbank Online';
+$_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_c363faf8e17f41335a3224dd3633e164'] = 'SberPay';
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_f7337702a47bd4cd79b8c8f2f0ec52ed'] = 'QIWI Wallet';
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_773c3ed6cfb7b75272be7b516a877ba0'] = 'Webmoney';
 $_MODULE['<{yoomoneymodule}prestashop>yoomoneymodule_ad0866dbe28c9ee3c0db20b66a3d2ebd'] = 'Cash via payment kiosks';
@@ -49,7 +49,7 @@ $_MODULE['<{yoomoneymodule}prestashop>formhelper_87763c7387b7723be773ffdbdbd2aec
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_039900bd2904ddb3b5b74b5249b7a79d'] = 'Activate payments via YooMoney Wallet';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_22e1d51d9dc5be8f4f901f150cbf6d09'] = 'Bank cards';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_4af90d43c2b7b70f1bdc9cc8837429c6'] = 'YooMoney';
-$_MODULE['<{yoomoneymodule}prestashop>formhelper_ee55b43dc97b2011716c124c0d412642'] = 'Sberbank Online';
+$_MODULE['<{yoomoneymodule}prestashop>formhelper_c363faf8e17f41335a3224dd3633e164'] = 'SberPay';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_f7337702a47bd4cd79b8c8f2f0ec52ed'] = 'QIWI Wallet';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_773c3ed6cfb7b75272be7b516a877ba0'] = 'Webmoney';
 $_MODULE['<{yoomoneymodule}prestashop>formhelper_ad0866dbe28c9ee3c0db20b66a3d2ebd'] = 'Cash via payment kiosks';
@@ -128,7 +128,7 @@ $_MODULE['<{yoomoneymodule}prestashop>kassamodel_22e1d51d9dc5be8f4f901f150cbf6d0
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_a63593a811927ba64204f7171601ff6e'] = 'Direct carrier billing';
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_773c3ed6cfb7b75272be7b516a877ba0'] = 'Webmoney';
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_ad0866dbe28c9ee3c0db20b66a3d2ebd'] = 'Cash via payment kiosks';
-$_MODULE['<{yoomoneymodule}prestashop>kassamodel_ee55b43dc97b2011716c124c0d412642'] = 'Sberbank Online';
+$_MODULE['<{yoomoneymodule}prestashop>kassamodel_c363faf8e17f41335a3224dd3633e164'] = 'SberPay';
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_621995df232472963068d5acc085332b'] = 'Alfa-Click';
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_f7337702a47bd4cd79b8c8f2f0ec52ed'] = 'QIWI Wallet';
 $_MODULE['<{yoomoneymodule}prestashop>kassamodel_8cbc1c96b2d62045b22a70717dcea3fe'] = 'Tinkoff Internet Bank';
