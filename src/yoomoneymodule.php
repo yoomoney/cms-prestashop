@@ -71,7 +71,7 @@ class YooMoneyModule extends PaymentModule
 
         $this->name            = 'yoomoneymodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '2.1.1';
+        $this->version         = '2.2.0';
         $this->author          = $this->l('YooMoney');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -316,7 +316,7 @@ class YooMoneyModule extends PaymentModule
         $names                 = array(
             \YooKassa\Model\PaymentMethodType::BANK_CARD      => $this->l('Bank cards'),
             \YooKassa\Model\PaymentMethodType::YOO_MONEY      => $this->l('YooMoney'),
-            \YooKassa\Model\PaymentMethodType::SBERBANK       => $this->l('Sberbank Online'),
+            \YooKassa\Model\PaymentMethodType::SBERBANK       => $this->l('SberPay'),
             \YooKassa\Model\PaymentMethodType::QIWI           => $this->l('QIWI Wallet'),
             \YooKassa\Model\PaymentMethodType::WEBMONEY       => $this->l('Webmoney'),
             \YooKassa\Model\PaymentMethodType::CASH           => $this->l('Cash via payment kiosks'),
