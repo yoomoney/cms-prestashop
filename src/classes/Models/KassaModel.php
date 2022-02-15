@@ -33,6 +33,7 @@ use YooKassa\Request\Payments\Payment\CreateCaptureRequest;
 use YooKassa\Request\Payments\Payment\CreateCaptureRequestBuilder;
 use YooKassa\Request\Payments\Payment\CreateCaptureRequestSerializer;
 use YooKassa\Request\Refunds\CreateRefundRequest;
+use YooKassa\Request\Refunds\RefundResponse;
 use YooMoneyModule;
 
 class KassaModel extends AbstractPaymentModel
@@ -50,6 +51,7 @@ class KassaModel extends AbstractPaymentModel
     private static $disabledPaymentMethods = array(
         PaymentMethodType::B2B_SBERBANK,
         PaymentMethodType::WECHAT,
+        PaymentMethodType::WEBMONEY,
     );
 
     const PAYMENT_METHOD_WIDGET = 'widget';
@@ -456,7 +458,7 @@ class KassaModel extends AbstractPaymentModel
 
         $token = Tools::getAdminTokenLite(YooMoneyModule::ADMIN_CONTROLLER);
 
-        return $this->module->displayConfirmation('Помогите нам улучшить модуль ЮKassa — ответьте на 
+        return $this->module->displayConfirmation('Помогите нам улучшить модуль ЮKassa — ответьте на
             <a href="#" onclick="return false;" class="yoomoney_nps_link"
             data-controller="'.YooMoneyModule::ADMIN_CONTROLLER.'"
             data-token="'.$token.'">один вопрос</a>');
@@ -720,6 +722,25 @@ class KassaModel extends AbstractPaymentModel
 
         /** @var Payment $payment */
         return $payment;
+    }
+
+    /**
+     * Получает по API Юkassa объект возврата по переданному id
+     *
+     * @param string $refundId
+     *
+     * @return RefundResponse|null
+     */
+    public function fetchRefund($refundId)
+    {
+        $refund = null;
+        try {
+            $refund = $this->getApiClient()->getRefundInfo($refundId);
+        } catch (\Exception $e) {
+            $this->module->log('error', 'Failed to fetch refund information from API: '.$e->getMessage());
+        }
+
+        return $refund;
     }
 
     /**

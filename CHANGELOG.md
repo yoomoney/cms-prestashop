@@ -1,3 +1,8 @@
+### v2.2.2 от 14.02.2022
+* Отключен способ оплаты Webmoney
+* Обновлен SDK до версии 2.2.6
+* Добавлена обработка уведомлений от ЮKassa следующих типов: payment.canceled, refund.succeeded, payout.canceled, payout.succeeded, deal.closed
+
 ### v2.2.1 от 02.12.2021
 * Обновлен SDK до версии 2.2.2
 

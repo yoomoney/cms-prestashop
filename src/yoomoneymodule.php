@@ -71,7 +71,7 @@ class YooMoneyModule extends PaymentModule
 
         $this->name            = 'yoomoneymodule';
         $this->tab             = 'payments_gateways';
-        $this->version         = '2.2.1';
+        $this->version         = '2.2.2';
         $this->author          = $this->l('YooMoney');
         $this->need_instance   = 1;
         $this->bootstrap       = 1;
@@ -1038,11 +1038,11 @@ class YooMoneyModule extends PaymentModule
     </div>
     <div>
         <button type="button" class="btn btn-default" id="yoomoney_kassa_capture_payment">
-            <i class="icon-check"></i> 
+            <i class="icon-check"></i>
             $capture
         </button>
         <button type="button" class="btn btn-default" id="yoomoney_kassa_cancel_payment">
-            <i class="icon-remove"></i> 
+            <i class="icon-remove"></i>
             $cancel
         </button>
     </div>
@@ -1050,8 +1050,8 @@ class YooMoneyModule extends PaymentModule
 <script type="text/javascript">
 $(document).ready(function() {
     function yoomoney_kassa_disable_payment_action_buttons() {
-        $('#yoomoney_kassa_capture_payment').addClass('disabled');           
-        $('#yoomoney_kassa_cancel_payment').addClass('disabled');           
+        $('#yoomoney_kassa_capture_payment').addClass('disabled');
+        $('#yoomoney_kassa_cancel_payment').addClass('disabled');
     }
     $('#yoomoney_kassa_capture_payment').on('click', function() {
         yoomoney_kassa_disable_payment_action_buttons();
@@ -1072,7 +1072,7 @@ $(document).ready(function() {
                 } else {
                     alert('$errorCapture');
                 }
-                location.reload();                    
+                location.reload();
             }
         });
     });
